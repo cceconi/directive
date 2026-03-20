@@ -4,6 +4,14 @@ declare(strict_types=1);
 
 namespace Directive;
 
+use Directive\Middleware\AuthMiddleware;
+use Directive\Middleware\ClientHeaderMiddleware;
+use Directive\Middleware\CompressResponseMiddleware;
+use Directive\Middleware\CookieMiddleware;
+use Directive\Middleware\HttpSecurityMiddleware;
+use Directive\Middleware\LoggerMiddleware;
+use Directive\Middleware\MaintenanceMiddleware;
+use Directive\Middleware\RequestIdMiddleware;
 use Directive\Service\Configuration\ConfigurationInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
@@ -130,14 +138,29 @@ class WebApplication extends AbstractApplication
     }
 
     /**
-     * Apply the middleware stack.
+     * Apply the default middleware stack.
      *
-     * The stack is intentionally minimal at Epic 1.
-     * Framework middlewares (Logger, HttpSecurity, Maintenance, etc.)
-     * are registered in Epic 6 and driven by Configuration.
+     * Slim processes middlewares in LIFO order, so the last middleware added
+     * here executes first on the incoming request. The desired execution order
+     * (outermost → innermost) is:
+     *
+     *   1. RequestIdMiddleware       — generate/propagate X-Request-Id
+     *   2. LoggerMiddleware          — log version on entry, flush on exit
+     *   3. HttpSecurityMiddleware    — CORS + security headers
+     *   4. MaintenanceMiddleware     — 503 if maintenance active
+     *   5. ClientHeaderMiddleware    — parse X-Client-* headers
+     *   6. CompressResponseMiddleware— gzip/deflate response body
+     *   7. CookieMiddleware          — load request cookies into container
+     *   8. AuthMiddleware            — authenticate user (needs cookies loaded)
+     *      ── Slim RoutingMiddleware ──
+     *      ── Slim ErrorMiddleware   ──
+     *
+     * Optional middlewares (BusinessBenchmarkMiddleware, RateLimitMiddleware)
+     * are NOT pre-wired. Register them in configureMiddleware() if needed.
      */
     private function applyMiddleware(): void
     {
+        // Innermost: Slim built-ins (added first = executed last)
         $this->slim->addRoutingMiddleware();
 
         $this->slim->addErrorMiddleware(
@@ -146,8 +169,33 @@ class WebApplication extends AbstractApplication
             logErrorDetails: true,
         );
 
-        // Epic 6: add framework middlewares here.
+        // Default stack — added in reverse execution order (LIFO)
+        $this->slim->add(AuthMiddleware::class);               // 8 — executes last (needs cookies)
+        $this->slim->add(CookieMiddleware::class);             // 7
+        $this->slim->add(CompressResponseMiddleware::class);   // 6
+        $this->slim->add(ClientHeaderMiddleware::class);       // 5
+        $this->slim->add(MaintenanceMiddleware::class);        // 4 — can short-circuit (503)
+        $this->slim->add(HttpSecurityMiddleware::class);       // 3
+        $this->slim->add(LoggerMiddleware::class);             // 2
+        $this->slim->add(RequestIdMiddleware::class);          // 1 — executes first (outermost)
+
+        // Application-level hook: override to add custom / optional middlewares
+        $this->configureMiddleware($this->slim);
     }
+
+    /**
+     * Override to register custom or optional middlewares.
+     *
+     * Called at the end of applyMiddleware(), after the default stack is wired.
+     * Use $slim->add() to append middlewares that execute before the default stack
+     * (outermost), or use route-specific middleware registration here.
+     *
+     * Example:
+     *   $slim->add(BusinessBenchmarkMiddleware::class);
+     *
+     * @param App<\Psr\Container\ContainerInterface|null> $slim
+     */
+    protected function configureMiddleware(App $slim): void {}
 
     /**
      * Override to register custom Slim routes that bypass the standard API stack.
