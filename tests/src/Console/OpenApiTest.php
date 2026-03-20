@@ -19,7 +19,7 @@ function buildOpenApiTree(): ApiDefinitionManager
         ->service('account')
         ->resource('profile')
         ->get(StubApi::class, StubPolicy::class)
-        ->put(StubApi::class, StubPolicy::class, profiles: ['admin']);
+        ->put(StubApi::class, StubPolicy::class, allowedRoles: ['admin']);
 
     $domain->version('v2', VersionStatus::Deprecated)
         ->service('account')

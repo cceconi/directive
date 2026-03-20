@@ -13,8 +13,8 @@ use Directive\Exception\MethodNotAllowedException;
  *
  * Fluent usage:
  *   $service->resource('profile')
- *       ->get(GetProfile::class, policyClass: GetProfilePolicy::class, profiles: ['user'])
- *       ->put(PutProfile::class, policyClass: PutProfilePolicy::class, profiles: ['user']);
+ *       ->get(GetProfile::class, policyClass: GetProfilePolicy::class, allowedRoles: ['user'])
+ *       ->put(PutProfile::class, policyClass: PutProfilePolicy::class, allowedRoles: ['user']);
  */
 class Resource
 {
@@ -32,7 +32,7 @@ class Resource
     /**
      * @param class-string      $apiClass
      * @param class-string      $policyClass
-     * @param array<string>     $profiles
+     * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
@@ -40,18 +40,18 @@ class Resource
     public function get(
         string $apiClass,
         string $policyClass,
-        array $profiles = [],
+        array $allowedRoles = [],
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
     ): static {
-        return $this->addMethod('GET', $apiClass, $policyClass, $profiles, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('GET', $apiClass, $policyClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
     }
 
     /**
      * @param class-string      $apiClass
      * @param class-string      $policyClass
-     * @param array<string>     $profiles
+     * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
@@ -59,18 +59,18 @@ class Resource
     public function post(
         string $apiClass,
         string $policyClass,
-        array $profiles = [],
+        array $allowedRoles = [],
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
     ): static {
-        return $this->addMethod('POST', $apiClass, $policyClass, $profiles, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('POST', $apiClass, $policyClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
     }
 
     /**
      * @param class-string      $apiClass
      * @param class-string      $policyClass
-     * @param array<string>     $profiles
+     * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
@@ -78,18 +78,18 @@ class Resource
     public function put(
         string $apiClass,
         string $policyClass,
-        array $profiles = [],
+        array $allowedRoles = [],
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
     ): static {
-        return $this->addMethod('PUT', $apiClass, $policyClass, $profiles, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('PUT', $apiClass, $policyClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
     }
 
     /**
      * @param class-string      $apiClass
      * @param class-string      $policyClass
-     * @param array<string>     $profiles
+     * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
@@ -97,18 +97,18 @@ class Resource
     public function patch(
         string $apiClass,
         string $policyClass,
-        array $profiles = [],
+        array $allowedRoles = [],
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
     ): static {
-        return $this->addMethod('PATCH', $apiClass, $policyClass, $profiles, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('PATCH', $apiClass, $policyClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
     }
 
     /**
      * @param class-string      $apiClass
      * @param class-string      $policyClass
-     * @param array<string>     $profiles
+     * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
@@ -116,12 +116,12 @@ class Resource
     public function delete(
         string $apiClass,
         string $policyClass,
-        array $profiles = [],
+        array $allowedRoles = [],
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
     ): static {
-        return $this->addMethod('DELETE', $apiClass, $policyClass, $profiles, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('DELETE', $apiClass, $policyClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
     }
 
     // ------------------------------------------------------------------
@@ -163,7 +163,7 @@ class Resource
     /**
      * @param class-string      $apiClass
      * @param class-string      $policyClass
-     * @param array<string>     $profiles
+     * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
@@ -172,7 +172,7 @@ class Resource
         string $httpMethod,
         string $apiClass,
         string $policyClass,
-        array $profiles,
+        array $allowedRoles,
         array $allowCors,
         ?string $responseEntityClass,
         ?string $requestEntityClass,
@@ -189,7 +189,7 @@ class Resource
             httpMethod: $key,
             apiClass: $apiClass,
             policyClass: $policyClass,
-            profiles: $profiles,
+            allowedRoles: $allowedRoles,
             allowCors: $allowCors,
             responseEntityClass: $responseEntityClass,
             requestEntityClass: $requestEntityClass,

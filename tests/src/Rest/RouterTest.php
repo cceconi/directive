@@ -17,7 +17,7 @@ function buildRouterTree(): ApiDefinitionManager
         ->service('test')
         ->resource('item')
         ->get(StubApi::class, StubPolicy::class)
-        ->post(StubApi::class, StubPolicy::class, profiles: ['admin']);
+        ->post(StubApi::class, StubPolicy::class, allowedRoles: ['admin']);
 
     $closedDomain = new Domain('old');
     $closedDomain->version('v1', VersionStatus::Closed)

@@ -11,7 +11,6 @@ use Directive\Exception\GoneException;
 use Directive\Exception\MethodNotAllowedException;
 use Directive\Exception\NotFoundException;
 use Directive\Exception\UnauthorizedException;
-use Directive\Service\Security\Profile;
 use Directive\Service\Security\WebUserInterface;
 use Directive\Web\ResponseEntity;
 use Psr\Container\ContainerInterface;
@@ -25,7 +24,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * the Router:
  *   1. Locates the Method in the ApiDefinitionManager tree.
  *   2. Validates the CORS origin.
- *   3. Checks the current user's profile against allowed profiles.
+ *   3. Checks the current user's role against allowed roles (UCAC).
  *   4. Runs the Policy to validate/clean input.
  *   5. Instantiates and runs the Api handler.
  *   6. Returns the formatted PSR-7 response via HttpResponse.
@@ -138,8 +137,8 @@ final class Router
         // 2. Validate CORS origin
         $this->checkCors($request, $methodDef);
 
-        // 3. Check user profile
-        $this->checkProfile($methodDef);
+        // 3. Check user role
+        $this->checkRole($methodDef);
 
         // 4. Run policy
         /** @var PolicyInterface $policy */
@@ -203,21 +202,21 @@ final class Router
      * @throws UnauthorizedException
      * @throws ForbiddenException
      */
-    private function checkProfile(Method $method): void
+    private function checkRole(Method $method): void
     {
-        if ($method->profiles === []) {
+        if ($method->allowedRoles === []) {
             return;
         }
 
-        $userProfile = $this->webUser->getProfile();
-
-        if ($userProfile === Profile::GUEST) {
+        if ($this->webUser->isGuest()) {
             throw new UnauthorizedException('Authentication required.');
         }
 
-        if (!in_array($userProfile, $method->profiles, true)) {
+        $slug = $this->webUser->getRole()->slug();
+
+        if (!in_array($slug, $method->allowedRoles, true)) {
             throw new ForbiddenException(
-                sprintf('Profile "%s" is not allowed on this route.', $userProfile),
+                sprintf('Role "%s" is not allowed on this route.', $slug),
             );
         }
     }

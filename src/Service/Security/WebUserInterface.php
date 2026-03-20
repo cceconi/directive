@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace Directive\Service\Security;
 
+use Directive\Service\Security\Role\AbstractRole;
+
 /**
  * Contract for the authenticated (or anonymous) web user.
  * Concrete implementations are application-specific.
  */
 interface WebUserInterface
 {
-    public function getProfile(): string;
+    /**
+     * Return the UCAC role for this user.
+     * Must never return null. Unauthenticated users return GuestRole.
+     */
+    public function getRole(): AbstractRole;
 
     public function isAuthenticated(): bool;
 

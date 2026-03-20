@@ -181,11 +181,11 @@ final class OpenApiCommand extends DirectiveCommand
     ): array {
         $operationId = implode('.', [$domain, $version, $service, $resource, $method->httpMethod]);
 
-        // Map profiles to security requirements.
-        // Empty profiles = open (no authentication required).
+        // Map allowedRoles to security requirements.
+        // Empty allowedRoles = open (no authentication required).
         $security = [];
-        if ($method->profiles !== []) {
-            $security = [['bearerAuth' => $method->profiles]];
+        if ($method->allowedRoles !== []) {
+            $security = [['bearerAuth' => $method->allowedRoles]];
         }
 
         $op = [

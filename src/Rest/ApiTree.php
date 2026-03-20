@@ -13,8 +13,8 @@ namespace Directive\Rest;
  *   $acct   = $v1->service('account');
  *
  *   $acct->resource('profile')
- *       ->get(GetProfile::class, policyClass: GetProfilePolicy::class, profiles: ['user', 'admin'])
- *       ->put(PutProfile::class, policyClass: PutProfilePolicy::class, profiles: ['user']);
+ *       ->get(GetProfile::class, policyClass: GetProfilePolicy::class, allowedRoles: ['user', 'admin'])
+ *       ->put(PutProfile::class, policyClass: PutProfilePolicy::class, allowedRoles: ['user']);
  *
  *   $acct->resource('settings')
  *       ->get(GetSettings::class, policyClass: GetSettingsPolicy::class);

@@ -6,6 +6,8 @@ namespace Directive\Service\Security;
 
 use Directive\Service\Security\Authentication\AuthInterface;
 use Directive\Service\Security\CookiesManagerInterface;
+use Directive\Service\Security\Role\AbstractRole;
+use Directive\Service\Security\Role\GuestRole;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -17,27 +19,37 @@ use Psr\Container\ContainerInterface;
  */
 abstract class WebUser implements WebUserInterface
 {
-    protected string $userId    = '';
-    protected string $fullName  = '';
-    protected string $profile   = Profile::GUEST;
-    protected bool   $renewPwd  = false;
+    protected string       $userId   = '';
+    protected string       $fullName = '';
+    protected AbstractRole $role;
+    protected bool         $renewPwd = false;
 
     /** @var array{jwt: string, renewAfter: int}|null */
-    protected ?array $token     = null;
-    protected ?string $csrf     = null;
-    protected int     $expire   = 0;
+    protected ?array  $token  = null;
+    protected ?string $csrf   = null;
+    protected int     $expire = 0;
 
     public function __construct(
         protected readonly ContainerInterface $container,
-    ) {}
+    ) {
+        $this->role = new GuestRole();
+    }
 
     // ------------------------------------------------------------------
     // WebUserInterface
     // ------------------------------------------------------------------
 
+    public function getRole(): AbstractRole
+    {
+        return $this->role;
+    }
+
+    /**
+     * @deprecated Use getRole()->slug() instead.
+     */
     public function getProfile(): string
     {
-        return $this->isGuest() ? Profile::GUEST : $this->profile;
+        return $this->getRole()->slug();
     }
 
     public function isAuthenticated(): bool
@@ -66,7 +78,7 @@ abstract class WebUser implements WebUserInterface
         return [
             'email'    => $this->getId(),
             'fullname' => $this->getFullName(),
-            'profile'  => $this->getProfile(),
+            'profile'  => $this->getRole()->slug(),
             'renewpwd' => $this->renewPwd,
             'csrf'     => $this->csrf,
             'expire'   => $this->expire,
@@ -112,6 +124,11 @@ abstract class WebUser implements WebUserInterface
         if ($userId !== '') {
             $this->initializeData($userId);
         }
+
+        $roleSlug = (string) ($claims['role'] ?? '');
+        if ($roleSlug !== '') {
+            $this->role = $this->resolveRole($roleSlug);
+        }
     }
 
     public function renewSecurityData(): void
@@ -137,6 +154,17 @@ abstract class WebUser implements WebUserInterface
 
     abstract protected function initializeData(string $userId): void;
 
+    /**
+     * Resolve a role slug to a concrete AbstractRole instance.
+     *
+     * Override in your application to map slugs to your domain roles.
+     * The default implementation always returns a GuestRole.
+     */
+    protected function resolveRole(string $slug): AbstractRole
+    {
+        return new GuestRole();
+    }
+
     // ------------------------------------------------------------------
     // Internal
     // ------------------------------------------------------------------
@@ -148,12 +176,12 @@ abstract class WebUser implements WebUserInterface
         }
 
         /** @var AuthInterface $auth */
-        $auth       = $this->container->get(AuthInterface::class);
-        $csrfToken  = bin2hex(random_bytes(16));
+        $auth      = $this->container->get(AuthInterface::class);
+        $csrfToken = bin2hex(random_bytes(16));
 
         $this->token = $auth->generateToken('auth token', [
             'client.id'  => $this->getId(),
-            'xsrfToken' => $csrfToken,
+            'xsrfToken'  => $csrfToken,
         ]);
 
         /** @var CookiesManagerInterface $cookies */
