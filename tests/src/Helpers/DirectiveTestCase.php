@@ -1,0 +1,142 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Helpers;
+
+use Directive\Rest\ApiDefinitionManager;
+use Directive\Rest\HttpResponse;
+use Directive\Rest\Router;
+use Directive\Service\Security\WebUserInterface;
+use DI\ContainerBuilder;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7\ServerRequest;
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
+/**
+ * Test helpers injected into all Pest test closures via uses() in tests/Pest.php.
+ *
+ * Must be a trait so Pest 3 properly mixes them into $this.
+ */
+trait DirectiveTestCase
+{
+    // ------------------------------------------------------------------
+    // Request builders
+    // ------------------------------------------------------------------
+
+    public function createRequest(
+        string $method,
+        string $uri,
+        array $body = [],
+        array $headers = [],
+    ): ServerRequestInterface {
+        $request = new ServerRequest($method, $uri);
+
+        foreach ($headers as $name => $value) {
+            $request = $request->withHeader($name, $value);
+        }
+
+        if ($body !== []) {
+            $request = $request->withParsedBody($body);
+        }
+
+        return $request;
+    }
+
+    public function createJsonRequest(string $method, string $uri, array $body = []): ServerRequestInterface
+    {
+        return $this->createRequest($method, $uri, $body, ['Content-Type' => 'application/json']);
+    }
+
+    // ------------------------------------------------------------------
+    // Router builder
+    // ------------------------------------------------------------------
+
+    /**
+     * Build a real Router wired with the provided ApiDefinitionManager.
+     *
+     * @param array<string, mixed> $extraDefinitions
+     */
+    public function buildRouter(
+        ApiDefinitionManager $manager,
+        ?WebUserInterface $webUser = null,
+        array $extraDefinitions = [],
+    ): Router {
+        $factory  = new Psr17Factory();
+        $httpResp = new HttpResponse($factory, $factory);
+        $user     = $webUser ?? new StubWebUser();
+
+        $builder = new ContainerBuilder();
+        $builder->addDefinitions($extraDefinitions);
+        $container = $builder->build();
+
+        return new Router($manager, $httpResp, $container, $user);
+    }
+
+    public function dispatch(
+        Router $router,
+        string $method,
+        string $domain,
+        string $version,
+        string $service,
+        string $resource,
+        array $body = [],
+    ): ResponseInterface {
+        $factory = new Psr17Factory();
+        $uri     = "/{$domain}/{$version}/{$service}/{$resource}";
+        $request = $this->createJsonRequest($method, $uri, $body);
+
+        return $router->resolve($request, $factory->createResponse(), [
+            'domain'   => $domain,
+            'version'  => $version,
+            'service'  => $service,
+            'resource' => $resource,
+        ]);
+    }
+
+    // ------------------------------------------------------------------
+    // Response assertions
+    // ------------------------------------------------------------------
+
+    public function assertResponseStatus(ResponseInterface $response, int $expected): void
+    {
+        expect($response->getStatusCode())->toBe($expected);
+    }
+
+    public function assertJsonBody(ResponseInterface $response, string $key, mixed $expected): void
+    {
+        $body = json_decode((string) $response->getBody(), true);
+        expect($body[$key] ?? null)->toBe($expected);
+    }
+
+    public function assertJsonDataContains(ResponseInterface $response, string $key, mixed $expected): void
+    {
+        $body = json_decode((string) $response->getBody(), associative: true) ?? [];
+        $data = $body['data'] ?? [];
+        expect($data[$key] ?? null)->toBe($expected);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getBodyArray(ResponseInterface $response): array
+    {
+        return json_decode((string) $response->getBody(), associative: true) ?? [];
+    }
+
+    // ------------------------------------------------------------------
+    // DI container builder
+    // ------------------------------------------------------------------
+
+    /**
+     * @param array<string, mixed> $definitions
+     */
+    public function container(array $definitions = []): ContainerInterface
+    {
+        $builder = new ContainerBuilder();
+        $builder->addDefinitions($definitions);
+        return $builder->build();
+    }
+}
