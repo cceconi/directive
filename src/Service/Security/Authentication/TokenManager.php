@@ -20,7 +20,7 @@ use Psr\Clock\ClockInterface;
  * One instance = one algorithm configuration (symmetric or asymmetric).
  * Create via AlgorithmFactory::buildConfiguration() + inject here.
  */
-final class TokenManager
+final class TokenManager implements TokenManagerInterface
 {
     /** Standard JWT registered claims — filtered out of application claims. */
     private const STANDARD_CLAIMS = ['iss', 'iat', 'nbf', 'exp', 'aud', 'sub', 'jti'];
@@ -28,6 +28,7 @@ final class TokenManager
     public function __construct(
         private readonly Configuration $jwtConfig,
         private readonly string $issuer,
+        private readonly ClockInterface $clock,
         private readonly int $notBeforeOffset = 0,
         private readonly int $lifetime = 300,
         private readonly int $renewOffset = -60,
@@ -103,7 +104,7 @@ final class TokenManager
                 $token,
                 new IssuedBy($this->issuer),
                 new PermittedFor($audience),
-                new StrictValidAt($this->systemClock()),
+                new StrictValidAt($this->clock),
             );
         } catch (\Throwable) {
             return false;
@@ -169,22 +170,16 @@ final class TokenManager
             throw new SecurityException('JWT token string cannot be empty.');
         }
 
-        $token = $this->jwtConfig->parser()->parse($rawToken);
+        try {
+            $token = $this->jwtConfig->parser()->parse($rawToken);
+        } catch (\Throwable $e) {
+            throw new SecurityException('Failed to parse JWT: ' . $e->getMessage(), 0, $e);
+        }
 
         if (!($token instanceof UnencryptedToken)) {
             throw new SecurityException('Encrypted tokens are not supported.');
         }
 
         return $token;
-    }
-
-    private function systemClock(): ClockInterface
-    {
-        return new class implements ClockInterface {
-            public function now(): DateTimeImmutable
-            {
-                return new DateTimeImmutable();
-            }
-        };
     }
 }

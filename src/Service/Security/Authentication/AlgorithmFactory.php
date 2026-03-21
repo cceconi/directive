@@ -21,7 +21,7 @@ use Lcobucci\JWT\Signer\Rsa\Sha512 as RsaSha512;
 /**
  * Creates lcobucci/jwt v5 Configuration instances for each supported algorithm.
  */
-final class AlgorithmFactory
+final class AlgorithmFactory implements AlgorithmFactoryInterface
 {
     public const ECDSA_SHA256 = 'ES256';
     public const ECDSA_SHA384 = 'ES384';
