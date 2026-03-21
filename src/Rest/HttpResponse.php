@@ -158,7 +158,9 @@ final class HttpResponse
         $stream   = $entity->getStream();
         $response = $this->responseFactory->createResponse(200)
             ->withHeader('Content-Type', $entity->getContentType())
-            ->withHeader('Content-Disposition', 'attachment; filename="' . $entity->getFilename() . '"'
+            ->withHeader(
+                'Content-Disposition',
+                'attachment; filename="' . $entity->getFilename() . '"',
             );
 
         if ($entity->getFilesize() > 0) {

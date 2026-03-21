@@ -8,7 +8,6 @@ use Directive\Service\Security\Authentication\AuthInterface;
 use Directive\Service\Security\WebUserInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  * Base for the three access strategies: user (cookie), machine (Bearer), none.

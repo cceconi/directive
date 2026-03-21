@@ -8,7 +8,7 @@ use Directive\Rest\ApiDefinitionManager;
 use Directive\Rest\Domain;
 use Directive\Rest\VersionStatus;
 use Tests\Helpers\StubApi;
-use Tests\Helpers\StubPolicy;
+use Tests\Helpers\StubRequestValidator;
 
 function buildTestTree(): ApiDefinitionManager
 {
@@ -17,7 +17,7 @@ function buildTestTree(): ApiDefinitionManager
     $domain->version('v1', VersionStatus::Open)
         ->service('account')
         ->resource('profile')
-        ->get(StubApi::class, StubPolicy::class);
+        ->get(StubApi::class, StubRequestValidator::class);
 
     $manager->registerDomain($domain);
     return $manager;
@@ -32,12 +32,12 @@ describe('ApiDefinitionManager', function () {
 
     it('throws NotFoundException for unknown domain', function () {
         $manager = buildTestTree();
-        expect(fn () => $manager->findDomain('unknown'))->toThrow(NotFoundException::class);
+        expect(fn() => $manager->findDomain('unknown'))->toThrow(NotFoundException::class);
     });
 
     it('throws ApiDefinitionException on duplicate domain', function () {
         $manager = buildTestTree();
-        expect(fn () => $manager->registerDomain(new Domain('users')))->toThrow(ApiDefinitionException::class);
+        expect(fn() => $manager->registerDomain(new Domain('users')))->toThrow(ApiDefinitionException::class);
     });
 
     it('getDomains() returns all registered domains', function () {
@@ -64,21 +64,21 @@ describe('Domain / Version / Service / Resource tree', function () {
     it('throws GoneException when version is Closed', function () {
         $domain = new Domain('d');
         $domain->version('v1', VersionStatus::Closed);
-        expect(fn () => $domain->findVersion('v1')->checkAvailability())
+        expect(fn() => $domain->findVersion('v1')->checkAvailability())
             ->toThrow(\Directive\Exception\GoneException::class);
     });
 
     it('throws GoneException when version is Wip', function () {
         $domain = new Domain('d');
         $domain->version('v1', VersionStatus::Wip);
-        expect(fn () => $domain->findVersion('v1')->checkAvailability())
+        expect(fn() => $domain->findVersion('v1')->checkAvailability())
             ->toThrow(\Directive\Exception\GoneException::class);
     });
 
     it('throws MethodNotAllowedException for unregistered HTTP verb', function () {
         $manager  = buildTestTree();
         $resource = $manager->findDomain('users')->findVersion('v1')->findService('account')->findResource('profile');
-        expect(fn () => $resource->findMethod('DELETE'))
+        expect(fn() => $resource->findMethod('DELETE'))
             ->toThrow(\Directive\Exception\MethodNotAllowedException::class);
     });
 

@@ -42,14 +42,14 @@ abstract class AbstractApi implements ApiInterface
         $this->preControl();
 
         if ($this->businessError->hasErrors()) {
-            throw (new ConflictException('Business rule violation.'))
+            throw new ConflictException('Business rule violation.')
                 ->withErrors($this->businessError->getErrors());
         }
 
         $this->compute();
 
         if ($this->businessError->hasErrors()) {
-            throw (new ConflictException('Business rule violation.'))
+            throw new ConflictException('Business rule violation.')
                 ->withErrors($this->businessError->getErrors());
         }
     }

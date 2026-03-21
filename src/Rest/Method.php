@@ -9,7 +9,7 @@ namespace Directive\Rest;
  *
  * Represents one HTTP method on one Resource, binding together:
  *   - the Api handler class (implements ApiInterface, Epic 4)
- *   - the Policy class      (extends Policy, Epic 4)
+ *   - the validator class   (extends AbstractRequestValidator)
  *   - the allowed role slugs (UCAC)
  *   - optional CORS origins, request/response entity classes
  *
@@ -19,7 +19,7 @@ readonly class Method
 {
     /**
      * @param class-string        $apiClass             Api handler class
-     * @param class-string        $policyClass          Policy class
+     * @param class-string        $policyClass          Request validator class (extends AbstractRequestValidator)
      * @param array<string>       $allowedRoles         Allowed role slugs (empty = public, no auth check)
      * @param array<string>       $allowCors            Allowed CORS origins (empty = use global config)
      * @param class-string|null   $responseEntityClass  Custom ResponseEntity class

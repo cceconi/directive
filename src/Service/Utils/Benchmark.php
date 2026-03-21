@@ -13,9 +13,7 @@ final class Benchmark implements BenchmarkInterface, JsonSerializable
     /** @var array<int, array<string, mixed>> */
     private array $points = [];
 
-    public function __construct(private readonly bool $enabled = true)
-    {
-    }
+    public function __construct(private readonly bool $enabled = true) {}
 
     public function start(): void
     {

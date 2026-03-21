@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Directive\Middleware\RequestIdMiddleware;
 use DI\ContainerBuilder;
+use Directive\Middleware\RequestIdMiddleware;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
@@ -80,7 +80,7 @@ describe('RequestIdMiddleware', function (): void {
     it('propagates an existing non-empty X-Request-Id header', function (): void {
         $factory    = new Psr17Factory();
         $existingId = 'my-upstream-request-id-abc123';
-        $request    = (new ServerRequest('GET', '/'))->withHeader('X-Request-Id', $existingId);
+        $request    = new ServerRequest('GET', '/')->withHeader('X-Request-Id', $existingId);
         $middleware = makeMiddleware();
 
         $captured = null;
@@ -92,7 +92,7 @@ describe('RequestIdMiddleware', function (): void {
 
     it('generates a new UUID v7 when X-Request-Id header is empty string', function (): void {
         $factory    = new Psr17Factory();
-        $request    = (new ServerRequest('GET', '/'))->withHeader('X-Request-Id', '');
+        $request    = new ServerRequest('GET', '/')->withHeader('X-Request-Id', '');
         $middleware = makeMiddleware();
 
         $captured = null;
@@ -107,7 +107,7 @@ describe('RequestIdMiddleware', function (): void {
     it('response X-Request-Id matches request attribute for propagated ID', function (): void {
         $factory    = new Psr17Factory();
         $existingId = '018e3b2a-1234-7abc-8def-000000000001';
-        $request    = (new ServerRequest('GET', '/'))->withHeader('X-Request-Id', $existingId);
+        $request    = new ServerRequest('GET', '/')->withHeader('X-Request-Id', $existingId);
         $middleware = makeMiddleware();
 
         $captured = null;

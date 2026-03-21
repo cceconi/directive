@@ -14,8 +14,7 @@ final class AnalysisResult
         private readonly string $filename,
         private readonly string $status,
         private readonly ?string $message = null,
-    ) {
-    }
+    ) {}
 
     public function getFilename(): string
     {

@@ -52,7 +52,7 @@ final class File extends InterfaceData
             throw new ConfigurationException('Configuration key "env.files.tmpdir" is not set.');
         }
 
-        if (!is_dir($tmpDir) && !mkdir($tmpDir, 0775, true) && !is_dir($tmpDir)) {
+        if (!is_dir($tmpDir) && !mkdir($tmpDir, 0o775, true) && !is_dir($tmpDir)) {
             throw new ConfigurationException(
                 sprintf('Temp directory "%s" could not be created.', $tmpDir),
             );

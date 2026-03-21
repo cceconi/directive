@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Directive\Service\Security\Antivirus\Adapters\Clamav\Sockets;
 
-use Socket\Raw\Socket as RawSocket;
 use Directive\Service\Security\Antivirus\Adapters\Clamav\Exception\SocketTimeoutException;
+use Socket\Raw\Socket as RawSocket;
 
 final class PhpSocket
 {

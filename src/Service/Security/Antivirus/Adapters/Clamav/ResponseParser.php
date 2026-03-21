@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Directive\Service\Security\Antivirus\Adapters\Clamav;
 
-use Directive\Service\Security\Antivirus\Analysis\Analysis;
-use Directive\Service\Security\Antivirus\Analysis\AnalysisResult;
 use Directive\Service\Security\Antivirus\Adapters\Clamav\Exception\UnexpectedResultException;
 use Directive\Service\Security\Antivirus\Adapters\Clamav\Exception\UnexpectedResultsException;
+use Directive\Service\Security\Antivirus\Analysis\Analysis;
+use Directive\Service\Security\Antivirus\Analysis\AnalysisResult;
 
 final class ResponseParser
 {

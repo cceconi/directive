@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Directive\Service\Security\Access\Type;
 
 use Directive\Service\Security\AccessManagerInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  * Cookie-based authentication (browser / SPA users).

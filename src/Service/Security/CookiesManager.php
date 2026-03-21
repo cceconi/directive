@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Directive\Service\Security;
 
-use Directive\Service\Configuration\ConfigurationInterface;
 use DateTime;
-use DateTimeInterface;
 use Dflydev\FigCookies\FigRequestCookies;
 use Dflydev\FigCookies\FigResponseCookies;
 use Dflydev\FigCookies\Modifier\SameSite;
 use Dflydev\FigCookies\SetCookie;
+use Directive\Service\Configuration\ConfigurationInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 

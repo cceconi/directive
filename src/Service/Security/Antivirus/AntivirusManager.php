@@ -26,10 +26,10 @@ class AntivirusManager
                 /** @var LoggerInterface $logger */
                 $logger  = $c->get(LoggerInterface::class);
                 $host    = (string) $config->get('env.antivirus.host');
-                $port    = (int)    $config->get('env.antivirus.port');
-                $timeout = (int)    $config->get('env.antivirus.timeout');
+                $port    = (int) $config->get('env.antivirus.port');
+                $timeout = (int) $config->get('env.antivirus.timeout');
                 return new ClamavService($logger, $host, $port, $timeout);
-            }
+            },
         );
     }
 

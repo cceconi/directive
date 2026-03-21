@@ -12,9 +12,7 @@ final class ClientHeaders implements ClientHeadersInterface
     /** @var array<string, string> */
     private array $data = [];
 
-    public function __construct(private readonly ConfigurationInterface $config)
-    {
-    }
+    public function __construct(private readonly ConfigurationInterface $config) {}
 
     public function load(ServerRequestInterface $request): void
     {

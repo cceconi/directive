@@ -8,15 +8,15 @@ use Directive\Web\RequestEntity;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Contract for all Policy classes.
+ * Contract for all request validator classes.
  *
- * A Policy validates and cleans the incoming request data, producing a RequestEntity.
- * Epic 4: expand with addScalar/addFile/addObject/addArray helpers.
+ * A request validator validates and cleans the incoming request data,
+ * producing a RequestEntity. Replaces PolicyInterface.
  */
-interface PolicyInterface
+interface RequestValidatorInterface
 {
     /**
-     * Set the raw PSR-7 request for this policy to process.
+     * Set the raw PSR-7 request for this validator to process.
      */
     public function setRequest(ServerRequestInterface $request): void;
 

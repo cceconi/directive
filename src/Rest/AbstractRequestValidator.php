@@ -4,23 +4,22 @@ declare(strict_types=1);
 
 namespace Directive\Rest;
 
-use Directive\Exception\PolicyException;
+use Directive\Exception\RequestValidatorException;
 use Directive\Web\InterfaceData\InterfaceDataInterface;
 use Directive\Web\RequestEntity;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Abstract base for all input validation policies.
+ * Abstract base for all request validators.
  *
  * Lifecycle:
  *   1. setRequest($request)
- *   2. registerScalars() / registerFiles() / registerObjects() / registerArrays()
- *      → each calls addScalar() / addFile() / addObject() / addArray()
+ *   2. register() → calls scalar() / file() / object() / array() helpers
  *   3. getRequestEntity() → hydrates, validates, collects errors
  *
- * Concrete subclasses implement the four register*() methods.
+ * Concrete subclasses implement the single register() hook.
  */
-abstract class Policy implements PolicyInterface
+abstract class AbstractRequestValidator implements RequestValidatorInterface
 {
     private ServerRequestInterface $request;
 
@@ -40,7 +39,7 @@ abstract class Policy implements PolicyInterface
     private array $errors = [];
 
     // ------------------------------------------------------------------
-    // PolicyInterface
+    // RequestValidatorInterface
     // ------------------------------------------------------------------
 
     final public function setRequest(ServerRequestInterface $request): void
@@ -55,10 +54,7 @@ abstract class Policy implements PolicyInterface
 
     final public function getRequestEntity(): RequestEntity
     {
-        $this->registerScalars();
-        $this->registerFiles();
-        $this->registerObjects();
-        $this->registerArrays();
+        $this->register();
 
         $body    = $this->request->getParsedBody() ?? [];
         $uploads = $this->request->getUploadedFiles();
@@ -70,7 +66,7 @@ abstract class Policy implements PolicyInterface
 
         $this->hydrateAndValidate($this->scalars, $bodyArray, $entity);
         $this->hydrateAndValidate($this->objects, $bodyArray, $entity);
-        $this->hydrateAndValidate($this->arrays,  $bodyArray, $entity);
+        $this->hydrateAndValidate($this->arrays, $bodyArray, $entity);
 
         // File inputs
         foreach ($this->files as $name => $entry) {
@@ -112,13 +108,13 @@ abstract class Policy implements PolicyInterface
     }
 
     // ------------------------------------------------------------------
-    // Registration helpers
+    // Registration helpers (call inside register())
     // ------------------------------------------------------------------
 
     /**
      * Register a scalar input field (string, numeric, boolean, date…).
      */
-    final protected function addScalar(
+    final protected function scalar(
         string $name,
         InterfaceDataInterface $field,
         bool $required = false,
@@ -128,17 +124,9 @@ abstract class Policy implements PolicyInterface
     }
 
     /**
-     * Shorthand for addScalar with no constraint.
-     */
-    final protected function addEasyScalar(string $name, bool $required = false): void
-    {
-        $this->addScalar($name, new \Directive\Web\InterfaceData\SimpleString(), $required);
-    }
-
-    /**
      * Register a file upload field.
      */
-    final protected function addFile(
+    final protected function file(
         string $name,
         InterfaceDataInterface $field,
         bool $required = false,
@@ -150,7 +138,7 @@ abstract class Policy implements PolicyInterface
     /**
      * Register a nested object (JSON sub-object decoded as array).
      */
-    final protected function addObject(
+    final protected function object(
         string $name,
         InterfaceDataInterface $field,
         bool $required = false,
@@ -162,7 +150,7 @@ abstract class Policy implements PolicyInterface
     /**
      * Register an array input.
      */
-    final protected function addArray(
+    final protected function array(
         string $name,
         InterfaceDataInterface $field,
         bool $required = false,
@@ -172,13 +160,10 @@ abstract class Policy implements PolicyInterface
     }
 
     // ------------------------------------------------------------------
-    // Abstract registration hooks
+    // Abstract registration hook
     // ------------------------------------------------------------------
 
-    abstract protected function registerScalars(): void;
-    abstract protected function registerFiles(): void;
-    abstract protected function registerObjects(): void;
-    abstract protected function registerArrays(): void;
+    abstract protected function register(): void;
 
     // ------------------------------------------------------------------
     // Hooks for subclasses
@@ -255,7 +240,7 @@ abstract class Policy implements PolicyInterface
         );
 
         if (in_array($name, $all, true)) {
-            throw new PolicyException(sprintf('Field "%s" is already registered in this policy.', $name));
+            throw new RequestValidatorException(sprintf('Field "%s" is already registered in this validator.', $name));
         }
     }
 }

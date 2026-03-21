@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Directive\Service\Security\Antivirus\Adapters\Clamav;
 
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
-use Socket\Raw\Factory;
-use Socket\Raw\Exception as SocketRawException;
-use Directive\Service\Security\Antivirus\AntivirusInterface;
-use Directive\Service\Security\Antivirus\AntivirusServiceInterface;
 use Directive\Service\Security\Antivirus\Adapters\Clamav\Exception\SocketException;
 use Directive\Service\Security\Antivirus\Adapters\Clamav\Sockets\PhpSocket;
+use Directive\Service\Security\Antivirus\AntivirusInterface;
+use Directive\Service\Security\Antivirus\AntivirusServiceInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Socket\Raw\Exception as SocketRawException;
+use Socket\Raw\Factory;
 
 final class ClamavService implements AntivirusServiceInterface
 {

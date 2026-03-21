@@ -75,29 +75,19 @@ class ConsoleLogger implements ConsoleLoggerInterface
     }
 
     /** No-op for console — no HTTP request. */
-    public function logRequest(string $url, ServerRequestInterface $request): void
-    {
-    }
+    public function logRequest(string $url, ServerRequestInterface $request): void {}
 
     /** No-op for console — no HTTP response. */
-    public function logResponse(ResponseInterface $response, string $message, mixed $data = null): void
-    {
-    }
+    public function logResponse(ResponseInterface $response, string $message, mixed $data = null): void {}
 
     /** No-op for console — no web user. */
-    public function logWebUser(?WebUserInterface $webUser): void
-    {
-    }
+    public function logWebUser(?WebUserInterface $webUser): void {}
 
     /** No-op for console — no JWT. */
-    public function logJwt(string $jwt): void
-    {
-    }
+    public function logJwt(string $jwt): void {}
 
     /** No-op for console — no API version context. */
-    public function logApiVersion(string $name, string $status, string $info = ''): void
-    {
-    }
+    public function logApiVersion(string $name, string $status, string $info = ''): void {}
 
     public function write(): void
     {

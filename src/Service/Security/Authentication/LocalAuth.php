@@ -43,10 +43,10 @@ final class LocalAuth extends AbstractAuth
         $this->tokenManager = new TokenManager(
             $jwtConfig,
             (string) $this->config->get('env.token.issuer', ''),
-            (int)    $this->config->get('env.token.notBeforeOffset', 0),
-            (int)    $this->config->get('env.token.lifetime', 300),
-            (int)    $this->config->get('env.token.renewOffset', -60),
-            (int)    $this->config->get('env.token.idComplexity', 24),
+            (int) $this->config->get('env.token.notBeforeOffset', 0),
+            (int) $this->config->get('env.token.lifetime', 300),
+            (int) $this->config->get('env.token.renewOffset', -60),
+            (int) $this->config->get('env.token.idComplexity', 24),
         );
     }
 

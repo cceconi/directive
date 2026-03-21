@@ -18,5 +18,5 @@ namespace Directive\Service\Security;
  */
 interface Profile
 {
-    const string GUEST = 'guest';
+    public const string GUEST = 'guest';
 }

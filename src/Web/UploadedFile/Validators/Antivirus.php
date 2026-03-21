@@ -30,7 +30,7 @@ final class Antivirus implements ValidatorInterface
     public function validate(FileInfo $fileInfo): void
     {
         $originalPerm = fileperms($fileInfo->getPathname());
-        chmod($fileInfo->getPathname(), 0664);
+        chmod($fileInfo->getPathname(), 0o664);
 
         try {
             $av       = $this->avService->create();

@@ -43,7 +43,7 @@ describe('GuestRole', function () {
     });
 
     it('returns slug "guest"', function () {
-        expect((new GuestRole())->slug())->toBe('guest');
+        expect(new GuestRole()->slug())->toBe('guest');
     });
 });
 
@@ -64,7 +64,7 @@ describe('SystemRole', function () {
     });
 
     it('returns slug "system"', function () {
-        expect((new SystemRole())->slug())->toBe('system');
+        expect(new SystemRole()->slug())->toBe('system');
     });
 });
 
@@ -84,7 +84,7 @@ describe('AgentRole', function () {
     });
 
     it('returns slug "agent"', function () {
-        expect((new AgentRole())->slug())->toBe('agent');
+        expect(new AgentRole()->slug())->toBe('agent');
     });
 });
 
@@ -150,7 +150,7 @@ describe('DomainUser', function () {
     it('is immutable (readonly)', function () {
         $user = new DomainUser('u1', new GuestRole());
 
-        expect(fn () => $user->id = 'changed') // @phpstan-ignore-line
+        expect(fn() => $user->id = 'changed') // @phpstan-ignore-line
             ->toThrow(\Error::class);
     });
 

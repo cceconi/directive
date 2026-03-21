@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Directive\Service\Security\Authentication;
 
-use Directive\Exception\SecurityException;
 use DateTimeImmutable;
+use Directive\Exception\SecurityException;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\UnencryptedToken;
 use Lcobucci\JWT\Validation\Constraint\IssuedBy;

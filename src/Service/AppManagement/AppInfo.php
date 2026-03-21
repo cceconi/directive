@@ -13,9 +13,7 @@ namespace Directive\Service\AppManagement;
 final class AppInfo implements AppInfoInterface
 {
     /** @param array<string, mixed> $data */
-    public function __construct(private readonly array $data = [])
-    {
-    }
+    public function __construct(private readonly array $data = []) {}
 
     public function getName(): string
     {

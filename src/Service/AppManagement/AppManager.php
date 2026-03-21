@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Directive\Service\AppManagement;
 
-use Directive\Exception\DirectiveException;
 use Directive\Exception\ConflictException;
+use Directive\Exception\DirectiveException;
 use Directive\Service\Utils\Json;
 
 final class AppManager
@@ -14,8 +14,7 @@ final class AppManager
         private readonly string $secretKey,
         private readonly string $filename,
         private readonly Json $json,
-    ) {
-    }
+    ) {}
 
     /**
      * Read app information.
@@ -38,7 +37,7 @@ final class AppManager
         }
 
         if ($key !== $this->secretKey) {
-            throw (new ConflictException('A business error occurred, please check your inputs.'))
+            throw new ConflictException('A business error occurred, please check your inputs.')
                 ->withErrors([['type' => 'business', 'property' => 'key', 'message' => 'Bad received key']]);
         }
 

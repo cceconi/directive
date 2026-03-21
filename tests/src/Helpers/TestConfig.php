@@ -16,7 +16,7 @@ final class TestConfig implements ConfigurationInterface
         'app.description' => 'Test application',
         'app.code'        => 'apisy-test',
         'log.dir'         => '/tmp',
-        'env.files.tmpdir'=> '/tmp/apisy-test-uploads',
+        'env.files.tmpdir' => '/tmp/apisy-test-uploads',
     ];
 
     public function setParams(): void {}

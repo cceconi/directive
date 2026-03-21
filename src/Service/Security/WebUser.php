@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Directive\Service\Security;
 
 use Directive\Service\Security\Authentication\AuthInterface;
-use Directive\Service\Security\CookiesManagerInterface;
 use Directive\Service\Security\Role\AbstractRole;
 use Directive\Service\Security\Role\GuestRole;
 use Psr\Container\ContainerInterface;

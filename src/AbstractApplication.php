@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Directive;
 
+use DI\ContainerBuilder;
 use Directive\Service\Configuration\ConfigurationInterface;
 use Directive\Service\Logging\RuntimeLogger;
-use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
 
 /**

@@ -48,7 +48,7 @@ describe('Boolean', function () {
         $f = new Boolean();
         foreach ([1, '1', 'true'] as $v) {
             $f->hydrate($v);
-            expect($f->getCleanedValue())->toBeTrue("expected to be true for input " . json_encode($v));
+            expect($f->getCleanedValue())->toBeTrue('expected to be true for input ' . json_encode($v));
         }
     });
 
@@ -56,7 +56,7 @@ describe('Boolean', function () {
         $f = new Boolean();
         foreach ([0, '0', 'false'] as $v) {
             $f->hydrate($v);
-            expect($f->getCleanedValue())->toBeFalse("expected to be false for input " . json_encode($v));
+            expect($f->getCleanedValue())->toBeFalse('expected to be false for input ' . json_encode($v));
         }
     });
 

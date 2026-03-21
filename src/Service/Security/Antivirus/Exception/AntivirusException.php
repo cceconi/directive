@@ -6,6 +6,4 @@ namespace Directive\Service\Security\Antivirus\Exception;
 
 use Directive\Exception\DirectiveException;
 
-class AntivirusException extends DirectiveException
-{
-}
+class AntivirusException extends DirectiveException {}

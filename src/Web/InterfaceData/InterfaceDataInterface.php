@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Directive\Web\InterfaceData;
 
-use Directive\Web\Constraints\GenericConstraintInterface;
-
 /**
  * Contract for typed input wrappers.
  *

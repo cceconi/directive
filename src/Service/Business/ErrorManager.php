@@ -28,7 +28,7 @@ final class ErrorManager implements ErrorInterface
     public function getErrorsByType(string $type): array
     {
         return array_values(
-            array_filter($this->errors, fn (array $e) => $e['type'] === $type),
+            array_filter($this->errors, fn(array $e) => $e['type'] === $type),
         );
     }
 

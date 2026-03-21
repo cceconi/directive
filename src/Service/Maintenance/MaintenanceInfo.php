@@ -13,8 +13,7 @@ final class MaintenanceInfo implements JsonSerializable
         private readonly bool $mode,
         private readonly int $period,
         private readonly string $message,
-    ) {
-    }
+    ) {}
 
     public function getMode(): bool
     {
@@ -49,8 +48,8 @@ final class MaintenanceInfo implements JsonSerializable
     public static function fromArray(array $data): self
     {
         return new self(
-            mode:    (bool)   ($data['mode']    ?? false),
-            period:  (int)    ($data['period']  ?? 0),
+            mode: (bool) ($data['mode']    ?? false),
+            period: (int) ($data['period']  ?? 0),
             message: (string) ($data['message'] ?? ''),
         );
     }

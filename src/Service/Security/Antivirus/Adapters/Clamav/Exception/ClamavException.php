@@ -6,6 +6,4 @@ namespace Directive\Service\Security\Antivirus\Adapters\Clamav\Exception;
 
 use Directive\Service\Security\Antivirus\Exception\AntivirusException;
 
-class ClamavException extends AntivirusException
-{
-}
+class ClamavException extends AntivirusException {}

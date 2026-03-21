@@ -37,7 +37,7 @@ final class CompressResponseMiddleware extends AbstractMiddleware
         }
 
         $requested = array_map(
-            static fn (string $e) => trim(strtolower($e)),
+            static fn(string $e) => trim(strtolower($e)),
             explode(',', $acceptEncoding),
         );
 

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Helpers;
 
+use DI\ContainerBuilder;
 use Directive\Rest\ApiDefinitionManager;
 use Directive\Rest\HttpResponse;
 use Directive\Rest\Router;
 use Directive\Service\Security\WebUserInterface;
-use DI\ContainerBuilder;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
 use Psr\Container\ContainerInterface;

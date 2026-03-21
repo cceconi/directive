@@ -42,8 +42,14 @@ final class StubWebLogger implements WebLoggerInterface
 
 final class StubAppInfo implements AppInfoInterface
 {
-    public function getVersion(): string { return '0.0.0-test'; }
-    public function getName(): string { return 'test'; }
+    public function getVersion(): string
+    {
+        return '0.0.0-test';
+    }
+    public function getName(): string
+    {
+        return 'test';
+    }
 }
 
 final class StubHeaderManager implements HeaderManagerInterface
@@ -52,28 +58,52 @@ final class StubHeaderManager implements HeaderManagerInterface
     {
         return $response;
     }
-    public function validateSecurityHeader(ServerRequestInterface $request): bool { return true; }
-    public function updateSecurityHeader(ResponseInterface $response): ResponseInterface { return $response; }
-    public function getError(): string { return ''; }
+    public function validateSecurityHeader(ServerRequestInterface $request): bool
+    {
+        return true;
+    }
+    public function updateSecurityHeader(ResponseInterface $response): ResponseInterface
+    {
+        return $response;
+    }
+    public function getError(): string
+    {
+        return '';
+    }
 }
 
 final class StubMaintenance implements MaintenanceManagerInterface
 {
-    public function isActive(): bool { return false; }
-    public function getMessage(): string { return ''; }
-    public function getPeriod(): string { return ''; }
+    public function isActive(): bool
+    {
+        return false;
+    }
+    public function getMessage(): string
+    {
+        return '';
+    }
+    public function getPeriod(): string
+    {
+        return '';
+    }
 }
 
 final class StubClientHeaders implements ClientHeadersInterface
 {
     public function load(ServerRequestInterface $request): void {}
-    public function get(string $headerName): ?string { return null; }
+    public function get(string $headerName): ?string
+    {
+        return null;
+    }
 }
 
 final class StubCookiesManager implements CookiesManagerInterface
 {
     public function storeFromRequest(ServerRequestInterface $request): void {}
-    public function setResponseCookies(ResponseInterface $response): ResponseInterface { return $response; }
+    public function setResponseCookies(ResponseInterface $response): ResponseInterface
+    {
+        return $response;
+    }
     public function addResponseCookie(string $name, string $value, ?int $maxAge = null, ?string $domain = null): void {}
     public function addResponseAccessTokenCookie(string $value, ?int $maxAge = null, ?string $domain = null): void {}
 }
@@ -155,7 +185,7 @@ describe('WebApplication middleware integration', function (): void {
         $app->setConfig(TestConfig::class);
 
         $existingId = 'upstream-gateway-id-xyz';
-        $request    = (new ServerRequest('GET', '/any/v1/foo/bar'))
+        $request    = new ServerRequest('GET', '/any/v1/foo/bar')
             ->withHeader('X-Request-Id', $existingId);
 
         $response = $app->resolve($request);

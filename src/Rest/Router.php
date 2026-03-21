@@ -141,14 +141,14 @@ final class Router
         // 3. Check user role
         $this->checkRole($methodDef);
 
-        // 4. Run policy
-        /** @var PolicyInterface $policy */
+        // 4. Run request validator
+        /** @var RequestValidatorInterface $policy */
         $policy = $this->container->get($methodDef->policyClass);
         $policy->setRequest($request);
         $requestEntity = $policy->getRequestEntity();
 
         if ($policy->hasErrors()) {
-            throw (new BadRequestException('Validation failed.'))->withErrors($policy->getErrors());
+            throw new BadRequestException('Validation failed.')->withErrors($policy->getErrors());
         }
 
         // 5. Resolve response entity class

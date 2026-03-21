@@ -81,9 +81,9 @@ class ConsoleApplication extends AbstractApplication
         // Build ConsoleLogger and register it for both its own interface
         // and WebLoggerInterface so middlewares relying on WebLoggerInterface work.
         $logger = new ConsoleLogger(
-            channel:  (string) $config->get('app.code', 'apisy-console'),
-            logDir:   $config->getLogDir(),
-            config:   $config,
+            channel: (string) $config->get('app.code', 'apisy-console'),
+            logDir: $config->getLogDir(),
+            config: $config,
         );
 
         $this->addDefinitions([
@@ -108,7 +108,7 @@ class ConsoleApplication extends AbstractApplication
         $config = $this->get(ConfigurationInterface::class);
 
         $this->console = new Application(
-            name:    (string) $config->get('app.name', 'Directive'),
+            name: (string) $config->get('app.name', 'Directive'),
             version: '3.0',
         );
 

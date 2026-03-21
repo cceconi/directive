@@ -17,7 +17,7 @@ final class FormatConstraint extends GenericConstraint
 
         // Temporarily install a no-op error handler so that an invalid PCRE pattern never
         // emits a PHP warning that test frameworks (e.g. Pest) would capture.
-        set_error_handler(static fn (): bool => true);
+        set_error_handler(static fn(): bool => true);
         $result = preg_match($this->pattern, '');
         restore_error_handler();
 

@@ -17,8 +17,7 @@ final class MaintenanceManager implements MaintenanceManagerInterface
         private readonly string $filename,
         private readonly Json $json,
         private readonly WebLoggerInterface $logger,
-    ) {
-    }
+    ) {}
 
     // ── MaintenanceManagerInterface ──────────────────────────────────────────
 
@@ -68,7 +67,7 @@ final class MaintenanceManager implements MaintenanceManagerInterface
     public function applyMode(array $data, string $providedKey): void
     {
         if ($providedKey !== $this->secretKey) {
-            throw (new ConflictException('A business error occurred, please check your inputs.'))
+            throw new ConflictException('A business error occurred, please check your inputs.')
                 ->withErrors([['type' => 'business', 'property' => 'key', 'message' => 'Bad received key']]);
         }
 
