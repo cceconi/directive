@@ -11,6 +11,7 @@ use Directive\Exception\GoneException;
 use Directive\Exception\MethodNotAllowedException;
 use Directive\Exception\NotFoundException;
 use Directive\Exception\UnauthorizedException;
+use Directive\Service\Security\Role\GuestRole;
 use Directive\Service\Security\WebUserInterface;
 use Directive\Web\ResponseEntity;
 use Psr\Container\ContainerInterface;
@@ -208,7 +209,7 @@ final class Router
             return;
         }
 
-        if ($this->webUser->isGuest()) {
+        if ($this->webUser->getRole() instanceof GuestRole) {
             throw new UnauthorizedException('Authentication required.');
         }
 

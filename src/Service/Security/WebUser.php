@@ -78,7 +78,7 @@ abstract class WebUser implements WebUserInterface
         return [
             'email'    => $this->getId(),
             'fullname' => $this->getFullName(),
-            'profile'  => $this->getRole()->slug(),
+            'role'     => $this->getRole()->slug(),
             'renewpwd' => $this->renewPwd,
             'csrf'     => $this->csrf,
             'expire'   => $this->expire,
@@ -182,6 +182,7 @@ abstract class WebUser implements WebUserInterface
         $this->token = $auth->generateToken('auth token', [
             'client.id'  => $this->getId(),
             'xsrfToken'  => $csrfToken,
+            'role'       => $this->role->slug(),
         ]);
 
         /** @var CookiesManagerInterface $cookies */

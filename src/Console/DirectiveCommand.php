@@ -42,12 +42,12 @@ abstract class DirectiveCommand extends Command
             $logger->logRaw('Options', $input->getOptions());
         }
 
-        $output->writeln(sprintf('[apisy] Running command: <info>%s</info>', $name));
+        $output->writeln(sprintf('[directive] Running command: <info>%s</info>', $name));
 
         $code = $this->executeCommand($input, $output);
 
         $label = $code === self::SUCCESS ? '<info>SUCCESS</info>' : '<error>FAILURE</error>';
-        $output->writeln(sprintf('[apisy] Command <comment>%s</comment> finished: %s', $name, $label));
+        $output->writeln(sprintf('[directive] Command <comment>%s</comment> finished: %s', $name, $label));
 
         if ($logger !== null) {
             $logger->logRaw('Result: ' . ($code === self::SUCCESS ? 'success' : 'failure'));
