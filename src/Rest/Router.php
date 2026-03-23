@@ -142,13 +142,13 @@ final class Router
         $this->checkRole($methodDef);
 
         // 4. Run request validator
-        /** @var RequestValidatorInterface $policy */
-        $policy = $this->container->get($methodDef->policyClass);
-        $policy->setRequest($request);
-        $requestEntity = $policy->getRequestEntity();
+        /** @var RequestValidatorInterface $requestValidator */
+        $requestValidator = $this->container->get($methodDef->requestValidatorClass);
+        $requestValidator->setRequest($request);
+        $requestEntity = $requestValidator->getRequestEntity();
 
-        if ($policy->hasErrors()) {
-            throw new BadRequestException('Validation failed.')->withErrors($policy->getErrors());
+        if ($requestValidator->hasErrors()) {
+            throw new BadRequestException('Validation failed.')->withErrors($requestValidator->getErrors());
         }
 
         // 5. Resolve response entity class
@@ -156,9 +156,14 @@ final class Router
         /** @var ResponseEntity $responseEntity */
         $responseEntity = new $responseEntityClass();
 
-        // 6. Run API handler
+        // 6. Run API handler — fresh ErrorManager per dispatch (never shared across requests)
         /** @var ApiInterface $api */
-        $api = new $methodDef->apiClass($this->container, $responseEntity, $requestEntity);
+        $api = new $methodDef->apiClass(
+            $this->container,
+            $responseEntity,
+            $requestEntity,
+            new $methodDef->errorClass(),
+        );
         $api->run();
 
         return $this->httpResponse->ok($api->getResponseEntity(), $route, $httpMethod);

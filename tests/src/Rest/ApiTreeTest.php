@@ -7,6 +7,7 @@ use Directive\Exception\NotFoundException;
 use Directive\Rest\ApiDefinitionManager;
 use Directive\Rest\Domain;
 use Directive\Rest\VersionStatus;
+use Directive\Service\Business\ErrorManager;
 use Tests\Helpers\StubApi;
 use Tests\Helpers\StubRequestValidator;
 
@@ -17,7 +18,7 @@ function buildTestTree(): ApiDefinitionManager
     $domain->version('v1', VersionStatus::Open)
         ->service('account')
         ->resource('profile')
-        ->get(StubApi::class, StubRequestValidator::class);
+        ->get(StubApi::class, StubRequestValidator::class, ErrorManager::class);
 
     $manager->registerDomain($domain);
     return $manager;

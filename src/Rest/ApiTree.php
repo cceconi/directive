@@ -13,11 +13,11 @@ namespace Directive\Rest;
  *   $acct   = $v1->service('account');
  *
  *   $acct->resource('profile')
- *       ->get(GetProfile::class, policyClass: GetProfilePolicy::class, allowedRoles: ['user', 'admin'])
- *       ->put(PutProfile::class, policyClass: PutProfilePolicy::class, allowedRoles: ['user']);
+ *       ->get(GetProfile::class, requestValidatorClass: GetProfilePolicy::class, errorClass: ErrorManager::class, allowedRoles: ['user', 'admin'])
+ *       ->put(PutProfile::class, requestValidatorClass: PutProfilePolicy::class, errorClass: ErrorManager::class, allowedRoles: ['user']);
  *
  *   $acct->resource('settings')
- *       ->get(GetSettings::class, policyClass: GetSettingsPolicy::class);
+ *       ->get(GetSettings::class, requestValidatorClass: GetSettingsPolicy::class, errorClass: ErrorManager::class);
  */
 final class ApiTree
 {

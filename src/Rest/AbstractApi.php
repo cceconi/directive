@@ -21,16 +21,12 @@ use Psr\Container\ContainerInterface;
  */
 abstract class AbstractApi implements ApiInterface
 {
-    protected readonly ErrorInterface $businessError;
-
     public function __construct(
         protected readonly ContainerInterface $container,
         protected readonly ResponseEntity $responseEntity,
         protected readonly RequestEntity $requestEntity,
+        protected readonly ErrorInterface $businessError,
     ) {
-        // ErrorManager is resolved lazily from the container in Epic 8.
-        // Until then, instantiate directly.
-        $this->businessError = new \Directive\Service\Business\ErrorManager();
     }
 
     // ------------------------------------------------------------------

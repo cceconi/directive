@@ -6,6 +6,7 @@ namespace Directive\Rest;
 
 use Directive\Exception\ApiDefinitionException;
 use Directive\Exception\MethodNotAllowedException;
+use Directive\Service\Business\ErrorManager;
 
 /**
  * A named resource within a Service.
@@ -13,8 +14,8 @@ use Directive\Exception\MethodNotAllowedException;
  *
  * Fluent usage:
  *   $service->resource('profile')
- *       ->get(GetProfile::class, policyClass: GetProfilePolicy::class, allowedRoles: ['user'])
- *       ->put(PutProfile::class, policyClass: PutProfilePolicy::class, allowedRoles: ['user']);
+ *       ->get(GetProfile::class, requestValidatorClass: GetProfilePolicy::class, errorClass: ErrorManager::class, allowedRoles: ['user'])
+ *       ->put(PutProfile::class, requestValidatorClass: PutProfilePolicy::class, errorClass: ErrorManager::class, allowedRoles: ['user']);
  */
 class Resource
 {
@@ -31,7 +32,8 @@ class Resource
 
     /**
      * @param class-string      $apiClass
-     * @param class-string      $policyClass
+     * @param class-string      $requestValidatorClass
+     * @param class-string      $errorClass
      * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
@@ -39,18 +41,20 @@ class Resource
      */
     public function get(
         string $apiClass,
-        string $policyClass,
+        string $requestValidatorClass,
+        string $errorClass = ErrorManager::class,
         array $allowedRoles = [],
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
     ): static {
-        return $this->addMethod('GET', $apiClass, $policyClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('GET', $apiClass, $requestValidatorClass, $errorClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
     }
 
     /**
      * @param class-string      $apiClass
-     * @param class-string      $policyClass
+     * @param class-string      $requestValidatorClass
+     * @param class-string      $errorClass
      * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
@@ -58,18 +62,20 @@ class Resource
      */
     public function post(
         string $apiClass,
-        string $policyClass,
+        string $requestValidatorClass,
+        string $errorClass = ErrorManager::class,
         array $allowedRoles = [],
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
     ): static {
-        return $this->addMethod('POST', $apiClass, $policyClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('POST', $apiClass, $requestValidatorClass, $errorClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
     }
 
     /**
      * @param class-string      $apiClass
-     * @param class-string      $policyClass
+     * @param class-string      $requestValidatorClass
+     * @param class-string      $errorClass
      * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
@@ -77,18 +83,20 @@ class Resource
      */
     public function put(
         string $apiClass,
-        string $policyClass,
+        string $requestValidatorClass,
+        string $errorClass = ErrorManager::class,
         array $allowedRoles = [],
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
     ): static {
-        return $this->addMethod('PUT', $apiClass, $policyClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('PUT', $apiClass, $requestValidatorClass, $errorClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
     }
 
     /**
      * @param class-string      $apiClass
-     * @param class-string      $policyClass
+     * @param class-string      $requestValidatorClass
+     * @param class-string      $errorClass
      * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
@@ -96,18 +104,20 @@ class Resource
      */
     public function patch(
         string $apiClass,
-        string $policyClass,
+        string $requestValidatorClass,
+        string $errorClass = ErrorManager::class,
         array $allowedRoles = [],
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
     ): static {
-        return $this->addMethod('PATCH', $apiClass, $policyClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('PATCH', $apiClass, $requestValidatorClass, $errorClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
     }
 
     /**
      * @param class-string      $apiClass
-     * @param class-string      $policyClass
+     * @param class-string      $requestValidatorClass
+     * @param class-string      $errorClass
      * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
@@ -115,13 +125,14 @@ class Resource
      */
     public function delete(
         string $apiClass,
-        string $policyClass,
+        string $requestValidatorClass,
+        string $errorClass = ErrorManager::class,
         array $allowedRoles = [],
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
     ): static {
-        return $this->addMethod('DELETE', $apiClass, $policyClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('DELETE', $apiClass, $requestValidatorClass, $errorClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
     }
 
     // ------------------------------------------------------------------
@@ -162,7 +173,8 @@ class Resource
 
     /**
      * @param class-string      $apiClass
-     * @param class-string      $policyClass
+     * @param class-string      $requestValidatorClass
+     * @param class-string      $errorClass
      * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
@@ -171,7 +183,8 @@ class Resource
     private function addMethod(
         string $httpMethod,
         string $apiClass,
-        string $policyClass,
+        string $requestValidatorClass,
+        string $errorClass,
         array $allowedRoles,
         array $allowCors,
         ?string $responseEntityClass,
@@ -188,7 +201,8 @@ class Resource
         $this->methods[$key] = new Method(
             httpMethod: $key,
             apiClass: $apiClass,
-            policyClass: $policyClass,
+            requestValidatorClass: $requestValidatorClass,
+            errorClass: $errorClass,
             allowedRoles: $allowedRoles,
             allowCors: $allowCors,
             responseEntityClass: $responseEntityClass,

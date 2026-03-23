@@ -8,6 +8,8 @@ use DI\ContainerBuilder;
 use Directive\Rest\ApiDefinitionManager;
 use Directive\Rest\HttpResponse;
 use Directive\Rest\Router;
+use Directive\Service\Business\ErrorInterface;
+use Directive\Service\Business\ErrorManager;
 use Directive\Service\Security\WebUserInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
@@ -69,7 +71,10 @@ trait DirectiveTestCase
         $user     = $webUser ?? new StubWebUser();
 
         $builder = new ContainerBuilder();
-        $builder->addDefinitions($extraDefinitions);
+        $builder->addDefinitions(array_merge(
+            [ErrorInterface::class => \DI\factory(fn () => new ErrorManager())],
+            $extraDefinitions,
+        ));
         $container = $builder->build();
 
         return new Router($manager, $httpResp, $container, $user);

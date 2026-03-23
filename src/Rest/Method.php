@@ -19,7 +19,8 @@ readonly class Method
 {
     /**
      * @param class-string        $apiClass             Api handler class
-     * @param class-string        $policyClass          Request validator class (extends AbstractRequestValidator)
+     * @param class-string        $requestValidatorClass Request validator class (extends AbstractRequestValidator)
+     * @param class-string        $errorClass           Error manager class
      * @param array<string>       $allowedRoles         Allowed role slugs (empty = public, no auth check)
      * @param array<string>       $allowCors            Allowed CORS origins (empty = use global config)
      * @param class-string|null   $responseEntityClass  Custom ResponseEntity class
@@ -28,7 +29,8 @@ readonly class Method
     public function __construct(
         public string $httpMethod,
         public string $apiClass,
-        public string $policyClass,
+        public string $requestValidatorClass,
+        public string $errorClass,
         public array $allowedRoles = [],
         public array $allowCors = [],
         public ?string $responseEntityClass = null,

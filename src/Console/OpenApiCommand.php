@@ -204,7 +204,7 @@ final class OpenApiCommand extends DirectiveCommand
         ];
 
         // Best-effort: annotate with handler class references
-        $op['x-policy'] = $method->policyClass;
+        $op['x-policy'] = $method->requestValidatorClass;
         $op['x-api']    = $method->apiClass;
 
         if ($method->requestEntityClass !== null) {

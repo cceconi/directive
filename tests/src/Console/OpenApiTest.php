@@ -7,6 +7,7 @@ use Directive\Rest\ApiDefinitionManager;
 use Directive\Rest\Domain;
 use Directive\Rest\VersionStatus;
 use Symfony\Component\Console\Tester\CommandTester;
+use Directive\Service\Business\ErrorManager;
 use Tests\Helpers\StubApi;
 use Tests\Helpers\StubRequestValidator;
 use Tests\Helpers\TestConfig;
@@ -18,13 +19,13 @@ function buildOpenApiTree(): ApiDefinitionManager
     $domain->version('v1', VersionStatus::Open, 'User management')
         ->service('account')
         ->resource('profile')
-        ->get(StubApi::class, StubRequestValidator::class)
-        ->put(StubApi::class, StubRequestValidator::class, allowedRoles: ['admin']);
+        ->get(StubApi::class, StubRequestValidator::class, ErrorManager::class)
+        ->put(StubApi::class, StubRequestValidator::class, ErrorManager::class, allowedRoles: ['admin']);
 
     $domain->version('v2', VersionStatus::Deprecated)
         ->service('account')
         ->resource('profile')
-        ->get(StubApi::class, StubRequestValidator::class);
+        ->get(StubApi::class, StubRequestValidator::class, ErrorManager::class);
 
     $manager->registerDomain($domain);
     return $manager;
