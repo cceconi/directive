@@ -6,9 +6,9 @@ namespace Directive\Exception;
 
 /**
  * Maps to HTTP 400.
- * Thrown when Policy finds validation errors — inherits the errors payload from ConflictException.
+ * Thrown when Policy finds validation errors — inherits the errors payload from UnprocessableException.
  */
-class BadRequestException extends ConflictException
+class BadRequestException extends UnprocessableException
 {
     public function httpStatus(): int
     {

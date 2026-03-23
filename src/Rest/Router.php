@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Directive\Rest;
 
 use Directive\Exception\BadRequestException;
-use Directive\Exception\ConflictException;
+use Directive\Exception\UnprocessableException;
 use Directive\Exception\ForbiddenException;
 use Directive\Exception\GoneException;
 use Directive\Exception\MethodNotAllowedException;
@@ -74,8 +74,8 @@ final class Router
             return $this->httpResponse->methodNotAllowed($route, $method);
         } catch (GoneException) {
             return $this->httpResponse->gone($route, $method);
-        } catch (ConflictException $e) {
-            return $this->httpResponse->conflict($route, $method, $e->getErrors());
+        } catch (UnprocessableException $e) {
+            return $this->httpResponse->unprocessable($route, $method, $e->getErrors());
         } catch (\Throwable) {
             return $this->httpResponse->internalError($route, $method);
         }
@@ -123,7 +123,7 @@ final class Router
      * @throws ForbiddenException
      * @throws UnauthorizedException
      * @throws BadRequestException
-     * @throws ConflictException
+     * @throws UnprocessableException
      */
     private function dispatch(
         ServerRequestInterface $request,

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Rest;
 
-use Directive\Exception\ConflictException;
+use Directive\Exception\UnprocessableException;
 use Directive\Service\Business\ErrorInterface;
 use Directive\Web\RequestEntity;
 use Directive\Web\ResponseEntity;
@@ -42,14 +42,14 @@ abstract class AbstractApi implements ApiInterface
         $this->preControl();
 
         if ($this->businessError->hasErrors()) {
-            throw new ConflictException('Business rule violation.')
+            throw new UnprocessableException('Business rule violation.')
                 ->withErrors($this->businessError->getErrors());
         }
 
         $this->compute();
 
         if ($this->businessError->hasErrors()) {
-            throw new ConflictException('Business rule violation.')
+            throw new UnprocessableException('Business rule violation.')
                 ->withErrors($this->businessError->getErrors());
         }
     }

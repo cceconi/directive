@@ -5,19 +5,21 @@ declare(strict_types=1);
 namespace Directive\Exception;
 
 /**
- * Maps to HTTP 409. Business rule violation with structured error payload.
+ * Maps to HTTP 422 Unprocessable Content.
+ * Thrown for business / domain rule violations where the request is syntactically valid
+ * but semantically rejected by the application layer.
  *
  * Use the fluent withErrors() factory to attach a structured error list:
- *   throw (new ConflictException('Business rule violation.'))->withErrors([...]);
+ *   throw (new UnprocessableException('Quota exceeded.'))->withErrors([...]);
  */
-class ConflictException extends DirectiveException
+class UnprocessableException extends DirectiveException
 {
     /** @var array<array<string, string>> */
     private array $errors = [];
 
     public function httpStatus(): int
     {
-        return 409;
+        return 422;
     }
 
     /**

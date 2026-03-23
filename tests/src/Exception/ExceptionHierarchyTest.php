@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Directive\Exception\BadRequestException;
-use Directive\Exception\ConflictException;
 use Directive\Exception\DirectiveException;
+use Directive\Exception\UnprocessableException;
 use Directive\Exception\ForbiddenException;
 use Directive\Exception\GoneException;
 use Directive\Exception\MethodNotAllowedException;
@@ -37,8 +37,8 @@ describe('DirectiveException hierarchy', function () {
         expect(new MethodNotAllowedException('method')->httpStatus())->toBe(405);
     });
 
-    it('ConflictException returns 409', function () {
-        expect(new ConflictException('conflict')->httpStatus())->toBe(409);
+    it('UnprocessableException returns 422', function () {
+        expect(new UnprocessableException('unprocessable')->httpStatus())->toBe(422);
     });
 
     it('GoneException returns 410', function () {
@@ -50,9 +50,9 @@ describe('DirectiveException hierarchy', function () {
     });
 });
 
-describe('ConflictException::withErrors()', function () {
+describe('UnprocessableException::withErrors()', function () {
     it('returns a clone with errors attached', function () {
-        $original = new ConflictException('conflict');
+        $original = new UnprocessableException('unprocessable');
         $withErr  = $original->withErrors([['property' => 'x', 'message' => 'msg', 'type' => 'invalid']]);
 
         expect($original->getErrors())->toBe([]);

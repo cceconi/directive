@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Service\AppManagement;
 
-use Directive\Exception\ConflictException;
+use Directive\Exception\UnprocessableException;
 use Directive\Exception\DirectiveException;
 use Directive\Service\Utils\Json;
 
@@ -20,7 +20,7 @@ final class AppManager
      * Read app information.
      *
      * @return array<string, mixed>
-     * @throws DirectiveException|ConflictException
+     * @throws DirectiveException|UnprocessableException
      */
     public function read(string $key): array
     {
@@ -37,7 +37,7 @@ final class AppManager
         }
 
         if ($key !== $this->secretKey) {
-            throw new ConflictException('A business error occurred, please check your inputs.')
+            throw new UnprocessableException('A business error occurred, please check your inputs.')
                 ->withErrors([['type' => 'business', 'property' => 'key', 'message' => 'Bad received key']]);
         }
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Service\Maintenance;
 
-use Directive\Exception\ConflictException;
+use Directive\Exception\UnprocessableException;
 use Directive\Service\Logging\WebLoggerInterface;
 use Directive\Service\Utils\Json;
 
@@ -62,12 +62,12 @@ final class MaintenanceManager implements MaintenanceManagerInterface
      * Apply a new maintenance mode from raw data array.
      *
      * @param array<string, mixed> $data
-     * @throws ConflictException when the secret key does not match.
+     * @throws UnprocessableException when the secret key does not match.
      */
     public function applyMode(array $data, string $providedKey): void
     {
         if ($providedKey !== $this->secretKey) {
-            throw new ConflictException('A business error occurred, please check your inputs.')
+            throw new UnprocessableException('A business error occurred, please check your inputs.')
                 ->withErrors([['type' => 'business', 'property' => 'key', 'message' => 'Bad received key']]);
         }
 

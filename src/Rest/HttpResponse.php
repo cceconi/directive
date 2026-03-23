@@ -13,7 +13,9 @@ use Psr\Http\Message\StreamFactoryInterface;
  * Centralised PSR-7 response factory.
  *
  * Every response carries the same JSON envelope:
- *   { "message": string, "data": mixed, "route": string, "method": string, "status": int }
+ *   { "message": string, "data": mixed, "errors"?: array, "route": string, "method": string, "status": int }
+ *
+ * The `errors` key is present only on 400 and 422 responses when the list is non-empty.
  *
  * Instantiated once in the DI container and injected into the Router.
  */
@@ -52,7 +54,7 @@ final class HttpResponse
         string $method,
         array $errors = [],
     ): ResponseInterface {
-        return $this->json(400, 'Bad Request', $errors, $route, $method);
+        return $this->json(400, 'Bad Request', null, $route, $method, $errors);
     }
 
     public function unauthorized(string $route, string $method): ResponseInterface
@@ -78,12 +80,12 @@ final class HttpResponse
     /**
      * @param array<array<string, string>> $errors
      */
-    public function conflict(
+    public function unprocessable(
         string $route,
         string $method,
         array $errors = [],
     ): ResponseInterface {
-        return $this->json(409, 'Conflict', $errors, $route, $method);
+        return $this->json(422, 'Unprocessable Content', null, $route, $method, $errors);
     }
 
     public function gone(string $route, string $method): ResponseInterface
@@ -129,22 +131,29 @@ final class HttpResponse
     // ------------------------------------------------------------------
 
     /**
-     * @param array<mixed> $data
+     * @param array<array<string, string>> $errors
      */
     private function json(
         int $status,
         string $message,
-        array $data,
+        mixed $data,
         string $route,
         string $method,
+        array $errors = [],
     ): ResponseInterface {
-        $payload = json_encode([
+        $envelope = [
             'message' => $message,
             'data'    => $data,
             'route'   => $route,
             'method'  => $method,
             'status'  => $status,
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        ];
+
+        if ($errors !== []) {
+            $envelope['errors'] = $errors;
+        }
+
+        $payload = json_encode($envelope, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         $body = $this->streamFactory->createStream($payload !== false ? $payload : '{}');
 
