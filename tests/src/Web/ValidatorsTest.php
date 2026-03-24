@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use Directive\Web\UploadedFile\FileInfo;
-use Directive\Web\UploadedFile\ValidatorException;
-use Directive\Web\UploadedFile\Validators\Dimensions;
-use Directive\Web\UploadedFile\Validators\Extension;
-use Directive\Web\UploadedFile\Validators\Mimetype;
-use Directive\Web\UploadedFile\Validators\Size;
+use Directive\Http\Upload\FileInfo;
+use Directive\Http\Upload\ValidatorException;
+use Directive\Http\Upload\Validators\Dimensions;
+use Directive\Http\Upload\Validators\Extension;
+use Directive\Http\Upload\Validators\Mimetype;
+use Directive\Http\Upload\Validators\Size;
 
 function makeTmpFile(string $content = 'test'): FileInfo
 {

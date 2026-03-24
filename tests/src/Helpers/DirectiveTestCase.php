@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tests\Helpers;
 
 use DI\ContainerBuilder;
-use Directive\Rest\ApiDefinitionManager;
-use Directive\Rest\HttpResponse;
-use Directive\Rest\Router;
+use Directive\Http\Endpoint\ApiDefinitionManager;
+use Directive\Http\Response\HttpResponse;
+use Directive\Http\Router;
 use Directive\Service\Business\ErrorInterface;
 use Directive\Service\Business\ErrorManager;
 use Directive\Service\Security\WebUserInterface;

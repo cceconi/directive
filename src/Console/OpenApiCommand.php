@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Directive\Console;
 
-use Directive\Rest\ApiDefinitionManager;
-use Directive\Rest\Method;
-use Directive\Rest\VersionStatus;
+use Directive\Http\Endpoint\ApiDefinitionManager;
+use Directive\Http\Routing\Method;
+use Directive\Http\Routing\VersionStatus;
 use Directive\Service\Configuration\ConfigurationInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;

@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Directive\Console\OpenApiCommand;
-use Directive\Rest\ApiDefinitionManager;
-use Directive\Rest\Domain;
-use Directive\Rest\VersionStatus;
+use Directive\Http\Endpoint\ApiDefinitionManager;
+use Directive\Http\Routing\Domain;
+use Directive\Http\Routing\VersionStatus;
 use Symfony\Component\Console\Tester\CommandTester;
 use Directive\Service\Business\ErrorManager;
 use Tests\Helpers\StubApi;
@@ -42,7 +42,7 @@ describe('OpenApiCommand', function () {
         $outFile  = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
 
         $container = $this->container([
-            \Directive\Rest\ApiDefinitionManager::class => $manager,
+            \Directive\Http\Endpoint\ApiDefinitionManager::class => $manager,
             \Directive\Service\Configuration\ConfigurationInterface::class => $config,
         ]);
 
@@ -68,7 +68,7 @@ describe('OpenApiCommand', function () {
         $outFile  = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
 
         $container = $this->container([
-            \Directive\Rest\ApiDefinitionManager::class => $manager,
+            \Directive\Http\Endpoint\ApiDefinitionManager::class => $manager,
             \Directive\Service\Configuration\ConfigurationInterface::class => $config,
         ]);
 
@@ -88,7 +88,7 @@ describe('OpenApiCommand', function () {
         $outFile  = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
 
         $container = $this->container([
-            \Directive\Rest\ApiDefinitionManager::class => $manager,
+            \Directive\Http\Endpoint\ApiDefinitionManager::class => $manager,
             \Directive\Service\Configuration\ConfigurationInterface::class => $config,
         ]);
 

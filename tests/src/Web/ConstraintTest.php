@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-use Directive\Exception\ConstraintException;
-use Directive\Web\Constraints\BoundedByConstraint;
-use Directive\Web\Constraints\EqualToConstraint;
-use Directive\Web\Constraints\FormatConstraint;
-use Directive\Web\Constraints\GreaterThanConstraint;
-use Directive\Web\Constraints\LesserThanConstraint;
-use Directive\Web\Constraints\ListValuesConstraint;
-use Directive\Web\Constraints\NoConstraint;
-use Directive\Web\Constraints\NotEqualToConstraint;
+use Directive\Http\Exception\ConstraintException;
+use Directive\Http\Input\Constraint\BoundedByConstraint;
+use Directive\Http\Input\Constraint\EqualToConstraint;
+use Directive\Http\Input\Constraint\FormatConstraint;
+use Directive\Http\Input\Constraint\GreaterThanConstraint;
+use Directive\Http\Input\Constraint\LesserThanConstraint;
+use Directive\Http\Input\Constraint\ListValuesConstraint;
+use Directive\Http\Input\Constraint\NoConstraint;
+use Directive\Http\Input\Constraint\NotEqualToConstraint;
 
 describe('NoConstraint', function () {
     it('always passes', function () {

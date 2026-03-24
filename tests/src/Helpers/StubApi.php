@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Helpers;
 
-use Directive\Rest\AbstractApi;
+use Directive\Http\Endpoint\AbstractApi;
 
 /** Minimal API handler that returns a fixed payload for router integration tests. */
 final class StubApi extends AbstractApi

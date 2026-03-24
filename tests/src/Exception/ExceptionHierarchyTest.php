@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-use Directive\Exception\BadRequestException;
+use Directive\Http\Exception\BadRequestException;
 use Directive\Exception\DirectiveException;
-use Directive\Exception\UnprocessableException;
-use Directive\Exception\ForbiddenException;
-use Directive\Exception\GoneException;
-use Directive\Exception\MethodNotAllowedException;
-use Directive\Exception\NotFoundException;
-use Directive\Exception\UnauthorizedException;
-use Directive\Exception\WebUserException;
+use Directive\Http\Exception\UnprocessableException;
+use Directive\Http\Exception\ForbiddenException;
+use Directive\Http\Exception\GoneException;
+use Directive\Http\Exception\MethodNotAllowedException;
+use Directive\Http\Exception\NotFoundException;
+use Directive\Http\Exception\UnauthorizedException;
+use Directive\Service\Security\WebUserException;
 
 describe('DirectiveException hierarchy', function () {
     it('DirectiveException defaults to HTTP 500', function () {

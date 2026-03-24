@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Directive\Web\UploadedFile\FileInfo;
+use Directive\Http\Upload\FileInfo;
 
 beforeEach(function () {
     $this->tmpFile = tempnam(sys_get_temp_dir(), 'apisy_test_');

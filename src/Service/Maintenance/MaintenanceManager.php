@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Service\Maintenance;
 
-use Directive\Exception\UnprocessableException;
+use Directive\Http\Exception\UnprocessableException;
 use Directive\Service\Logging\WebLoggerInterface;
 use Directive\Service\Utils\Json;
 

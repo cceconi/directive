@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Directive;
 
-use Directive\Middleware\AuthMiddleware;
-use Directive\Middleware\ClientHeaderMiddleware;
-use Directive\Middleware\CompressResponseMiddleware;
-use Directive\Middleware\CookieMiddleware;
-use Directive\Middleware\HttpSecurityMiddleware;
-use Directive\Middleware\LoggerMiddleware;
-use Directive\Middleware\MaintenanceMiddleware;
-use Directive\Middleware\RequestIdMiddleware;
+use Directive\Http\Middleware\AuthMiddleware;
+use Directive\Http\Middleware\ClientHeaderMiddleware;
+use Directive\Http\Middleware\CompressResponseMiddleware;
+use Directive\Http\Middleware\CookieMiddleware;
+use Directive\Http\Middleware\HttpSecurityMiddleware;
+use Directive\Http\Middleware\LoggerMiddleware;
+use Directive\Http\Middleware\MaintenanceMiddleware;
+use Directive\Http\Middleware\RequestIdMiddleware;
 use Directive\Service\Configuration\ConfigurationInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Directive\Web\InterfaceData\Boolean;
-use Directive\Web\InterfaceData\EasyFilenaming;
-use Directive\Web\InterfaceData\EmailAddress;
-use Directive\Web\InterfaceData\SimpleNumeric;
-use Directive\Web\InterfaceData\SimpleString;
+use Directive\Http\Input\Boolean;
+use Directive\Http\Input\EasyFilenaming;
+use Directive\Http\Input\EmailAddress;
+use Directive\Http\Input\SimpleNumeric;
+use Directive\Http\Input\SimpleString;
 
 describe('SimpleString', function () {
     it('strips HTML tags', function () {

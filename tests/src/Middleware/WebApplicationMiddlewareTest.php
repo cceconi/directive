@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Directive\Rest\HttpResponse;
+use Directive\Http\Response\HttpResponse;
 use Directive\Service\AppManagement\AppInfoInterface;
 use Directive\Service\AppManagement\ClientHeadersInterface;
 use Directive\Service\Configuration\ConfigurationInterface;
