@@ -21,7 +21,32 @@ class Service
 
     public function __construct(
         public private(set) readonly string $name,
+        private MethodDefaults $defaults = new MethodDefaults(),
     ) {}
+
+    /** @param class-string $class */
+    public function withErrorClass(string $class): static
+    {
+        $clone           = clone $this;
+        $clone->defaults = $this->defaults->withErrorClass($class);
+        return $clone;
+    }
+
+    /** @param class-string $class */
+    public function withRequestValidatorClass(string $class): static
+    {
+        $clone           = clone $this;
+        $clone->defaults = $this->defaults->withRequestValidatorClass($class);
+        return $clone;
+    }
+
+    /** @param array<string> $roles */
+    public function withAllowedRoles(array $roles): static
+    {
+        $clone           = clone $this;
+        $clone->defaults = $this->defaults->withAllowedRoles($roles);
+        return $clone;
+    }
 
     /**
      * Create a new Resource and register it in this service.
@@ -36,7 +61,7 @@ class Service
             );
         }
 
-        $resource = new Resource($name);
+        $resource = new Resource($name, $this->defaults);
         $this->resources[$name] = $resource;
 
         return $resource;

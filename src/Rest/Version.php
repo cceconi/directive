@@ -25,7 +25,32 @@ class Version
         public private(set) readonly string $name,
         public private(set) readonly VersionStatus $status = VersionStatus::Open,
         public private(set) readonly string $info = '',
+        private MethodDefaults $defaults = new MethodDefaults(),
     ) {}
+
+    /** @param class-string $class */
+    public function withErrorClass(string $class): static
+    {
+        $clone           = clone $this;
+        $clone->defaults = $this->defaults->withErrorClass($class);
+        return $clone;
+    }
+
+    /** @param class-string $class */
+    public function withRequestValidatorClass(string $class): static
+    {
+        $clone           = clone $this;
+        $clone->defaults = $this->defaults->withRequestValidatorClass($class);
+        return $clone;
+    }
+
+    /** @param array<string> $roles */
+    public function withAllowedRoles(array $roles): static
+    {
+        $clone           = clone $this;
+        $clone->defaults = $this->defaults->withAllowedRoles($roles);
+        return $clone;
+    }
 
     /**
      * Create a new Service and register it in this version.
@@ -40,7 +65,7 @@ class Version
             );
         }
 
-        $service = new Service($name);
+        $service = new Service($name, $this->defaults);
         $this->services[$name] = $service;
 
         return $service;

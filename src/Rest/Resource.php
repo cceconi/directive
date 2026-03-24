@@ -12,10 +12,15 @@ use Directive\Service\Business\ErrorManager;
  * A named resource within a Service.
  * Holds one Method per HTTP verb.
  *
- * Fluent usage:
+ * Defaults are configured via the with* fluent methods (mutation semantics — returns $this):
  *   $service->resource('profile')
- *       ->get(GetProfile::class, requestValidatorClass: GetProfilePolicy::class, errorClass: ErrorManager::class, allowedRoles: ['user'])
- *       ->put(PutProfile::class, requestValidatorClass: PutProfilePolicy::class, errorClass: ErrorManager::class, allowedRoles: ['user']);
+ *       ->withAllowedRoles(['user'])
+ *       ->get(GetProfile::class)
+ *       ->put(PutProfile::class);
+ *
+ * withErrorClass/withRequestValidatorClass/withAllowedRoles update $this in-place and
+ * return $this. This is intentional: Resource is a mutable builder, and Service holds
+ * a reference to the same object. A clone would orphan methods added after the with* call.
  */
 class Resource
 {
@@ -24,7 +29,33 @@ class Resource
 
     public function __construct(
         public private(set) readonly string $name,
+        private MethodDefaults $defaults = new MethodDefaults(),
     ) {}
+
+    // ------------------------------------------------------------------
+    // Fluent defaults (mutation semantics — returns $this)
+    // ------------------------------------------------------------------
+
+    /** @param class-string $class */
+    public function withErrorClass(string $class): static
+    {
+        $this->defaults = $this->defaults->withErrorClass($class);
+        return $this;
+    }
+
+    /** @param class-string $class */
+    public function withRequestValidatorClass(string $class): static
+    {
+        $this->defaults = $this->defaults->withRequestValidatorClass($class);
+        return $this;
+    }
+
+    /** @param array<string> $roles */
+    public function withAllowedRoles(array $roles): static
+    {
+        $this->defaults = $this->defaults->withAllowedRoles($roles);
+        return $this;
+    }
 
     // ------------------------------------------------------------------
     // HTTP method shortcuts — each returns $this for chaining
@@ -32,107 +63,77 @@ class Resource
 
     /**
      * @param class-string      $apiClass
-     * @param class-string      $requestValidatorClass
-     * @param class-string      $errorClass
-     * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
      */
     public function get(
         string $apiClass,
-        string $requestValidatorClass,
-        string $errorClass = ErrorManager::class,
-        array $allowedRoles = [],
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
     ): static {
-        return $this->addMethod('GET', $apiClass, $requestValidatorClass, $errorClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('GET', $apiClass, $allowCors, $responseEntityClass, $requestEntityClass);
     }
 
     /**
      * @param class-string      $apiClass
-     * @param class-string      $requestValidatorClass
-     * @param class-string      $errorClass
-     * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
      */
     public function post(
         string $apiClass,
-        string $requestValidatorClass,
-        string $errorClass = ErrorManager::class,
-        array $allowedRoles = [],
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
     ): static {
-        return $this->addMethod('POST', $apiClass, $requestValidatorClass, $errorClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('POST', $apiClass, $allowCors, $responseEntityClass, $requestEntityClass);
     }
 
     /**
      * @param class-string      $apiClass
-     * @param class-string      $requestValidatorClass
-     * @param class-string      $errorClass
-     * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
      */
     public function put(
         string $apiClass,
-        string $requestValidatorClass,
-        string $errorClass = ErrorManager::class,
-        array $allowedRoles = [],
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
     ): static {
-        return $this->addMethod('PUT', $apiClass, $requestValidatorClass, $errorClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('PUT', $apiClass, $allowCors, $responseEntityClass, $requestEntityClass);
     }
 
     /**
      * @param class-string      $apiClass
-     * @param class-string      $requestValidatorClass
-     * @param class-string      $errorClass
-     * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
      */
     public function patch(
         string $apiClass,
-        string $requestValidatorClass,
-        string $errorClass = ErrorManager::class,
-        array $allowedRoles = [],
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
     ): static {
-        return $this->addMethod('PATCH', $apiClass, $requestValidatorClass, $errorClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('PATCH', $apiClass, $allowCors, $responseEntityClass, $requestEntityClass);
     }
 
     /**
      * @param class-string      $apiClass
-     * @param class-string      $requestValidatorClass
-     * @param class-string      $errorClass
-     * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
      */
     public function delete(
         string $apiClass,
-        string $requestValidatorClass,
-        string $errorClass = ErrorManager::class,
-        array $allowedRoles = [],
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
     ): static {
-        return $this->addMethod('DELETE', $apiClass, $requestValidatorClass, $errorClass, $allowedRoles, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('DELETE', $apiClass, $allowCors, $responseEntityClass, $requestEntityClass);
     }
 
     // ------------------------------------------------------------------
@@ -173,9 +174,6 @@ class Resource
 
     /**
      * @param class-string      $apiClass
-     * @param class-string      $requestValidatorClass
-     * @param class-string      $errorClass
-     * @param array<string>     $allowedRoles
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
@@ -183,9 +181,6 @@ class Resource
     private function addMethod(
         string $httpMethod,
         string $apiClass,
-        string $requestValidatorClass,
-        string $errorClass,
-        array $allowedRoles,
         array $allowCors,
         ?string $responseEntityClass,
         ?string $requestEntityClass,
@@ -201,9 +196,9 @@ class Resource
         $this->methods[$key] = new Method(
             httpMethod: $key,
             apiClass: $apiClass,
-            requestValidatorClass: $requestValidatorClass,
-            errorClass: $errorClass,
-            allowedRoles: $allowedRoles,
+            requestValidatorClass: $this->defaults->requestValidatorClass ?? NullRequestValidator::class,
+            errorClass: $this->defaults->errorClass ?? ErrorManager::class,
+            allowedRoles: $this->defaults->allowedRoles ?? [],
             allowCors: $allowCors,
             responseEntityClass: $responseEntityClass,
             requestEntityClass: $requestEntityClass,

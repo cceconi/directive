@@ -11,10 +11,14 @@ use Directive\Exception\NotFoundException;
  * Top-level node of the API tree: a named collection of Versions.
  *
  * Fluent usage — start here:
- *   ApiTree::domain('users')
- *       ->version('v1', VersionStatus::Open)
- *           ->service('account')
- *               ->resource('profile')->get(...)
+ *   $domain = new Domain('users');
+ *   $domain->version('v1', VersionStatus::Open)
+ *       ->service('account')
+ *           ->resource('profile')->get(...)
+ *
+ * Cascading defaults — set once, propagate down:
+ *   $domain->withErrorClass(AppErrorManager::class)
+ *       ->version('v1')->service('account')->resource('profile')->get(...)
  */
 class Domain
 {
@@ -23,7 +27,32 @@ class Domain
 
     public function __construct(
         public private(set) readonly string $name,
+        private MethodDefaults $defaults = new MethodDefaults(),
     ) {}
+
+    /** @param class-string $class */
+    public function withErrorClass(string $class): static
+    {
+        $clone           = clone $this;
+        $clone->defaults = $this->defaults->withErrorClass($class);
+        return $clone;
+    }
+
+    /** @param class-string $class */
+    public function withRequestValidatorClass(string $class): static
+    {
+        $clone           = clone $this;
+        $clone->defaults = $this->defaults->withRequestValidatorClass($class);
+        return $clone;
+    }
+
+    /** @param array<string> $roles */
+    public function withAllowedRoles(array $roles): static
+    {
+        $clone           = clone $this;
+        $clone->defaults = $this->defaults->withAllowedRoles($roles);
+        return $clone;
+    }
 
     /**
      * Create a new Version and register it in this domain.
@@ -41,7 +70,7 @@ class Domain
             );
         }
 
-        $version = new Version($name, $status, $info);
+        $version = new Version($name, $status, $info, $this->defaults);
         $this->versions[$name] = $version;
 
         return $version;

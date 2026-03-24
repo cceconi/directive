@@ -18,7 +18,9 @@ function buildTestTree(): ApiDefinitionManager
     $domain->version('v1', VersionStatus::Open)
         ->service('account')
         ->resource('profile')
-        ->get(StubApi::class, StubRequestValidator::class, ErrorManager::class);
+        ->withRequestValidatorClass(StubRequestValidator::class)
+        ->withErrorClass(ErrorManager::class)
+        ->get(StubApi::class);
 
     $manager->registerDomain($domain);
     return $manager;

@@ -19,13 +19,17 @@ function buildOpenApiTree(): ApiDefinitionManager
     $domain->version('v1', VersionStatus::Open, 'User management')
         ->service('account')
         ->resource('profile')
-        ->get(StubApi::class, StubRequestValidator::class, ErrorManager::class)
-        ->put(StubApi::class, StubRequestValidator::class, ErrorManager::class, allowedRoles: ['admin']);
+        ->withRequestValidatorClass(StubRequestValidator::class)
+        ->withErrorClass(ErrorManager::class)
+        ->get(StubApi::class)->withAllowedRoles(['admin'])
+        ->put(StubApi::class);
 
     $domain->version('v2', VersionStatus::Deprecated)
         ->service('account')
         ->resource('profile')
-        ->get(StubApi::class, StubRequestValidator::class, ErrorManager::class);
+        ->withRequestValidatorClass(StubRequestValidator::class)
+        ->withErrorClass(ErrorManager::class)
+        ->get(StubApi::class);
 
     $manager->registerDomain($domain);
     return $manager;
