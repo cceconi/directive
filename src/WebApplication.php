@@ -13,6 +13,7 @@ use Directive\Http\Middleware\LoggerMiddleware;
 use Directive\Http\Middleware\MaintenanceMiddleware;
 use Directive\Http\Middleware\RequestIdMiddleware;
 use Directive\Service\Configuration\ConfigurationInterface;
+use Directive\Service\Health\HealthCheckInterface;
 use Directive\Service\Health\HealthManager;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;

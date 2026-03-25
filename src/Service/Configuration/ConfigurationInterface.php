@@ -14,12 +14,6 @@ namespace Directive\Service\Configuration;
 interface ConfigurationInterface
 {
     /**
-     * Set all configuration parameters.
-     * Called once by the framework immediately after instantiation.
-     */
-    public function setParams(): void;
-
-    /**
      * Assert all required parameters are present and valid.
      * Throws ConfigurationException on any missing/invalid value.
      */

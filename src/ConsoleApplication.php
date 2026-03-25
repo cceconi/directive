@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace Directive;
 
+use Directive\Console\ConfigCheckCommand;
+use Directive\Console\ConfigExportCommand;
+use Directive\Console\ConfigListCommand;
+use Directive\Console\ConfigVerifyCommand;
 use Directive\Console\DirectiveCommand;
+use Directive\Console\FeatureListCommand;
 use Directive\Console\OpenApiCommand;
 use Directive\Service\Configuration\ConfigurationInterface;
 use Directive\Service\Logging\ConsoleLogger;
@@ -113,7 +118,12 @@ class ConsoleApplication extends AbstractApplication
         );
 
         // Always-present framework commands
-        $this->console->add(new OpenApiCommand($this->getContainer()));
+        $this->console->addCommand(new OpenApiCommand($this->getContainer()));
+        $this->console->addCommand(new ConfigCheckCommand($this->getContainer()));
+        $this->console->addCommand(new ConfigListCommand($this->getContainer()));
+        $this->console->addCommand(new ConfigExportCommand($this->getContainer()));
+        $this->console->addCommand(new FeatureListCommand($this->getContainer()));
+        $this->console->addCommand(new ConfigVerifyCommand($this->getContainer()));
 
         // User-registered commands
         if ($this->userCommands !== []) {

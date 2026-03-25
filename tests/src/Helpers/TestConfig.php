@@ -19,8 +19,6 @@ final class TestConfig implements ConfigurationInterface
         'env.files.tmpdir' => '/tmp/apisy-test-uploads',
     ];
 
-    public function setParams(): void {}
-
     public function validate(): void {}
 
     public function getLogDir(): string

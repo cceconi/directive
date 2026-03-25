@@ -10,9 +10,8 @@ use Directive\Exception\ConfigurationException;
  * Base configuration class.
  *
  * Lifecycle (driven by AbstractApplication::setConfig):
- *   1. new MyConfig()       — defaults registered via setDefault(), requiredParams declared.
- *   2. ->setParams()        — user sets all app/env parameters.
- *   3. ->validate()         — checks all required params are present.
+ *   1. new MyConfig()  — defaults registered via setDefault(), requiredParams declared.
+ *   2. ->validate()    — checks all required params are present.
  */
 abstract class Configuration implements ConfigurationInterface
 {
@@ -53,11 +52,6 @@ abstract class Configuration implements ConfigurationInterface
 
         $this->setDefault();
     }
-
-    // ── Abstract hooks ───────────────────────────────────────────────────────
-
-    /** User sets all app/env parameters here. */
-    abstract public function setParams(): void;
 
     // ── ConfigurationInterface ───────────────────────────────────────────────
 

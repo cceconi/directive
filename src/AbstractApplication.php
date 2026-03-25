@@ -42,7 +42,6 @@ abstract class AbstractApplication implements ApplicationInterface
     {
         /** @var ConfigurationInterface $config */
         $config = new $configClass();
-        $config->setParams();
         $config->validate();
 
         // Re-create RuntimeLogger now that we know the real log directory.
