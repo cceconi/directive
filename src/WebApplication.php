@@ -13,6 +13,7 @@ use Directive\Http\Middleware\LoggerMiddleware;
 use Directive\Http\Middleware\MaintenanceMiddleware;
 use Directive\Http\Middleware\RequestIdMiddleware;
 use Directive\Service\Configuration\ConfigurationInterface;
+use Directive\Service\Health\HealthManager;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
 use Psr\Http\Message\ResponseInterface;
@@ -99,19 +100,27 @@ class WebApplication extends AbstractApplication
      * Register all framework routes.
      *
      * Route pattern: /{domain}/{version}/{service}/{resource}
-     * Built-in routes: POST /maintenance, GET /appinfo/{key}
+     * Built-in routes: POST /maintenance, GET /appinfo/{key},
+     *                  GET /health/live, GET /health/ready
      *
      * The actual dispatch logic lives in Rest\Router (Epic 3).
      */
     private function setRoutes(): void
     {
-        $app = $this->slim;
+        $app       = $this->slim;
+        $container = $this->getContainer();
+        $checks    = $this->configureHealthChecks();
 
-        // -- API routes (all HTTP verbs) ----------------------------------
-        $app->any('/{domain}/{version}/{service}/{resource}', function ($request, $response) {
-            // Epic 3: delegate to Rest\Router::resolve()
-            return $response;
-        });
+        // -- API routes (non-OPTIONS HTTP verbs) --------------------------
+        // OPTIONS is handled separately to avoid a FastRoute duplicate conflict.
+        $app->map(
+            ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+            '/{domain}/{version}/{service}/{resource}',
+            function ($request, $response) {
+                // Epic 3: delegate to Rest\Router::resolve()
+                return $response;
+            }
+        );
 
         // -- CORS OPTIONS preflight ---------------------------------------
         $app->options('/{domain}/{version}/{service}/{resource}', function ($request, $response) {
@@ -129,6 +138,19 @@ class WebApplication extends AbstractApplication
         $app->get('/appinfo/{key}', function ($request, $response) {
             // Epic 8: delegate to AppManager::resolve()
             return $response;
+        });
+
+        // -- Built-in: health probes (IETF + Kubernetes) ------------------
+        $app->get('/health/live', function ($request, $response) use ($container) {
+            /** @var HealthManager $healthManager */
+            $healthManager = $container->get(HealthManager::class);
+            return $healthManager->resolveLive($response);
+        });
+
+        $app->get('/health/ready', function ($request, $response) use ($container, $checks) {
+            /** @var HealthManager $healthManager */
+            $healthManager = $container->get(HealthManager::class);
+            return $healthManager->resolveReady($response, $checks);
         });
 
         // -- Catch-all 404 ------------------------------------------------
@@ -196,6 +218,22 @@ class WebApplication extends AbstractApplication
      * @param App<\Psr\Container\ContainerInterface|null> $slim
      */
     protected function configureMiddleware(App $slim): void {}
+
+    /**
+     * Override to register application-level health checks for GET /health/ready.
+     *
+     * Returns an empty array by default (no application checks).
+     * Each entry is a named check: key = check name, value = HealthCheckInterface.
+     *
+     * Example:
+     *   return ['database' => new DatabaseHealthCheck($this->get(PDO::class))];
+     *
+     * @return array<string, HealthCheckInterface>
+     */
+    protected function configureHealthChecks(): array
+    {
+        return [];
+    }
 
     /**
      * Override to register custom Slim routes that bypass the standard API stack.
