@@ -8,9 +8,9 @@ use Directive\Http\Routing\Domain;
 use Directive\Http\Routing\VersionStatus;
 use Symfony\Component\Console\Tester\CommandTester;
 use Directive\Service\Business\ErrorManager;
+use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Tests\Helpers\StubApi;
 use Tests\Helpers\StubRequestValidator;
-use Tests\Helpers\TestConfig;
 
 function buildOpenApiTree(): ApiDefinitionManager
 {
@@ -35,15 +35,25 @@ function buildOpenApiTree(): ApiDefinitionManager
     return $manager;
 }
 
+function stubAppIdentity(): AppIdentityConfigInterface
+{
+    return new class implements AppIdentityConfigInterface {
+        public function getAppCode(): string { return 'apisy-test'; }
+        public function getAppName(): string { return 'DirectiveTestApp'; }
+        public function getAppVersion(): string { return '3.0.0'; }
+        public function getAppDescription(): string { return 'Test application'; }
+        public function getAppUrl(): string { return ''; }
+    };
+}
+
 describe('OpenApiCommand', function () {
     it('generates an OpenAPI document with correct structure', function () {
-        $manager  = buildOpenApiTree();
-        $config   = new TestConfig();
-        $outFile  = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
+        $manager = buildOpenApiTree();
+        $outFile = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
 
         $container = $this->container([
             \Directive\Http\Endpoint\ApiDefinitionManager::class => $manager,
-            \Directive\Service\Configuration\ConfigurationInterface::class => $config,
+            AppIdentityConfigInterface::class                    => stubAppIdentity(),
         ]);
 
         $command = new OpenApiCommand($container);
@@ -63,13 +73,12 @@ describe('OpenApiCommand', function () {
     });
 
     it('includes security requirement on protected operations', function () {
-        $manager  = buildOpenApiTree();
-        $config   = new TestConfig();
-        $outFile  = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
+        $manager = buildOpenApiTree();
+        $outFile = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
 
         $container = $this->container([
             \Directive\Http\Endpoint\ApiDefinitionManager::class => $manager,
-            \Directive\Service\Configuration\ConfigurationInterface::class => $config,
+            AppIdentityConfigInterface::class                    => stubAppIdentity(),
         ]);
 
         $command = new OpenApiCommand($container);
@@ -83,13 +92,12 @@ describe('OpenApiCommand', function () {
     });
 
     it('marks deprecated versions in tag descriptions', function () {
-        $manager  = buildOpenApiTree();
-        $config   = new TestConfig();
-        $outFile  = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
+        $manager = buildOpenApiTree();
+        $outFile = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
 
         $container = $this->container([
             \Directive\Http\Endpoint\ApiDefinitionManager::class => $manager,
-            \Directive\Service\Configuration\ConfigurationInterface::class => $config,
+            AppIdentityConfigInterface::class                    => stubAppIdentity(),
         ]);
 
         $command = new OpenApiCommand($container);

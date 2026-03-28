@@ -7,7 +7,7 @@ namespace Directive\Console;
 use Directive\Http\Endpoint\ApiDefinitionManager;
 use Directive\Http\Routing\Method;
 use Directive\Http\Routing\VersionStatus;
-use Directive\Service\Configuration\ConfigurationInterface;
+use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -46,15 +46,15 @@ final class OpenApiCommand extends DirectiveCommand
     {
         $outFile = (string) $input->getOption('output');
 
-        /** @var ConfigurationInterface $config */
-        $config = $this->container->get(ConfigurationInterface::class);
+        /** @var AppIdentityConfigInterface $config */
+        $config = $this->container->get(AppIdentityConfigInterface::class);
 
         /** @var ApiDefinitionManager $manager */
         $manager = $this->container->get(ApiDefinitionManager::class);
 
-        $appName    = (string) $config->get('app.name', 'Directive');
-        $appVersion = (string) $config->get('app.version', '1.0.0');
-        $appDesc    = (string) $config->get('app.description', '');
+        $appName    = $config->getAppName();
+        $appVersion = $config->getAppVersion();
+        $appDesc    = $config->getAppDescription();
 
         $doc = $this->buildDocument($manager, $appName, $appVersion, $appDesc);
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Directive\Http\Input;
 
 use Directive\Exception\ConfigurationException;
-use Directive\Service\Configuration\ConfigurationInterface;
+use Directive\Http\Middleware\HttpConfigInterface;
 use Directive\Http\Input\Constraint\FileConstraint;
 use Directive\Http\Upload\FileInfo;
 use Psr\Http\Message\UploadedFileInterface;
@@ -20,7 +20,7 @@ use Psr\Http\Message\UploadedFileInterface;
 final class File extends InterfaceData
 {
     public function __construct(
-        private readonly ConfigurationInterface $config,
+        private readonly HttpConfigInterface $config,
         FileConstraint $constraint,
         string $errorLabel = '',
     ) {
@@ -46,9 +46,9 @@ final class File extends InterfaceData
         $basename       = str_replace('.', '_', uniqid('', true));
         $filename       = sprintf('%s.%0.8s', $basename, $extension);
 
-        $tmpDir = $this->config->get('env.files.tmpdir');
+        $tmpDir = $this->config->getUploadTmpDir();
 
-        if (!is_string($tmpDir) || $tmpDir === '') {
+        if ($tmpDir === '') {
             throw new ConfigurationException('Configuration key "env.files.tmpdir" is not set.');
         }
 

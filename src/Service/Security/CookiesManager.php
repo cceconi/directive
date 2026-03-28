@@ -9,7 +9,7 @@ use Dflydev\FigCookies\FigRequestCookies;
 use Dflydev\FigCookies\FigResponseCookies;
 use Dflydev\FigCookies\Modifier\SameSite;
 use Dflydev\FigCookies\SetCookie;
-use Directive\Service\Configuration\ConfigurationInterface;
+use Directive\Service\Security\SecurityConfigInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -23,7 +23,7 @@ final class CookiesManager implements CookiesManagerInterface
     private array $responseCookies = [];
 
     public function __construct(
-        private readonly ConfigurationInterface $config,
+        private readonly SecurityConfigInterface $config,
     ) {}
 
     // ------------------------------------------------------------------
@@ -91,13 +91,13 @@ final class CookiesManager implements CookiesManagerInterface
         ?int $maxAge = null,
         ?string $domain = null,
     ): SetCookie {
-        $lifetime  = (int) $this->config->get('env.token.lifetime', 300);
-        $maxAge    ??= $lifetime;
-        $expire    = time() + $maxAge;
-        $cookieDomain = $domain ?? (string) $this->config->get('env.security.cookie.domain', '');
-        $secure    = (bool) $this->config->get('env.security.http.secure', false);
-        $httpOnly  = (bool) $this->config->get('env.security.cookie.httponly', true);
-        $sameSite  = (string) $this->config->get('env.security.cookie.samesite', 'Strict');
+        $lifetime     = $this->config->getTokenLifetime();
+        $maxAge       ??= $lifetime;
+        $expire       = time() + $maxAge;
+        $cookieDomain = $domain ?? $this->config->getCookieDomain();
+        $secure       = $this->config->isHttpSecure();
+        $httpOnly     = $this->config->isCookieHttpOnly();
+        $sameSite     = $this->config->getCookieSameSite();
 
         $cookie = SetCookie::create($name)
             ->withValue($value)

@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Directive\Http\Response\HttpResponse;
 use Directive\Service\AppManagement\AppInfoInterface;
 use Directive\Service\AppManagement\ClientHeadersInterface;
-use Directive\Service\Configuration\ConfigurationInterface;
+use Directive\Service\Configuration\AbstractConfiguration;
 use Directive\Service\Health\AbstractHealthCheck;
 use Directive\Service\Health\HealthCheckInterface;
 use Directive\Service\Logging\WebLoggerInterface;
@@ -114,7 +114,7 @@ class HealthRouteWebApplication extends WebApplication
     /** @var MaintenanceManagerInterface|null */
     public ?MaintenanceManagerInterface $maintenanceOverride = null;
 
-    protected function registerServices(ConfigurationInterface $config): void
+    protected function registerServices(AbstractConfiguration $config): void
     {
         parent::registerServices($config);
 

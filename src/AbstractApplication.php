@@ -5,8 +5,18 @@ declare(strict_types=1);
 namespace Directive;
 
 use DI\ContainerBuilder;
-use Directive\Service\Configuration\ConfigurationInterface;
+use Directive\Http\Middleware\DefaultHttpConfig;
+use Directive\Http\Middleware\HttpConfigInterface;
+use Directive\Service\AppIdentity\AppIdentityConfigInterface;
+use Directive\Service\AppIdentity\DefaultAppIdentityConfig;
+use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Logging\DefaultLoggingConfig;
+use Directive\Service\Logging\LoggingConfigInterface;
 use Directive\Service\Logging\RuntimeLogger;
+use Directive\Service\Security\Antivirus\AntivirusConfigInterface;
+use Directive\Service\Security\Antivirus\DefaultAntivirusConfig;
+use Directive\Service\Security\DefaultSecurityConfig;
+use Directive\Service\Security\SecurityConfigInterface;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -14,7 +24,7 @@ use Psr\Container\ContainerInterface;
  *
  * Lifecycle:
  *   1. new WebApplication()         — RuntimeLogger up, ContainerBuilder created.
- *   2. ->setConfig(MyConfig::class) — config validated, container built, services wired.
+ *   2. ->setConfig(MyConfig::class) — config validated, service defaults bound, container built.
  *   3. ->run()                      — application starts.
  */
 abstract class AbstractApplication implements ApplicationInterface
@@ -23,6 +33,9 @@ abstract class AbstractApplication implements ApplicationInterface
     private ContainerBuilder $builder;
 
     private ?ContainerInterface $container = null;
+
+    /** @var array<string> Interface keys already registered by user via addDefinitions(). */
+    private array $userDefinedKeys = [];
 
     public function __construct()
     {
@@ -40,16 +53,20 @@ abstract class AbstractApplication implements ApplicationInterface
 
     final public function setConfig(string $configClass): static
     {
-        /** @var ConfigurationInterface $config */
+        /** @var AbstractConfiguration $config */
         $config = new $configClass();
-        $config->validate();
+        $config->audit();
 
-        // Re-create RuntimeLogger now that we know the real log directory.
-        new RuntimeLogger($config->getRuntimeLoggerName(), $config->getLogDir());
+        // Auto-bind the 5 default service configs (skip any already overridden by user).
+        $loggingConfig = $this->autoBindServiceDefaults();
 
-        $this->builder->addDefinitions([
-            ConfigurationInterface::class => $config,
-        ]);
+        // Re-init RuntimeLogger now that we know the real log directory.
+        new RuntimeLogger($this->runtimeLoggerName(), $loggingConfig->getLogPath());
+
+        // Warn if running in production without a compiled config cache.
+        $this->checkProductionCacheConfig();
+
+        $this->builder->addDefinitions([$configClass => $config]);
 
         $this->registerServices($config);
 
@@ -78,7 +95,7 @@ abstract class AbstractApplication implements ApplicationInterface
      * Called before the container is built.
      * Override in subclasses to add mode-specific definitions.
      */
-    protected function registerServices(ConfigurationInterface $config): void
+    protected function registerServices(AbstractConfiguration $config): void
     {
         // Populated in subsequent epics (loggers, security, managers…).
     }
@@ -120,11 +137,68 @@ abstract class AbstractApplication implements ApplicationInterface
     /**
      * Add DI definitions to the builder.
      * Must be called before setConfig() triggers the build.
+     * Tracks which interface keys are user-defined so auto-defaults skip them.
      *
      * @param array<string, mixed> $definitions
      */
     protected function addDefinitions(array $definitions): void
     {
+        foreach (array_keys($definitions) as $key) {
+            $this->userDefinedKeys[] = $key;
+        }
+
         $this->builder->addDefinitions($definitions);
+    }
+
+    /**
+     * Instantiates, audits, and registers each default service config
+     * unless the user already provided that interface binding.
+     *
+     * Returns the resolved LoggingConfigInterface for RuntimeLogger re-init.
+     */
+    private function autoBindServiceDefaults(): LoggingConfigInterface
+    {
+        /** @var array<class-string, AbstractConfiguration> $defaults */
+        $defaults = [
+            LoggingConfigInterface::class     => new DefaultLoggingConfig(),
+            AppIdentityConfigInterface::class => new DefaultAppIdentityConfig(),
+            AntivirusConfigInterface::class   => new DefaultAntivirusConfig(),
+            SecurityConfigInterface::class    => new DefaultSecurityConfig(),
+            HttpConfigInterface::class        => new DefaultHttpConfig(),
+        ];
+
+        foreach ($defaults as $interface => $impl) {
+            $impl->audit();
+            if (!in_array($interface, $this->userDefinedKeys, true)) {
+                $this->builder->addDefinitions([$interface => $impl]);
+            }
+        }
+
+        /** @var LoggingConfigInterface $logging */
+        $logging = $defaults[LoggingConfigInterface::class];
+
+        return $logging;
+    }
+
+    /**
+     * Emit warnings when running in production without a config cache.
+     */
+    private function checkProductionCacheConfig(): void
+    {
+        $appEnv = $_ENV['APP_ENV'] ?? '';
+
+        if ($appEnv !== 'production') {
+            return;
+        }
+
+        if (!file_exists('var/cache/config.php')) {
+            error_log('[Directive] Production environment detected but var/cache/config.php is missing.'
+                . ' Run "php artisan config:compile" to generate the cache.');
+        }
+
+        if (isset($_ENV['DIRECTIVE_CONFIG_CACHE']) && $_ENV['DIRECTIVE_CONFIG_CACHE'] === '0') {
+            error_log('[Directive] Security warning: configuration cache is explicitly disabled in'
+                . ' production (DIRECTIVE_CONFIG_CACHE=0).');
+        }
     }
 }

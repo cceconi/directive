@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Service\Logging;
 
-use Directive\Service\Configuration\ConfigurationInterface;
+use Directive\Service\Logging\LoggingConfigInterface;
 use Directive\Service\Security\WebUserInterface;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\RotatingFileHandler;
@@ -36,7 +36,7 @@ class ConsoleLogger implements ConsoleLoggerInterface
     public function __construct(
         private readonly string $channel,
         private readonly string $logDir,
-        private readonly ConfigurationInterface $config,
+        private readonly LoggingConfigInterface $config,
         ?float $timeref = null,
     ) {
         $this->timeref = $timeref ?? microtime(true);
@@ -95,8 +95,8 @@ class ConsoleLogger implements ConsoleLoggerInterface
 
         $data = [
             'server'             => gethostname() !== false ? gethostname() : 'N/A',
-            'app'                => $this->config->get('app.code'),
-            'mode'               => $this->config->get('env.code'),
+            'app'                => $this->config->getAppCode(),
+            'mode'               => $this->config->getEnvCode(),
             'version'            => $this->version,
             '@timestamp'         => date('c', (int) $this->timeref),
             'started_at'         => $this->timeref,

@@ -4,35 +4,20 @@ declare(strict_types=1);
 
 namespace Tests\Helpers;
 
-use Directive\Service\Configuration\ConfigurationInterface;
+use Directive\Service\Configuration\AbstractConfiguration;
 
-/** Minimal configuration for tests. */
-final class TestConfig implements ConfigurationInterface
+/** Minimal configuration for tests — all keys are optional with sensible defaults. */
+final class TestConfig extends AbstractConfiguration
 {
-    /** @var array<string, mixed> */
-    private array $params = [
-        'app.name'        => 'DirectiveTestApp',
-        'app.version'     => '3.0.0',
-        'app.description' => 'Test application',
-        'app.code'        => 'apisy-test',
-        'log.dir'         => '/tmp',
-        'env.files.tmpdir' => '/tmp/apisy-test-uploads',
-    ];
-
-    public function validate(): void {}
-
-    public function getLogDir(): string
+    protected function define(): void
     {
-        return '/tmp';
-    }
-
-    public function getRuntimeLoggerName(): string
-    {
-        return 'console';
-    }
-
-    public function get(string $key, mixed $default = null): mixed
-    {
-        return $this->params[$key] ?? $default;
+        $this->optional('DIRECTIVE_APP_CODE', 'apisy-test', 'string');
+        $this->optional('DIRECTIVE_APP_NAME', 'DirectiveTestApp', 'string');
+        $this->optional('DIRECTIVE_APP_VERSION', '3.0.0', 'string');
+        $this->optional('DIRECTIVE_APP_DESCRIPTION', 'Test application', 'string');
+        $this->optional('DIRECTIVE_APP_URL', '', 'string');
+        $this->optional('DIRECTIVE_LOG_PATH', '/tmp', 'string');
+        $this->optional('DIRECTIVE_ENV_CODE', 'test', 'string');
+        $this->optional('DIRECTIVE_UPLOAD_TMPDIR', '/tmp/apisy-test-uploads', 'string');
     }
 }

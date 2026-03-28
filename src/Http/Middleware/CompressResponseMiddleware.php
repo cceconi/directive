@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Http\Middleware;
 
-use Directive\Service\Configuration\ConfigurationInterface;
+use Directive\Http\Middleware\HttpConfigInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -23,10 +23,10 @@ final class CompressResponseMiddleware extends AbstractMiddleware
     ): ResponseInterface {
         $response = $handler->handle($request);
 
-        /** @var ConfigurationInterface $config */
-        $config = $this->container->get(ConfigurationInterface::class);
+        /** @var HttpConfigInterface $config */
+        $config = $this->container->get(HttpConfigInterface::class);
 
-        if (!$config->get('env.response.compress', false)) {
+        if (!$config->isCompressionEnabled()) {
             return $response;
         }
 

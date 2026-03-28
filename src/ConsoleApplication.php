@@ -11,9 +11,11 @@ use Directive\Console\ConfigVerifyCommand;
 use Directive\Console\DirectiveCommand;
 use Directive\Console\FeatureListCommand;
 use Directive\Console\OpenApiCommand;
-use Directive\Service\Configuration\ConfigurationInterface;
+use Directive\Service\AppIdentity\AppIdentityConfigInterface;
+use Directive\Service\Configuration\AbstractConfiguration;
 use Directive\Service\Logging\ConsoleLogger;
 use Directive\Service\Logging\ConsoleLoggerInterface;
+use Directive\Service\Logging\DefaultLoggingConfig;
 use Directive\Service\Logging\WebLoggerInterface;
 use Symfony\Component\Console\Application;
 
@@ -79,16 +81,19 @@ class ConsoleApplication extends AbstractApplication
         return 'console';
     }
 
-    protected function registerServices(ConfigurationInterface $config): void
+    protected function registerServices(AbstractConfiguration $config): void
     {
         parent::registerServices($config);
 
         // Build ConsoleLogger and register it for both its own interface
         // and WebLoggerInterface so middlewares relying on WebLoggerInterface work.
+        $loggingConfig = new DefaultLoggingConfig();
+        $loggingConfig->audit();
+
         $logger = new ConsoleLogger(
-            channel: (string) $config->get('app.code', 'apisy-console'),
-            logDir: $config->getLogDir(),
-            config: $config,
+            channel: $loggingConfig->getAppCode(),
+            logDir: $loggingConfig->getLogPath(),
+            config: $loggingConfig,
         );
 
         $this->addDefinitions([
@@ -109,11 +114,11 @@ class ConsoleApplication extends AbstractApplication
 
     private function bootConsole(): void
     {
-        /** @var ConfigurationInterface $config */
-        $config = $this->get(ConfigurationInterface::class);
+        /** @var AppIdentityConfigInterface $appId */
+        $appId = $this->get(AppIdentityConfigInterface::class);
 
         $this->console = new Application(
-            name: (string) $config->get('app.name', 'Directive'),
+            name: $appId->getAppName(),
             version: '3.0',
         );
 

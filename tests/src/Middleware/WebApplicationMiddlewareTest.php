@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Directive\Http\Response\HttpResponse;
 use Directive\Service\AppManagement\AppInfoInterface;
 use Directive\Service\AppManagement\ClientHeadersInterface;
-use Directive\Service\Configuration\ConfigurationInterface;
+use Directive\Service\Configuration\AbstractConfiguration;
 use Directive\Service\Logging\WebLoggerInterface;
 use Directive\Service\Maintenance\MaintenanceManagerInterface;
 use Directive\Service\Security\AccessManagerInterface;
@@ -121,7 +121,7 @@ final class FullStackWebApplication extends WebApplication
 {
     public bool $configureMiddlewareCalled = false;
 
-    protected function registerServices(ConfigurationInterface $config): void
+    protected function registerServices(AbstractConfiguration $config): void
     {
         parent::registerServices($config);
 

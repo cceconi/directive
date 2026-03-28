@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Service\Security;
 
-use Directive\Service\Configuration\ConfigurationInterface;
+use Directive\Service\Security\SecurityConfigInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -24,26 +24,10 @@ final class HeaderManager implements HeaderManagerInterface
         'Referrer-Policy'            => 'same-origin',
     ];
 
-    /**
-     * Optional headers driven by configuration keys.
-     *
-     * @var array<string, string>
-     */
-    private const CONFIG_HEADERS = [
-        'env.security.http.header.sts'  => 'Strict-Transport-Security',
-        'env.security.http.header.sfo'  => 'X-Frame-Options',
-        'env.security.http.header.xxp'  => 'X-XSS-Protection',
-        'env.security.http.header.xcto' => 'X-Content-Type-Options',
-        'env.security.http.header.rpo'  => 'Referrer-Policy',
-        'env.security.http.header.csp'  => 'Content-Security-Policy',
-        'env.security.http.header.ect'  => 'Expect-CT',
-        'env.security.http.header.fpo'  => 'Feature-Policy',
-    ];
-
     private string $lastError = '';
 
     public function __construct(
-        private readonly ConfigurationInterface $config,
+        private readonly SecurityConfigInterface $config,
     ) {}
 
     // ------------------------------------------------------------------
@@ -61,12 +45,11 @@ final class HeaderManager implements HeaderManagerInterface
         }
 
         // Own origin — no CORS headers needed.
-        if ($origin === (string) $this->config->get('env.url', '')) {
+        if ($origin === $this->config->getAppUrl()) {
             return $response;
         }
 
-        /** @var array<string> $allowedOrigins */
-        $allowedOrigins = (array) $this->config->get('env.security.cors', []);
+        $allowedOrigins = $this->config->getCorsAllowedOrigins();
 
         if (!in_array($origin, $allowedOrigins, strict: true)) {
             return $response;
@@ -80,17 +63,15 @@ final class HeaderManager implements HeaderManagerInterface
     public function validateSecurityHeader(ServerRequestInterface $request): bool
     {
         $scheme = $request->getUri()->getScheme();
-        $secure = (bool) $this->config->get('env.security.http.secure', false);
+        $secure = $this->config->isHttpSecure();
 
         if ($scheme === 'https' || !$secure) {
             return true;
         }
 
         // HTTP request but secure mode is on — check relaxed hosts.
-        $host     = $request->getUri()->getHost();
-
-        /** @var array<string> $relaxed */
-        $relaxed  = (array) $this->config->get('env.security.http.relaxed', []);
+        $host    = $request->getUri()->getHost();
+        $relaxed = $this->config->getHttpRelaxedHosts();
 
         if (!in_array($host, $relaxed, strict: true)) {
             $this->lastError = sprintf(
@@ -110,12 +91,9 @@ final class HeaderManager implements HeaderManagerInterface
             $response = $response->withHeader($header, $value);
         }
 
-        // Allow configuration to override.
-        foreach (self::CONFIG_HEADERS as $configKey => $header) {
-            $value = $this->config->get($configKey);
-            if ($value !== null) {
-                $response = $response->withHeader($header, (string) $value);
-            }
+        // Allow SecurityConfigInterface overrides to replace defaults.
+        foreach ($this->config->getSecurityHeaderOverrides() as $header => $value) {
+            $response = $response->withHeader($header, $value);
         }
 
         return $response;

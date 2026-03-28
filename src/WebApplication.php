@@ -12,7 +12,7 @@ use Directive\Http\Middleware\HttpSecurityMiddleware;
 use Directive\Http\Middleware\LoggerMiddleware;
 use Directive\Http\Middleware\MaintenanceMiddleware;
 use Directive\Http\Middleware\RequestIdMiddleware;
-use Directive\Service\Configuration\ConfigurationInterface;
+use Directive\Service\Configuration\AbstractConfiguration;
 use Directive\Service\Health\HealthCheckInterface;
 use Directive\Service\Health\HealthManager;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -70,7 +70,7 @@ class WebApplication extends AbstractApplication
         return 'webapp';
     }
 
-    protected function registerServices(ConfigurationInterface $config): void
+    protected function registerServices(AbstractConfiguration $config): void
     {
         parent::registerServices($config);
         // Web-specific service definitions added in subsequent epics
