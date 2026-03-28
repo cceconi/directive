@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Directive\Service\Configuration;
 
 use Directive\Exception\ConfigurationException;
+use Directive\Service\Configuration\ConfigSourceTracker;
 
 /**
  * Base class for application-level configuration backed by environment variables.
@@ -19,6 +20,9 @@ abstract class AbstractConfiguration
 
     /** @var array<string, mixed> */
     private array $resolved = [];
+
+    /** @var array<string, string> */
+    private array $sources = [];
 
     public function __construct()
     {
@@ -91,6 +95,7 @@ abstract class AbstractConfiguration
                 }
 
                 $this->resolved[$key] = $def['default'];
+                $this->sources[$key]  = 'default';
                 continue;
             }
 
@@ -107,6 +112,7 @@ abstract class AbstractConfiguration
             }
 
             $this->resolved[$key] = $this->cast($rawStr, $def['type']);
+            $this->sources[$key]  = ConfigSourceTracker::getSource($key) ?? 'default';
         }
 
         if ($errors !== []) {
@@ -144,6 +150,28 @@ abstract class AbstractConfiguration
     public function getAll(): array
     {
         return $this->resolved;
+    }
+
+    /**
+     * Return the tracked source origin for a resolved variable.
+     *
+     * Possible values: '.env', '.env.local', 'system', 'default'.
+     *
+     * @throws ConfigurationException when the key is not declared or audit() has not been called yet.
+     */
+    public function getSource(string $key): string
+    {
+        if (!array_key_exists($key, $this->definitions)) {
+            throw new ConfigurationException(sprintf('Configuration key "%s" is not declared.', $key));
+        }
+
+        if (!array_key_exists($key, $this->sources)) {
+            throw new ConfigurationException(
+                sprintf('Source for "%s" is not available — has audit() been called?', $key),
+            );
+        }
+
+        return $this->sources[$key];
     }
 
     /**

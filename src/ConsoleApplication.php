@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Directive;
 
+use Directive\Console\ConfigAuditCommand;
 use Directive\Console\ConfigCheckCommand;
+use Directive\Console\ConfigCompileCommand;
 use Directive\Console\ConfigExportCommand;
 use Directive\Console\ConfigListCommand;
 use Directive\Console\ConfigVerifyCommand;
@@ -127,6 +129,8 @@ class ConsoleApplication extends AbstractApplication
         $this->console->addCommand(new ConfigCheckCommand($this->getContainer()));
         $this->console->addCommand(new ConfigListCommand($this->getContainer()));
         $this->console->addCommand(new ConfigExportCommand($this->getContainer()));
+        $this->console->addCommand(new ConfigAuditCommand($this->getContainer()));
+        $this->console->addCommand(new ConfigCompileCommand($this->getContainer()));
         $this->console->addCommand(new FeatureListCommand($this->getContainer()));
         $this->console->addCommand(new ConfigVerifyCommand($this->getContainer()));
 
