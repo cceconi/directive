@@ -13,6 +13,16 @@ use Directive\Http\Response\ResponseEntity;
  */
 interface ApiInterface
 {
+    /**
+     * Execute the handler. Implementations may throw any DirectiveException.
+     *
+     * @throws \Directive\Http\Exception\TooManyRequestsException
+     * @throws \Directive\Http\Exception\BadRequestException
+     * @throws \Directive\Http\Exception\ForbiddenException
+     * @throws \Directive\Http\Exception\NotFoundException
+     * @throws \Directive\Http\Exception\UnauthorizedException
+     * @throws \Directive\Http\Exception\UnprocessableException
+     */
     public function run(): void;
 
     public function getResponseEntity(): ResponseEntity;

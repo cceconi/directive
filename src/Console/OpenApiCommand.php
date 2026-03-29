@@ -229,6 +229,14 @@ final class OpenApiCommand extends DirectiveCommand
             $op['x-response-entity'] = $method->responseEntityClass;
         }
 
+        if ($method->rateLimit !== null) {
+            $op['x-rate-limit'] = [
+                'window'       => $method->rateLimit->window,
+                'max_requests' => $method->rateLimit->maxRequests,
+                'key_type'     => $method->rateLimit->keyType->value,
+            ];
+        }
+
         return $op;
     }
 

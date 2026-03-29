@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Directive\Http;
 
 use Directive\Http\Exception\BadRequestException;
+use Directive\Http\Exception\TooManyRequestsException;
 use Directive\Http\Exception\UnprocessableException;
 use Directive\Http\Exception\ForbiddenException;
 use Directive\Http\Exception\GoneException;
@@ -80,6 +81,8 @@ final class Router
             return $this->httpResponse->methodNotAllowed($route, $method);
         } catch (GoneException) {
             return $this->httpResponse->gone($route, $method);
+        } catch (TooManyRequestsException $e) {
+            return $this->httpResponse->tooManyRequests($route, $method, (string) $e->getResetIn());
         } catch (UnprocessableException $e) {
             return $this->httpResponse->unprocessable($route, $method, $e->getErrors());
         } catch (\Throwable) {
@@ -130,6 +133,7 @@ final class Router
      * @throws UnauthorizedException
      * @throws BadRequestException
      * @throws UnprocessableException
+     * @throws TooManyRequestsException
      */
     private function dispatch(
         ServerRequestInterface $request,

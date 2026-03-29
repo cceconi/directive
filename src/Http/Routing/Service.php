@@ -63,6 +63,27 @@ class Service
         return $clone;
     }
 
+    public function withRateLimit(RateLimit $rateLimit): static
+    {
+        $clone           = clone $this;
+        $clone->defaults = $this->defaults->withRateLimit($rateLimit);
+        return $clone;
+    }
+
+    public function withRateLimitKeyType(RateLimitKeyType $rateLimitKeyType): static
+    {
+        $clone           = clone $this;
+        $clone->defaults = $this->defaults->withRateLimitKeyType($rateLimitKeyType);
+        return $clone;
+    }
+
+    public function withRateLimitEnabled(bool $rateLimitEnabled): static
+    {
+        $clone           = clone $this;
+        $clone->defaults = $this->defaults->withRateLimitEnabled($rateLimitEnabled);
+        return $clone;
+    }
+
     /**
      * Create a new Resource and register it in this service.
      *

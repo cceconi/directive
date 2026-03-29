@@ -11,8 +11,15 @@ use Directive\Http\Middleware\CookieMiddleware;
 use Directive\Http\Middleware\HttpSecurityMiddleware;
 use Directive\Http\Middleware\LoggerMiddleware;
 use Directive\Http\Middleware\MaintenanceMiddleware;
+use Directive\Http\Middleware\RateLimitMiddleware;
 use Directive\Http\Middleware\RequestIdMiddleware;
 use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\AbstractFeatures;
+use Directive\Service\Configuration\DirectiveFeatures;
+use Directive\Service\RateLimit\DefaultRateLimitConfig;
+use Directive\Service\RateLimit\RateLimitConfigInterface;
+use Directive\Service\RateLimit\RateLimiterInterface;
+use Directive\Service\RateLimit\RedisRateLimiter;
 use Directive\Service\Health\HealthCheckInterface;
 use Directive\Service\Health\HealthManager;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -73,8 +80,17 @@ class WebApplication extends AbstractApplication
     protected function registerServices(AbstractConfiguration $config): void
     {
         parent::registerServices($config);
-        // Web-specific service definitions added in subsequent epics
-        // (Router, HttpResponse, WebUser, security services…).
+
+        $rateLimitConfig = new DefaultRateLimitConfig();
+        $rateLimitConfig->audit();
+
+        $features = new DirectiveFeatures();
+
+        $this->addDefinitions([
+            AbstractFeatures::class         => $features,
+            RateLimitConfigInterface::class => $rateLimitConfig,
+            RateLimiterInterface::class     => new RedisRateLimiter($rateLimitConfig),
+        ]);
     }
 
     protected function addServices(): void
@@ -175,11 +191,12 @@ class WebApplication extends AbstractApplication
      *   6. CompressResponseMiddleware— gzip/deflate response body
      *   7. CookieMiddleware          — load request cookies into container
      *   8. AuthMiddleware            — authenticate user (needs cookies loaded)
+     *   9. RateLimitMiddleware       — enforce per-route rate limits (needs user identity)
      *      ── Slim RoutingMiddleware ──
      *      ── Slim ErrorMiddleware   ──
      *
-     * Optional middlewares (BusinessBenchmarkMiddleware, RateLimitMiddleware)
-     * are NOT pre-wired. Register them in configureMiddleware() if needed.
+     * Optional middlewares (BusinessBenchmarkMiddleware) are NOT pre-wired.
+     * Register them in configureMiddleware() if needed.
      */
     private function applyMiddleware(): void
     {
@@ -191,6 +208,8 @@ class WebApplication extends AbstractApplication
             logErrors: true,
             logErrorDetails: true,
         );
+
+        $this->slim->add(RateLimitMiddleware::class);          // 9 — enforce limits after auth
 
         // Default stack — added in reverse execution order (LIFO)
         $this->slim->add(AuthMiddleware::class);               // 8 — executes last (needs cookies)

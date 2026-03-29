@@ -93,6 +93,12 @@ final class HttpResponse
         return $this->json(410, 'Gone', [], $route, $method);
     }
 
+    public function tooManyRequests(string $route, string $method, string $retryAfter = '60'): ResponseInterface
+    {
+        return $this->json(429, 'Too Many Requests', [], $route, $method)
+            ->withHeader('Retry-After', $retryAfter);
+    }
+
     // ------------------------------------------------------------------
     // Server errors
     // ------------------------------------------------------------------

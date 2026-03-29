@@ -12,6 +12,7 @@ namespace Directive\Http\Routing;
  *   - the validator class   (extends AbstractRequestValidator)
  *   - the allowed role slugs (UCAC)
  *   - optional CORS origins, request/response entity classes
+ *   - optional rate limit config (overrides global defaults when set)
  *
  * PHP 8.4 readonly class: all properties are immutable after construction.
  */
@@ -29,6 +30,9 @@ readonly class Method
      * @param string|null         $responseSchema        Response schema ref: class-string or external path
      * @param array<int>          $errorCodes            Explicit HTTP error codes for this endpoint (overrides auto-detection)
      * @param bool                $authenticated         Force Bearer auth in OpenAPI even when allowedRoles is empty
+     * @param RateLimit|null      $rateLimit             Per-route rate limit; null = fall back to global RateLimitConfigInterface defaults
+     * @param RateLimitKeyType|null $rateLimitKeyType    Overrides rateLimit->keyType for key derivation if explicitly set
+     * @param bool|null           $rateLimitEnabled      null = follow global feature flag; false = opt-out; true = force-enable
      */
     public function __construct(
         public string $httpMethod,
@@ -43,5 +47,8 @@ readonly class Method
         public ?string $responseSchema = null,
         public array $errorCodes = [],
         public bool $authenticated = false,
+        public ?RateLimit $rateLimit = null,
+        public ?RateLimitKeyType $rateLimitKeyType = null,
+        public ?bool $rateLimitEnabled = null,
     ) {}
 }

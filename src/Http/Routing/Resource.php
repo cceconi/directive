@@ -71,6 +71,24 @@ class Resource
         return $this;
     }
 
+    public function withRateLimit(RateLimit $rateLimit): static
+    {
+        $this->defaults = $this->defaults->withRateLimit($rateLimit);
+        return $this;
+    }
+
+    public function withRateLimitKeyType(RateLimitKeyType $rateLimitKeyType): static
+    {
+        $this->defaults = $this->defaults->withRateLimitKeyType($rateLimitKeyType);
+        return $this;
+    }
+
+    public function withRateLimitEnabled(bool $rateLimitEnabled): static
+    {
+        $this->defaults = $this->defaults->withRateLimitEnabled($rateLimitEnabled);
+        return $this;
+    }
+
     // ------------------------------------------------------------------
     // HTTP method shortcuts — each returns $this for chaining
     // ------------------------------------------------------------------
@@ -250,6 +268,9 @@ class Resource
             responseSchema: $responseSchema,
             errorCodes: $errorCodes ?? $this->defaults->errorCodes ?? [],
             authenticated: $authenticated ?? $this->defaults->authenticated ?? false,
+            rateLimit: $this->defaults->rateLimit,
+            rateLimitKeyType: $this->defaults->rateLimitKeyType,
+            rateLimitEnabled: $this->defaults->rateLimitEnabled,
         );
 
         return $this;
