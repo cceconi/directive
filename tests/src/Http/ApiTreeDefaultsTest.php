@@ -228,3 +228,93 @@ describe('MethodDefaults cascade — sibling isolation', function () {
         expect($m2->errorClass)->toBe(ErrorManager::class);
     });
 });
+
+describe('errorCodes cascade — strict replacement', function () {
+    it('propagates errorCodes set on Domain down to Method', function () {
+        $method = (new Domain('d'))
+            ->withErrorCodes([400, 404])
+            ->version('v1')
+            ->service('svc')
+            ->resource('res')
+            ->get(StubApi::class)
+            ->findMethod('GET');
+
+        expect($method->errorCodes)->toBe([400, 404]);
+    });
+
+    it('Service-level errorCodes replace Domain-level — no merge', function () {
+        $method = (new Domain('d'))
+            ->withErrorCodes([400, 500])
+            ->version('v1')
+            ->service('svc')
+            ->withErrorCodes([422])
+            ->resource('res')
+            ->get(StubApi::class)
+            ->findMethod('GET');
+
+        expect($method->errorCodes)->toBe([422]);
+        expect($method->errorCodes)->not->toContain(400);
+    });
+
+    it('withErrorCodes([]) on Resource stops fall-through (public, no error codes)', function () {
+        $method = (new Domain('d'))
+            ->withErrorCodes([400, 500])
+            ->version('v1')
+            ->service('svc')
+            ->resource('res')
+            ->withErrorCodes([])
+            ->get(StubApi::class)
+            ->findMethod('GET');
+
+        expect($method->errorCodes)->toBe([]);
+    });
+
+    it('uses empty errorCodes by default when nothing is set', function () {
+        $method = (new Domain('d'))
+            ->version('v1')
+            ->service('svc')
+            ->resource('res')
+            ->get(StubApi::class)
+            ->findMethod('GET');
+
+        expect($method->errorCodes)->toBe([]);
+    });
+});
+
+describe('authenticated cascade — fall-through', function () {
+    it('propagates authenticated set on Domain down to Method', function () {
+        $method = (new Domain('d'))
+            ->withAuthenticated(true)
+            ->version('v1')
+            ->service('svc')
+            ->resource('res')
+            ->get(StubApi::class)
+            ->findMethod('GET');
+
+        expect($method->authenticated)->toBeTrue();
+    });
+
+    it('Service-level authenticated overrides Domain-level', function () {
+        $method = (new Domain('d'))
+            ->withAuthenticated(true)
+            ->version('v1')
+            ->service('svc')
+            ->withAuthenticated(false)
+            ->resource('res')
+            ->get(StubApi::class)
+            ->findMethod('GET');
+
+        expect($method->authenticated)->toBeFalse();
+    });
+
+    it('defaults to false when nothing is set', function () {
+        $method = (new Domain('d'))
+            ->version('v1')
+            ->service('svc')
+            ->resource('res')
+            ->get(StubApi::class)
+            ->findMethod('GET');
+
+        expect($method->authenticated)->toBeFalse();
+    });
+});

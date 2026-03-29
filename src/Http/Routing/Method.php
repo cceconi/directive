@@ -18,13 +18,17 @@ namespace Directive\Http\Routing;
 readonly class Method
 {
     /**
-     * @param class-string        $apiClass             Api handler class
+     * @param class-string        $apiClass              Api handler class
      * @param class-string        $requestValidatorClass Request validator class (extends AbstractRequestValidator)
-     * @param class-string        $errorClass           Error manager class
-     * @param array<string>       $allowedRoles         Allowed role slugs (empty = public, no auth check)
-     * @param array<string>       $allowCors            Allowed CORS origins (empty = use global config)
-     * @param class-string|null   $responseEntityClass  Custom ResponseEntity class
-     * @param class-string|null   $requestEntityClass   Custom RequestEntity class
+     * @param class-string        $errorClass            Error manager class
+     * @param array<string>       $allowedRoles          Allowed role slugs (empty = public, no auth check)
+     * @param array<string>       $allowCors             Allowed CORS origins (empty = use global config)
+     * @param class-string|null   $responseEntityClass   Custom ResponseEntity class
+     * @param class-string|null   $requestEntityClass    Custom RequestEntity class
+     * @param string|null         $requestSchema         Request schema ref: class-string or external path (e.g. 'schemas/foo.json')
+     * @param string|null         $responseSchema        Response schema ref: class-string or external path
+     * @param array<int>          $errorCodes            Explicit HTTP error codes for this endpoint (overrides auto-detection)
+     * @param bool                $authenticated         Force Bearer auth in OpenAPI even when allowedRoles is empty
      */
     public function __construct(
         public string $httpMethod,
@@ -35,5 +39,9 @@ readonly class Method
         public array $allowCors = [],
         public ?string $responseEntityClass = null,
         public ?string $requestEntityClass = null,
+        public ?string $requestSchema = null,
+        public ?string $responseSchema = null,
+        public array $errorCodes = [],
+        public bool $authenticated = false,
     ) {}
 }

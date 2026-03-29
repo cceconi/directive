@@ -12,6 +12,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Directive\Http\Validator\NullRequestValidator;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -158,7 +159,7 @@ final class OpenApiCommand extends DirectiveCommand
         ];
 
         return [
-            'openapi'    => '3.0.3',
+            'openapi'    => '3.1.0',
             'info'       => $info,
             'tags'       => $tags,
             'paths'      => $paths ?: new \stdClass(),
@@ -181,11 +182,13 @@ final class OpenApiCommand extends DirectiveCommand
     ): array {
         $operationId = implode('.', [$domain, $version, $service, $resource, $method->httpMethod]);
 
-        // Map allowedRoles to security requirements.
-        // Empty allowedRoles = open (no authentication required).
-        $security = [];
-        if ($method->allowedRoles !== []) {
+        // Security: explicit authenticated flag wins; fallback to allowedRoles inference.
+        if ($method->authenticated) {
+            $security = [['bearerAuth' => []]];
+        } elseif ($method->allowedRoles !== []) {
             $security = [['bearerAuth' => $method->allowedRoles]];
+        } else {
+            $security = [];
         }
 
         $op = [
@@ -193,28 +196,124 @@ final class OpenApiCommand extends DirectiveCommand
             'tags'        => [$tag],
             'summary'     => '',
             'security'    => $security,
-            'responses'   => [
-                '200' => ['description' => 'OK', 'content' => ['application/json' => ['schema' => ['type' => 'object']]]],
-                '400' => ['description' => 'Bad Request'],
-                '401' => ['description' => 'Unauthorized'],
-                '403' => ['description' => 'Forbidden'],
-                '409' => ['description' => 'Conflict'],
-                '500' => ['description' => 'Internal Server Error'],
-            ],
+            'responses'   => $this->buildResponses($method),
         ];
 
-        // Best-effort: annotate with handler class references
-        $op['x-policy'] = $method->requestValidatorClass;
-        $op['x-api']    = $method->apiClass;
-
-        if ($method->requestEntityClass !== null) {
+        // Request body schema
+        if ($method->requestSchema !== null) {
+            if (str_contains($method->requestSchema, '/')) {
+                $op['requestBody'] = [
+                    'content' => [
+                        'application/json' => [
+                            'schema' => ['$ref' => $method->requestSchema],
+                        ],
+                    ],
+                ];
+            } else {
+                $op['x-schema-class'] = $method->requestSchema;
+            }
+        } elseif ($method->requestEntityClass !== null) {
             $op['x-request-entity'] = $method->requestEntityClass;
         }
+
+        // Response schema annotated inline (class-string only — path-based refs live in buildResponses)
+        if ($method->responseSchema !== null && !str_contains($method->responseSchema, '/')) {
+            $op['x-response-schema-class'] = $method->responseSchema;
+        }
+
+        // Retain class references for tooling
+        $op['x-policy'] = $method->requestValidatorClass;
+        $op['x-api']    = $method->apiClass;
 
         if ($method->responseEntityClass !== null) {
             $op['x-response-entity'] = $method->responseEntityClass;
         }
 
         return $op;
+    }
+
+    /**
+     * Build the responses map for an operation.
+     *
+     * If Method::$errorCodes is non-empty → use that list verbatim (+ 200 always).
+     * Otherwise → compute intelligent defaults from other Method properties.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private function buildResponses(Method $method): array
+    {
+        /** @var array<int, string> $httpDescriptions */
+        $httpDescriptions = [
+            200 => 'OK',
+            400 => 'Bad Request',
+            401 => 'Unauthorized',
+            403 => 'Forbidden',
+            404 => 'Not Found',
+            405 => 'Method Not Allowed',
+            409 => 'Conflict',
+            422 => 'Unprocessable Entity',
+            429 => 'Too Many Requests',
+            500 => 'Internal Server Error',
+        ];
+
+        /** @var array<int, int> $codes */
+        $codes = [200];
+
+        if ($method->errorCodes !== []) {
+            // Explicit list — used as-is, 500 is always appended
+            foreach ($method->errorCodes as $code) {
+                $codes[] = $code;
+            }
+        } else {
+            // Intelligent defaults
+            if ($method->requestValidatorClass !== NullRequestValidator::class) {
+                $codes[] = 400;
+            }
+
+            if ($method->authenticated) {
+                $codes[] = 401;
+            }
+
+            if ($method->allowedRoles !== []) {
+                $codes[] = 403;
+            }
+
+            if (strtoupper($method->httpMethod) === 'GET') {
+                $codes[] = 404;
+            }
+        }
+
+        // 500 is always emitted (explicit list and smart defaults alike)
+        $codes[] = 500;
+
+        /** @var list<int> $codes */
+        $codes = array_values(array_unique($codes));
+        sort($codes);
+
+        $responseSchemaIsRef = $method->responseSchema !== null && str_contains($method->responseSchema, '/');
+
+        $responses = [];
+
+        foreach ($codes as $code) {
+            $description = $httpDescriptions[$code] ?? 'Error';
+            $key         = (string) $code;
+
+            if ($code === 200) {
+                $schema  = $responseSchemaIsRef
+                    ? ['$ref' => $method->responseSchema]
+                    : ['type' => 'object'];
+                $responses[$key] = [
+                    'description' => $description,
+                    'content'     => ['application/json' => ['schema' => $schema]],
+                ];
+            } else {
+                $responses[$key] = ['description' => $description];
+            }
+        }
+
+        /** @var array<string, array<string, mixed>> $typed */
+        $typed = $responses;
+
+        return $typed;
     }
 }

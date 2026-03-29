@@ -63,4 +63,53 @@ describe('MethodDefaults', function () {
         expect($second->allowedRoles)->toBe(['user']);
         expect($second->allowedRoles)->not->toContain('admin');
     });
+
+    it('errorCodes and authenticated start as null', function () {
+        $d = new MethodDefaults();
+        expect($d->errorCodes)->toBeNull();
+        expect($d->authenticated)->toBeNull();
+    });
+
+    it('withErrorCodes returns new instance with updated errorCodes', function () {
+        $original = new MethodDefaults();
+        $updated  = $original->withErrorCodes([400, 422]);
+
+        expect($updated->errorCodes)->toBe([400, 422]);
+        expect($original->errorCodes)->toBeNull(); // original unchanged
+    });
+
+    it('withAuthenticated returns new instance with updated authenticated', function () {
+        $original = new MethodDefaults();
+        $updated  = $original->withAuthenticated(true);
+
+        expect($updated->authenticated)->toBeTrue();
+        expect($original->authenticated)->toBeNull(); // original unchanged
+    });
+
+    it('withErrorCodes with empty array is a concrete value — not null', function () {
+        $d = (new MethodDefaults())->withErrorCodes([]);
+        expect($d->errorCodes)->toBe([]);
+        expect($d->errorCodes)->not->toBeNull();
+    });
+
+    it('withErrorCodes replaces rather than merges', function () {
+        $first  = (new MethodDefaults())->withErrorCodes([400, 500]);
+        $second = $first->withErrorCodes([422]);
+
+        expect($second->errorCodes)->toBe([422]);
+        expect($second->errorCodes)->not->toContain(400);
+    });
+
+    it('chained with* calls preserve all fields including new ones', function () {
+        $d = (new MethodDefaults())
+            ->withErrorClass('App\\ErrorManager')
+            ->withErrorCodes([400, 404])
+            ->withAuthenticated(true);
+
+        expect($d->errorClass)->toBe('App\\ErrorManager');
+        expect($d->errorCodes)->toBe([400, 404]);
+        expect($d->authenticated)->toBeTrue();
+        expect($d->requestValidatorClass)->toBeNull();
+        expect($d->allowedRoles)->toBeNull();
+    });
 });

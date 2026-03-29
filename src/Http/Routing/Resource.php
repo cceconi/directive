@@ -58,6 +58,19 @@ class Resource
         return $this;
     }
 
+    /** @param array<int> $codes */
+    public function withErrorCodes(array $codes): static
+    {
+        $this->defaults = $this->defaults->withErrorCodes($codes);
+        return $this;
+    }
+
+    public function withAuthenticated(bool $authenticated): static
+    {
+        $this->defaults = $this->defaults->withAuthenticated($authenticated);
+        return $this;
+    }
+
     // ------------------------------------------------------------------
     // HTTP method shortcuts — each returns $this for chaining
     // ------------------------------------------------------------------
@@ -67,14 +80,19 @@ class Resource
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
+     * @param array<int>|null   $errorCodes         If null, inherits from cascaded defaults
      */
     public function get(
         string $apiClass,
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
+        ?string $requestSchema = null,
+        ?string $responseSchema = null,
+        ?array $errorCodes = null,
+        ?bool $authenticated = null,
     ): static {
-        return $this->addMethod('GET', $apiClass, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('GET', $apiClass, $allowCors, $responseEntityClass, $requestEntityClass, $requestSchema, $responseSchema, $errorCodes, $authenticated);
     }
 
     /**
@@ -82,14 +100,19 @@ class Resource
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
+     * @param array<int>|null   $errorCodes         If null, inherits from cascaded defaults
      */
     public function post(
         string $apiClass,
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
+        ?string $requestSchema = null,
+        ?string $responseSchema = null,
+        ?array $errorCodes = null,
+        ?bool $authenticated = null,
     ): static {
-        return $this->addMethod('POST', $apiClass, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('POST', $apiClass, $allowCors, $responseEntityClass, $requestEntityClass, $requestSchema, $responseSchema, $errorCodes, $authenticated);
     }
 
     /**
@@ -97,14 +120,19 @@ class Resource
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
+     * @param array<int>|null   $errorCodes         If null, inherits from cascaded defaults
      */
     public function put(
         string $apiClass,
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
+        ?string $requestSchema = null,
+        ?string $responseSchema = null,
+        ?array $errorCodes = null,
+        ?bool $authenticated = null,
     ): static {
-        return $this->addMethod('PUT', $apiClass, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('PUT', $apiClass, $allowCors, $responseEntityClass, $requestEntityClass, $requestSchema, $responseSchema, $errorCodes, $authenticated);
     }
 
     /**
@@ -112,14 +140,19 @@ class Resource
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
+     * @param array<int>|null   $errorCodes         If null, inherits from cascaded defaults
      */
     public function patch(
         string $apiClass,
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
+        ?string $requestSchema = null,
+        ?string $responseSchema = null,
+        ?array $errorCodes = null,
+        ?bool $authenticated = null,
     ): static {
-        return $this->addMethod('PATCH', $apiClass, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('PATCH', $apiClass, $allowCors, $responseEntityClass, $requestEntityClass, $requestSchema, $responseSchema, $errorCodes, $authenticated);
     }
 
     /**
@@ -127,14 +160,19 @@ class Resource
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
+     * @param array<int>|null   $errorCodes         If null, inherits from cascaded defaults
      */
     public function delete(
         string $apiClass,
         array $allowCors = [],
         ?string $responseEntityClass = null,
         ?string $requestEntityClass = null,
+        ?string $requestSchema = null,
+        ?string $responseSchema = null,
+        ?array $errorCodes = null,
+        ?bool $authenticated = null,
     ): static {
-        return $this->addMethod('DELETE', $apiClass, $allowCors, $responseEntityClass, $requestEntityClass);
+        return $this->addMethod('DELETE', $apiClass, $allowCors, $responseEntityClass, $requestEntityClass, $requestSchema, $responseSchema, $errorCodes, $authenticated);
     }
 
     // ------------------------------------------------------------------
@@ -178,6 +216,7 @@ class Resource
      * @param array<string>     $allowCors
      * @param class-string|null $responseEntityClass
      * @param class-string|null $requestEntityClass
+     * @param array<int>|null   $errorCodes          Per-call override; null falls through to defaults
      */
     private function addMethod(
         string $httpMethod,
@@ -185,6 +224,10 @@ class Resource
         array $allowCors,
         ?string $responseEntityClass,
         ?string $requestEntityClass,
+        ?string $requestSchema = null,
+        ?string $responseSchema = null,
+        ?array $errorCodes = null,
+        ?bool $authenticated = null,
     ): static {
         $key = strtoupper($httpMethod);
 
@@ -203,6 +246,10 @@ class Resource
             allowCors: $allowCors,
             responseEntityClass: $responseEntityClass,
             requestEntityClass: $requestEntityClass,
+            requestSchema: $requestSchema,
+            responseSchema: $responseSchema,
+            errorCodes: $errorCodes ?? $this->defaults->errorCodes ?? [],
+            authenticated: $authenticated ?? $this->defaults->authenticated ?? false,
         );
 
         return $this;

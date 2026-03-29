@@ -54,6 +54,21 @@ class Domain
         return $clone;
     }
 
+    /** @param array<int> $codes */
+    public function withErrorCodes(array $codes): static
+    {
+        $clone           = clone $this;
+        $clone->defaults = $this->defaults->withErrorCodes($codes);
+        return $clone;
+    }
+
+    public function withAuthenticated(bool $authenticated): static
+    {
+        $clone           = clone $this;
+        $clone->defaults = $this->defaults->withAuthenticated($authenticated);
+        return $clone;
+    }
+
     /**
      * Create a new Version and register it in this domain.
      *
