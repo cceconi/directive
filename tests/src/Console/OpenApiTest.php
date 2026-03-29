@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Directive\Console\OpenApiCommand;
 use Directive\Http\Endpoint\ApiDefinitionManager;
 use Directive\Http\Routing\Domain;
+use Directive\Http\Routing\MethodDefaults;
 use Directive\Http\Routing\VersionStatus;
 use Symfony\Component\Console\Tester\CommandTester;
 use Directive\Service\Business\ErrorManager;
@@ -121,7 +122,7 @@ describe('OpenApiCommand — response codes (task 4.4)', function () {
             ->resource('item')
             ->withRequestValidatorClass(StubRequestValidator::class)
             ->withErrorClass(ErrorManager::class)
-            ->get(StubApi::class, errorCodes: [400, 422, 503]);
+            ->get(StubApi::class, overrides: new MethodDefaults(errorCodes: [400, 422, 503]));
 
         $manager->registerDomain($domain);
         $outFile = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
@@ -172,7 +173,7 @@ describe('OpenApiCommand — requestSchema / responseSchema (task 4.5)', functio
             ->resource('upload')
             ->withRequestValidatorClass(NullRequestValidator::class)
             ->withErrorClass(ErrorManager::class)
-            ->post(StubApi::class, requestSchema: 'schemas/upload-request.json');
+            ->post(StubApi::class, overrides: new MethodDefaults(requestSchema: 'schemas/upload-request.json'));
 
         $manager->registerDomain($domain);
         $outFile = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
@@ -200,7 +201,7 @@ describe('OpenApiCommand — requestSchema / responseSchema (task 4.5)', functio
             ->resource('detail')
             ->withRequestValidatorClass(NullRequestValidator::class)
             ->withErrorClass(ErrorManager::class)
-            ->get(StubApi::class, responseSchema: 'schemas/item-response.json');
+            ->get(StubApi::class, overrides: new MethodDefaults(responseSchema: 'schemas/item-response.json'));
 
         $manager->registerDomain($domain);
         $outFile = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
@@ -228,7 +229,7 @@ describe('OpenApiCommand — requestSchema / responseSchema (task 4.5)', functio
             ->resource('upload')
             ->withRequestValidatorClass(NullRequestValidator::class)
             ->withErrorClass(ErrorManager::class)
-            ->post(StubApi::class, requestSchema: 'App\\Web\\Request\\UploadRequest');
+            ->post(StubApi::class, overrides: new MethodDefaults(requestSchema: 'App\Web\Request\UploadRequest'));
 
         $manager->registerDomain($domain);
         $outFile = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';

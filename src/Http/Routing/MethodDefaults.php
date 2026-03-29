@@ -25,6 +25,8 @@ readonly class MethodDefaults
      * @param RateLimit|null     $rateLimit       null = fall through to global RateLimitConfigInterface defaults
      * @param RateLimitKeyType|null $rateLimitKeyType null = fall through; overrides rateLimit->keyType when set
      * @param bool|null          $rateLimitEnabled null = fall through; false = subtree opt-out; true = force-enable
+     * @param string|null        $requestSchema   null = fall through; path-ref (contains '/') or class-string
+     * @param string|null        $responseSchema  null = fall through; path-ref (contains '/') or class-string
      */
     public function __construct(
         public ?string $errorClass = null,
@@ -35,18 +37,20 @@ readonly class MethodDefaults
         public ?RateLimit $rateLimit = null,
         public ?RateLimitKeyType $rateLimitKeyType = null,
         public ?bool $rateLimitEnabled = null,
+        public ?string $requestSchema = null,
+        public ?string $responseSchema = null,
     ) {}
 
     /** @param class-string $class */
     public function withErrorClass(string $class): self
     {
-        return new self($class, $this->requestValidatorClass, $this->allowedRoles, $this->errorCodes, $this->authenticated, $this->rateLimit, $this->rateLimitKeyType, $this->rateLimitEnabled);
+        return new self($class, $this->requestValidatorClass, $this->allowedRoles, $this->errorCodes, $this->authenticated, $this->rateLimit, $this->rateLimitKeyType, $this->rateLimitEnabled, $this->requestSchema, $this->responseSchema);
     }
 
     /** @param class-string $class */
     public function withRequestValidatorClass(string $class): self
     {
-        return new self($this->errorClass, $class, $this->allowedRoles, $this->errorCodes, $this->authenticated, $this->rateLimit, $this->rateLimitKeyType, $this->rateLimitEnabled);
+        return new self($this->errorClass, $class, $this->allowedRoles, $this->errorCodes, $this->authenticated, $this->rateLimit, $this->rateLimitKeyType, $this->rateLimitEnabled, $this->requestSchema, $this->responseSchema);
     }
 
     /**
@@ -56,7 +60,7 @@ readonly class MethodDefaults
      */
     public function withAllowedRoles(array $roles): self
     {
-        return new self($this->errorClass, $this->requestValidatorClass, $roles, $this->errorCodes, $this->authenticated, $this->rateLimit, $this->rateLimitKeyType, $this->rateLimitEnabled);
+        return new self($this->errorClass, $this->requestValidatorClass, $roles, $this->errorCodes, $this->authenticated, $this->rateLimit, $this->rateLimitKeyType, $this->rateLimitEnabled, $this->requestSchema, $this->responseSchema);
     }
 
     /**
@@ -66,7 +70,7 @@ readonly class MethodDefaults
      */
     public function withErrorCodes(array $codes): self
     {
-        return new self($this->errorClass, $this->requestValidatorClass, $this->allowedRoles, $codes, $this->authenticated, $this->rateLimit, $this->rateLimitKeyType, $this->rateLimitEnabled);
+        return new self($this->errorClass, $this->requestValidatorClass, $this->allowedRoles, $codes, $this->authenticated, $this->rateLimit, $this->rateLimitKeyType, $this->rateLimitEnabled, $this->requestSchema, $this->responseSchema);
     }
 
     /**
@@ -74,7 +78,7 @@ readonly class MethodDefaults
      */
     public function withAuthenticated(bool $authenticated): self
     {
-        return new self($this->errorClass, $this->requestValidatorClass, $this->allowedRoles, $this->errorCodes, $authenticated, $this->rateLimit, $this->rateLimitKeyType, $this->rateLimitEnabled);
+        return new self($this->errorClass, $this->requestValidatorClass, $this->allowedRoles, $this->errorCodes, $authenticated, $this->rateLimit, $this->rateLimitKeyType, $this->rateLimitEnabled, $this->requestSchema, $this->responseSchema);
     }
 
     /**
@@ -83,7 +87,7 @@ readonly class MethodDefaults
      */
     public function withRateLimit(RateLimit $rateLimit): self
     {
-        return new self($this->errorClass, $this->requestValidatorClass, $this->allowedRoles, $this->errorCodes, $this->authenticated, $rateLimit, $this->rateLimitKeyType, $this->rateLimitEnabled);
+        return new self($this->errorClass, $this->requestValidatorClass, $this->allowedRoles, $this->errorCodes, $this->authenticated, $rateLimit, $this->rateLimitKeyType, $this->rateLimitEnabled, $this->requestSchema, $this->responseSchema);
     }
 
     /**
@@ -92,7 +96,7 @@ readonly class MethodDefaults
      */
     public function withRateLimitKeyType(RateLimitKeyType $rateLimitKeyType): self
     {
-        return new self($this->errorClass, $this->requestValidatorClass, $this->allowedRoles, $this->errorCodes, $this->authenticated, $this->rateLimit, $rateLimitKeyType, $this->rateLimitEnabled);
+        return new self($this->errorClass, $this->requestValidatorClass, $this->allowedRoles, $this->errorCodes, $this->authenticated, $this->rateLimit, $rateLimitKeyType, $this->rateLimitEnabled, $this->requestSchema, $this->responseSchema);
     }
 
     /**
@@ -102,6 +106,16 @@ readonly class MethodDefaults
      */
     public function withRateLimitEnabled(bool $rateLimitEnabled): self
     {
-        return new self($this->errorClass, $this->requestValidatorClass, $this->allowedRoles, $this->errorCodes, $this->authenticated, $this->rateLimit, $this->rateLimitKeyType, $rateLimitEnabled);
+        return new self($this->errorClass, $this->requestValidatorClass, $this->allowedRoles, $this->errorCodes, $this->authenticated, $this->rateLimit, $this->rateLimitKeyType, $rateLimitEnabled, $this->requestSchema, $this->responseSchema);
+    }
+
+    public function withRequestSchema(string $schema): self
+    {
+        return new self($this->errorClass, $this->requestValidatorClass, $this->allowedRoles, $this->errorCodes, $this->authenticated, $this->rateLimit, $this->rateLimitKeyType, $this->rateLimitEnabled, $schema, $this->responseSchema);
+    }
+
+    public function withResponseSchema(string $schema): self
+    {
+        return new self($this->errorClass, $this->requestValidatorClass, $this->allowedRoles, $this->errorCodes, $this->authenticated, $this->rateLimit, $this->rateLimitKeyType, $this->rateLimitEnabled, $this->requestSchema, $schema);
     }
 }

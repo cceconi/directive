@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Directive\Http\Routing\Domain;
 use Directive\Http\Routing\MethodDefaults;
+use Directive\Http\Routing\RateLimit;
+use Directive\Http\Routing\RateLimitKeyType;
 use Directive\Http\Validator\NullRequestValidator;
 use Directive\Http\Routing\VersionStatus;
 use Directive\Service\Business\ErrorManager;
@@ -316,5 +318,104 @@ describe('authenticated cascade — fall-through', function () {
             ->findMethod('GET');
 
         expect($method->authenticated)->toBeFalse();
+    });
+});
+
+describe('per-verb MethodDefaults overrides', function () {
+    it('no overrides — all fields inherited from Resource defaults', function () {
+        $resource = (new Domain('d'))
+            ->withAllowedRoles(['user'])
+            ->withErrorCodes([400, 500])
+            ->withAuthenticated(true)
+            ->version('v1')
+            ->service('svc')
+            ->resource('res');
+        $resource->get(StubApi::class);
+        $method = $resource->findMethod('GET');
+
+        expect($method->allowedRoles)->toBe(['user']);
+        expect($method->errorCodes)->toBe([400, 500]);
+        expect($method->authenticated)->toBeTrue();
+    });
+
+    it('per-verb allowedRoles shadows Resource-level default, other verbs unaffected', function () {
+        $resource = (new Domain('d'))
+            ->version('v1')
+            ->service('svc')
+            ->resource('res')
+            ->withAllowedRoles(['user']);
+        $resource
+            ->get(StubApi::class)
+            ->post(StubApi::class, overrides: new MethodDefaults(allowedRoles: ['admin']));
+
+        expect($resource->findMethod('POST')->allowedRoles)->toBe(['admin']);
+        expect($resource->findMethod('GET')->allowedRoles)->toBe(['user']);
+    });
+
+    it('per-verb rateLimit shadows Resource-level withRateLimit', function () {
+        $resource = (new Domain('d'))
+            ->version('v1')
+            ->service('svc')
+            ->resource('res')
+            ->withRateLimit(new RateLimit(60, 100, RateLimitKeyType::Ip));
+        $resource
+            ->get(StubApi::class)
+            ->post(StubApi::class, overrides: new MethodDefaults(
+                rateLimit: new RateLimit(60, 5, RateLimitKeyType::UserId),
+            ));
+
+        expect($resource->findMethod('POST')->rateLimit?->maxRequests)->toBe(5);
+        expect($resource->findMethod('POST')->rateLimit?->keyType)->toBe(RateLimitKeyType::UserId);
+        expect($resource->findMethod('GET')->rateLimit?->maxRequests)->toBe(100);
+    });
+
+    it('per-verb rateLimitEnabled false overrides Resource-level true', function () {
+        $resource = (new Domain('d'))
+            ->version('v1')
+            ->service('svc')
+            ->resource('res')
+            ->withRateLimitEnabled(true);
+        $resource
+            ->get(StubApi::class)
+            ->delete(StubApi::class, overrides: new MethodDefaults(rateLimitEnabled: false));
+
+        expect($resource->findMethod('DELETE')->rateLimitEnabled)->toBeFalse();
+        expect($resource->findMethod('GET')->rateLimitEnabled)->toBeTrue();
+    });
+
+    it('partial overrides — unset fields fall through to Resource defaults', function () {
+        $resource = (new Domain('d'))
+            ->version('v1')
+            ->service('svc')
+            ->resource('res')
+            ->withRateLimit(new RateLimit(60, 100, RateLimitKeyType::Ip))
+            ->withErrorCodes([400, 500]);
+        $resource->post(StubApi::class, overrides: new MethodDefaults(allowedRoles: ['admin']));
+        $method = $resource->findMethod('POST');
+
+        expect($method->allowedRoles)->toBe(['admin']);
+        expect($method->rateLimit?->maxRequests)->toBe(100);
+        expect($method->errorCodes)->toBe([400, 500]);
+    });
+
+    it('withMethod registers non-standard verb', function () {
+        $resource = (new Domain('d'))
+            ->version('v1')
+            ->service('svc')
+            ->resource('res');
+        $resource->withMethod('HEAD', StubApi::class);
+
+        expect($resource->findMethod('HEAD')->httpMethod)->toBe('HEAD');
+    });
+
+    it('withMethod with overrides applies resolution chain', function () {
+        $resource = (new Domain('d'))
+            ->version('v1')
+            ->service('svc')
+            ->resource('res')
+            ->withRateLimitEnabled(true);
+        $resource->withMethod('HEAD', StubApi::class, overrides: new MethodDefaults(rateLimitEnabled: false));
+
+        expect($resource->findMethod('HEAD')->rateLimitEnabled)->toBeFalse();
     });
 });
