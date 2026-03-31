@@ -10,7 +10,7 @@ use Directive\Http\Response\HttpResponse;
 use Directive\Http\Router;
 use Directive\Service\Business\ErrorInterface;
 use Directive\Service\Business\ErrorManager;
-use Directive\Service\Security\Role\AbstractRole;
+use Directive\Application\Role\AbstractRole;
 use Directive\Service\Security\WebUserInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;

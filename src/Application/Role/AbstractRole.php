@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Directive\Service\Security\Role;
+namespace Directive\Application\Role;
 
 /**
  * Base class for all UCAC roles.

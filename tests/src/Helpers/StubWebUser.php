@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Helpers;
 
-use Directive\Service\Security\Role\AbstractRole;
-use Directive\Service\Security\Role\GuestRole;
-use Directive\Service\Security\Role\Permission;
+use Directive\Application\Role\AbstractRole;
+use Directive\Application\Role\GuestRole;
+use Directive\Application\Role\Permission;
 use Directive\Service\Security\WebUserInterface;
 
 /** Configurable web user stub for tests. Defaults to guest. */

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use Directive\Service\Security\Role\AbstractRole;
-use Directive\Service\Security\Role\AgentRole;
-use Directive\Service\Security\Role\DomainUser;
-use Directive\Service\Security\Role\GuestRole;
-use Directive\Service\Security\Role\Permission;
-use Directive\Service\Security\Role\SystemRole;
+use Directive\Application\Role\AbstractRole;
+use Directive\Application\Role\AgentRole;
+use Directive\Application\Role\GuestRole;
+use Directive\Application\Role\Permission;
+use Directive\Application\Role\SystemRole;
+use Directive\Application\User\DomainUser;
 
 // ---------------------------------------------------------------------------
 // Permission enum

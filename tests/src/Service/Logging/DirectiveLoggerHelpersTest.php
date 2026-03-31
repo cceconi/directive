@@ -74,10 +74,13 @@ describe('DirectiveLogger — semantic helpers', function (): void {
         /** @var TestHandler $handler */
 
         $user = new class implements \Directive\Service\Security\WebUserInterface {
-            public function getRole(): \Directive\Service\Security\Role\AbstractRole
+            public function getRole(): \Directive\Application\Role\AbstractRole
             {
-                return new class extends \Directive\Service\Security\Role\AbstractRole {
-                    public function getCode(): string { return 'guest'; }
+                return new class extends \Directive\Application\Role\AbstractRole {
+                    public function getPermission(string $useCase): \Directive\Application\Role\Permission
+                    {
+                        return \Directive\Application\Role\Permission::Forbidden;
+                    }
                 };
             }
             public function isAuthenticated(): bool          { return false; }

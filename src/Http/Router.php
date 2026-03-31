@@ -12,7 +12,7 @@ use Directive\Http\Exception\GoneException;
 use Directive\Http\Exception\MethodNotAllowedException;
 use Directive\Http\Exception\NotFoundException;
 use Directive\Http\Exception\UnauthorizedException;
-use Directive\Service\Security\Role\GuestRole;
+use Directive\Application\Role\GuestRole;
 use Directive\Service\Security\WebUserInterface;
 use Directive\Http\Response\ResponseEntity;
 use Psr\Container\ContainerInterface;

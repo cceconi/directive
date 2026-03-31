@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Directive\Service\Security\Role;
+namespace Directive\Application\User;
+
+use Directive\Application\Role\AbstractRole;
 
 /**
  * Immutable value object carrying the authenticated user's identity and role

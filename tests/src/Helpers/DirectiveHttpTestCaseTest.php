@@ -6,9 +6,9 @@ use Directive\Http\Endpoint\ApiDefinitionManager;
 use Directive\Http\Routing\Domain;
 use Directive\Http\Validator\NullRequestValidator;
 use Directive\Service\Business\ErrorManager;
-use Directive\Service\Security\Role\AbstractRole;
-use Directive\Service\Security\Role\GuestRole;
-use Directive\Service\Security\Role\Permission;
+use Directive\Application\Role\AbstractRole;
+use Directive\Application\Role\GuestRole;
+use Directive\Application\Role\Permission;
 use Tests\Helpers\StubApi;
 use Tests\Helpers\StubWebUser;
 

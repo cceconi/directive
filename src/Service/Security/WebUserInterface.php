@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Service\Security;
 
-use Directive\Service\Security\Role\AbstractRole;
+use Directive\Application\Role\AbstractRole;
 
 /**
  * Contract for the authenticated (or anonymous) web user.
