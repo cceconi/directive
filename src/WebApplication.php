@@ -8,6 +8,7 @@ use Directive\Http\Middleware\AuthMiddleware;
 use Directive\Http\Middleware\ClientHeaderMiddleware;
 use Directive\Http\Middleware\CompressResponseMiddleware;
 use Directive\Http\Middleware\CookieMiddleware;
+use Directive\Http\Middleware\HttpDebugLoggingMiddleware;
 use Directive\Http\Middleware\HttpSecurityMiddleware;
 use Directive\Http\Middleware\LoggerMiddleware;
 use Directive\Http\Middleware\MaintenanceMiddleware;
@@ -16,6 +17,9 @@ use Directive\Http\Middleware\RequestIdMiddleware;
 use Directive\Service\Configuration\AbstractConfiguration;
 use Directive\Service\Configuration\AbstractFeatures;
 use Directive\Service\Configuration\DirectiveFeatures;
+use Directive\Service\Logging\DefaultLoggingConfig;
+use Directive\Service\Logging\DirectiveLogger;
+use Directive\Service\Logging\RequestIdHolder;
 use Directive\Service\RateLimit\DefaultRateLimitConfig;
 use Directive\Service\RateLimit\RateLimitConfigInterface;
 use Directive\Service\RateLimit\RateLimiterInterface;
@@ -26,6 +30,7 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use Slim\App;
 use Slim\Factory\AppFactory;
 
@@ -81,12 +86,20 @@ class WebApplication extends AbstractApplication
     {
         parent::registerServices($config);
 
+        $loggingConfig = new DefaultLoggingConfig();
+        $loggingConfig->audit();
+
+        $holder   = new RequestIdHolder();
+        $logger   = new DirectiveLogger($loggingConfig, $holder);
+        $features = new DirectiveFeatures();
+
         $rateLimitConfig = new DefaultRateLimitConfig();
         $rateLimitConfig->audit();
 
-        $features = new DirectiveFeatures();
-
         $this->addDefinitions([
+            LoggerInterface::class          => $logger,
+            DirectiveLogger::class          => $logger,
+            RequestIdHolder::class          => $holder,
             AbstractFeatures::class         => $features,
             RateLimitConfigInterface::class => $rateLimitConfig,
             RateLimiterInterface::class     => new RedisRateLimiter($rateLimitConfig),
@@ -234,6 +247,15 @@ class WebApplication extends AbstractApplication
         $this->slim->add(MaintenanceMiddleware::class);        // 4 — can short-circuit (503)
         $this->slim->add(HttpSecurityMiddleware::class);       // 3
         $this->slim->add(LoggerMiddleware::class);             // 2
+
+        // Optional: debug request/response logging (enabled via DIRECTIVE_DEBUG_LOGGING)
+        // Must be added BEFORE RequestIdMiddleware so it executes AFTER it (LIFO)
+        /** @var AbstractFeatures $features */
+        $features = $this->get(AbstractFeatures::class);
+        if ($features->isEnabled('debug_logging')) {
+            $this->slim->add(HttpDebugLoggingMiddleware::class);// 1.5 — after RequestId
+        }
+
         $this->slim->add(RequestIdMiddleware::class);          // 1 — executes first (outermost)
 
         // Application-level hook: override to add custom / optional middlewares

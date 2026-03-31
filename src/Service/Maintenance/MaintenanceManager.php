@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Directive\Service\Maintenance;
 
 use Directive\Http\Exception\UnprocessableException;
-use Directive\Service\Logging\WebLoggerInterface;
 use Directive\Service\Utils\Json;
+use Psr\Log\LoggerInterface;
 
 final class MaintenanceManager implements MaintenanceManagerInterface
 {
@@ -16,7 +16,7 @@ final class MaintenanceManager implements MaintenanceManagerInterface
         private readonly string $secretKey,
         private readonly string $filename,
         private readonly Json $json,
-        private readonly WebLoggerInterface $logger,
+        private readonly LoggerInterface $logger,
     ) {}
 
     // ── MaintenanceManagerInterface ──────────────────────────────────────────
@@ -53,7 +53,10 @@ final class MaintenanceManager implements MaintenanceManagerInterface
             }
             return $this->getInfo();
         } catch (\Throwable $e) {
-            $this->logger->logError($e);
+            $this->logger->error('maintenance.read.error', [
+                'error_class'   => $e::class,
+                'error_message' => $e->getMessage(),
+            ]);
         }
         return ['mode' => true, 'period' => 2, 'message' => 'App is currently under maintenance.'];
     }

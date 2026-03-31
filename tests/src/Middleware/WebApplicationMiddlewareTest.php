@@ -6,39 +6,29 @@ use Directive\Http\Response\HttpResponse;
 use Directive\Service\AppManagement\AppInfoInterface;
 use Directive\Service\AppManagement\ClientHeadersInterface;
 use Directive\Service\Configuration\AbstractConfiguration;
-use Directive\Service\Logging\WebLoggerInterface;
+use Directive\Service\Logging\DefaultLoggingConfig;
+use Directive\Service\Logging\DirectiveLogger;
+use Directive\Service\Logging\RequestIdHolder;
 use Directive\Service\Maintenance\MaintenanceManagerInterface;
 use Directive\Service\Security\AccessManagerInterface;
 use Directive\Service\Security\CookiesManagerInterface;
 use Directive\Service\Security\HeaderManagerInterface;
 use Directive\Service\Security\WebUserInterface;
 use Directive\WebApplication;
+use Monolog\Handler\TestHandler;
+use Monolog\Level;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Slim\App;
 use Tests\Helpers\TestConfig;
 
 // ---------------------------------------------------------------------------
 // No-op stubs for all services required by the 8 default middlewares.
 // ---------------------------------------------------------------------------
-
-final class StubWebLogger implements WebLoggerInterface
-{
-    public function logVersion(string $version): void {}
-    public function logBusinessTimeExecution(float $elapsed): void {}
-    /** @param array<int, array<string, mixed>> $points */
-    public function logBusinessBenchmark(array $points): void {}
-    public function logRaw(string $message, mixed $context = null): void {}
-    public function logRequest(string $url, ServerRequestInterface $request): void {}
-    public function logResponse(ResponseInterface $response, string $message, mixed $data = null): void {}
-    public function logWebUser(?WebUserInterface $webUser): void {}
-    public function logJwt(string $jwt): void {}
-    public function logApiVersion(string $name, string $status, string $info = ''): void {}
-    public function write(): void {}
-    public function logError(\Throwable $e): void {}
-}
 
 final class StubAppInfo implements AppInfoInterface
 {
@@ -127,7 +117,7 @@ final class FullStackWebApplication extends WebApplication
 
         $factory = new Psr17Factory();
         $this->addDefinitions([
-            WebLoggerInterface::class                       => new StubWebLogger(),
+            \Psr\Log\LoggerInterface::class                 => new NullLogger(),
             AppInfoInterface::class                         => new StubAppInfo(),
             HeaderManagerInterface::class                   => new StubHeaderManager(),
             HttpResponse::class                             => new HttpResponse($factory, $factory),
@@ -191,5 +181,81 @@ describe('WebApplication middleware integration', function (): void {
         $response = $app->resolve($request);
 
         expect($response->getHeaderLine('X-Request-Id'))->toBe($existingId);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Test double for HttpDebugLoggingMiddleware integration
+// ---------------------------------------------------------------------------
+
+final class DebugLoggingWebApplication extends WebApplication
+{
+    public TestHandler $testHandler;
+
+    protected function registerServices(AbstractConfiguration $config): void
+    {
+        parent::registerServices($config);
+
+        $this->testHandler = new TestHandler(Level::Debug, bubble: false);
+
+        $loggingConfig = new DefaultLoggingConfig();
+        $loggingConfig->audit();
+        $holder = new RequestIdHolder();
+        $logger = new DirectiveLogger($loggingConfig, $holder);
+        $logger->setHandlers([$this->testHandler]);
+
+        $factory = new Psr17Factory();
+        $this->addDefinitions([
+            DirectiveLogger::class                          => $logger,
+            LoggerInterface::class                          => $logger,
+            RequestIdHolder::class                          => $holder,
+            AppInfoInterface::class                         => new StubAppInfo(),
+            HeaderManagerInterface::class                   => new StubHeaderManager(),
+            HttpResponse::class                             => new HttpResponse($factory, $factory),
+            MaintenanceManagerInterface::class              => new StubMaintenance(),
+            ClientHeadersInterface::class                   => new StubClientHeaders(),
+            \Psr\Http\Message\StreamFactoryInterface::class => $factory,
+            CookiesManagerInterface::class                  => new StubCookiesManager(),
+            AccessManagerInterface::class                   => new StubAccessManager(),
+        ]);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Tests — S-01 HttpDebugLoggingMiddleware wiring via DirectiveFeatures flag
+// ---------------------------------------------------------------------------
+
+describe('WebApplication HttpDebugLoggingMiddleware wiring', function (): void {
+
+    afterEach(function (): void {
+        unset($_ENV['DIRECTIVE_DEBUG_LOGGING']);
+    });
+
+    it('wires HttpDebugLoggingMiddleware and logs request/response when debug_logging is enabled', function (): void {
+        $_ENV['DIRECTIVE_DEBUG_LOGGING'] = '1';
+
+        $app = new DebugLoggingWebApplication();
+        $app->setConfig(TestConfig::class);
+
+        $request = new ServerRequest('GET', '/any/v1/foo/bar');
+        $app->resolve($request);
+
+        $messages = array_column($app->testHandler->getRecords(), 'message');
+        expect($messages)->toContain('http.request');
+        expect($messages)->toContain('http.response');
+    });
+
+    it('does not wire HttpDebugLoggingMiddleware when debug_logging is disabled', function (): void {
+        unset($_ENV['DIRECTIVE_DEBUG_LOGGING']);
+
+        $app = new DebugLoggingWebApplication();
+        $app->setConfig(TestConfig::class);
+
+        $request = new ServerRequest('GET', '/any/v1/foo/bar');
+        $app->resolve($request);
+
+        $messages = array_column($app->testHandler->getRecords(), 'message');
+        expect($messages)->not->toContain('http.request');
+        expect($messages)->not->toContain('http.response');
     });
 });

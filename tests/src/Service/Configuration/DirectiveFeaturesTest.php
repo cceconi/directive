@@ -9,7 +9,10 @@ use Directive\Exception\ConfigurationException;
 describe('DirectiveFeatures', function (): void {
 
     beforeEach(function (): void {
-        unset($_ENV['DIRECTIVE_RATE_LIMIT_ENABLED']);
+        unset(
+            $_ENV['DIRECTIVE_RATE_LIMIT_ENABLED'],
+            $_ENV['DIRECTIVE_DEBUG_LOGGING'],
+        );
     });
 
     it('extends AbstractFeatures', function (): void {
@@ -43,5 +46,23 @@ describe('DirectiveFeatures', function (): void {
         $all      = $features->getAll();
 
         expect($all)->toHaveKey('rate_limit');
+    });
+
+    it('debug_logging is disabled by default', function (): void {
+        $features = new DirectiveFeatures();
+        expect($features->isEnabled('debug_logging'))->toBeFalse();
+    });
+
+    it('debug_logging can be enabled via env var', function (): void {
+        $_ENV['DIRECTIVE_DEBUG_LOGGING'] = '1';
+        $features = new DirectiveFeatures();
+        expect($features->isEnabled('debug_logging'))->toBeTrue();
+    });
+
+    it('getAll includes debug_logging flag', function (): void {
+        $features = new DirectiveFeatures();
+        $all      = $features->getAll();
+
+        expect($all)->toHaveKey('debug_logging');
     });
 });

@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Directive\Http\Middleware;
 
 use Directive\Service\AppManagement\AppInfoInterface;
-use Directive\Service\Logging\WebLoggerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
- * Logs the application version on entry and flushes the log on exit.
+ * Logs the application version on every request.
  */
 final class LoggerMiddleware extends AbstractMiddleware
 {
@@ -19,17 +19,15 @@ final class LoggerMiddleware extends AbstractMiddleware
         ServerRequestInterface $request,
         RequestHandlerInterface $handler,
     ): ResponseInterface {
-        /** @var WebLoggerInterface $logger */
-        $logger = $this->container->get(WebLoggerInterface::class);
+        /** @var LoggerInterface $logger */
+        $logger = $this->container->get(LoggerInterface::class);
 
         /** @var AppInfoInterface $appInfo */
         $appInfo = $this->container->get(AppInfoInterface::class);
 
-        $logger->logVersion($appInfo->getVersion());
-
         $response = $handler->handle($request);
 
-        $logger->write();
+        $logger->info('request.complete', ['app_version' => $appInfo->getVersion()]);
 
         return $response;
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Http\Middleware;
 
-use Directive\Service\Logging\WebLoggerInterface;
+use Directive\Service\Logging\DirectiveLogger;
 use Directive\Service\Utils\BenchmarkInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -22,17 +22,15 @@ final class BusinessBenchmarkMiddleware extends AbstractMiddleware
         /** @var BenchmarkInterface $benchmark */
         $benchmark = $this->container->get(BenchmarkInterface::class);
 
-        /** @var WebLoggerInterface $logger */
-        $logger = $this->container->get(WebLoggerInterface::class);
+        /** @var DirectiveLogger $logger */
+        $logger = $this->container->get(DirectiveLogger::class);
 
         $benchmark->start();
 
         $response = $handler->handle($request);
 
-        $logger->logBusinessTimeExecution($benchmark->getFullTimeExecution());
-
         if ($benchmark->havePoints()) {
-            $logger->logBusinessBenchmark($benchmark->getPoints());
+            $logger->logBenchmark($benchmark->getPoints(), $benchmark->getFullTimeExecution());
         }
 
         return $response;

@@ -8,7 +8,6 @@ use Directive\Service\AppManagement\ClientHeadersInterface;
 use Directive\Service\Configuration\AbstractConfiguration;
 use Directive\Service\Health\AbstractHealthCheck;
 use Directive\Service\Health\HealthCheckInterface;
-use Directive\Service\Logging\WebLoggerInterface;
 use Directive\Service\Maintenance\MaintenanceManagerInterface;
 use Directive\Service\Security\AccessManagerInterface;
 use Directive\Service\Security\CookiesManagerInterface;
@@ -19,28 +18,13 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\NullLogger;
 use Slim\App;
 use Tests\Helpers\TestConfig;
 
 // ---------------------------------------------------------------------------
 // Stubs (prefixed to avoid redeclaration conflicts)
 // ---------------------------------------------------------------------------
-
-final class HRStubWebLogger implements WebLoggerInterface
-{
-    public function logVersion(string $version): void {}
-    public function logBusinessTimeExecution(float $elapsed): void {}
-    /** @param array<int, array<string, mixed>> $points */
-    public function logBusinessBenchmark(array $points): void {}
-    public function logRaw(string $message, mixed $context = null): void {}
-    public function logRequest(string $url, ServerRequestInterface $request): void {}
-    public function logResponse(ResponseInterface $response, string $message, mixed $data = null): void {}
-    public function logWebUser(?WebUserInterface $webUser): void {}
-    public function logJwt(string $jwt): void {}
-    public function logApiVersion(string $name, string $status, string $info = ''): void {}
-    public function write(): void {}
-    public function logError(\Throwable $e): void {}
-}
 
 final class HRStubAppInfo implements AppInfoInterface
 {
@@ -122,7 +106,7 @@ class HealthRouteWebApplication extends WebApplication
         $maintenance = $this->maintenanceOverride ?? new HRStubMaintenanceOff();
 
         $this->addDefinitions([
-            WebLoggerInterface::class                       => new HRStubWebLogger(),
+            \Psr\Log\LoggerInterface::class                 => new NullLogger(),
             AppInfoInterface::class                         => new HRStubAppInfo(),
             HeaderManagerInterface::class                   => new HRStubHeaderManager(),
             HttpResponse::class                             => new HttpResponse($factory, $factory),

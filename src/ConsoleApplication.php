@@ -15,10 +15,10 @@ use Directive\Console\FeatureListCommand;
 use Directive\Console\OpenApiCommand;
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Directive\Service\Configuration\AbstractConfiguration;
-use Directive\Service\Logging\ConsoleLogger;
-use Directive\Service\Logging\ConsoleLoggerInterface;
 use Directive\Service\Logging\DefaultLoggingConfig;
-use Directive\Service\Logging\WebLoggerInterface;
+use Directive\Service\Logging\DirectiveLogger;
+use Directive\Service\Logging\RequestIdHolder;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Application;
 
 /**
@@ -44,13 +44,11 @@ class ConsoleApplication extends AbstractApplication
 
     public function run(): void
     {
-        /** @var ConsoleLoggerInterface $logger */
-        $logger = $this->get(ConsoleLoggerInterface::class);
-        $logger->logVersion($this->console->getVersion());
+        /** @var LoggerInterface $logger */
+        $logger = $this->get(LoggerInterface::class);
+        $logger->info('console.start', ['version' => $this->console->getVersion()]);
 
         $this->console->run();
-
-        $logger->write();
     }
 
     // ------------------------------------------------------------------
@@ -92,15 +90,13 @@ class ConsoleApplication extends AbstractApplication
         $loggingConfig = new DefaultLoggingConfig();
         $loggingConfig->audit();
 
-        $logger = new ConsoleLogger(
-            channel: $loggingConfig->getAppCode(),
-            logDir: $loggingConfig->getLogPath(),
-            config: $loggingConfig,
-        );
+        $holder = new RequestIdHolder();
+        $logger = new DirectiveLogger($loggingConfig, $holder);
 
         $this->addDefinitions([
-            ConsoleLoggerInterface::class => $logger,
-            WebLoggerInterface::class     => $logger,
+            LoggerInterface::class  => $logger,
+            DirectiveLogger::class  => $logger,
+            RequestIdHolder::class  => $holder,
         ]);
     }
 

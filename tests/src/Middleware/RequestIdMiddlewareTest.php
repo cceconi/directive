@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use DI\ContainerBuilder;
 use Directive\Http\Middleware\RequestIdMiddleware;
+use Directive\Service\Logging\RequestId;
+use Directive\Service\Logging\RequestIdHolder;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
@@ -37,6 +39,8 @@ function makeHandler(Psr17Factory $factory, ?ServerRequestInterface &$captured =
 function makeMiddleware(): RequestIdMiddleware
 {
     $builder = new ContainerBuilder();
+    $holder  = new RequestIdHolder();
+    $builder->addDefinitions([RequestIdHolder::class => $holder]);
     return new RequestIdMiddleware($builder->build());
 }
 
@@ -115,5 +119,18 @@ describe('RequestIdMiddleware', function (): void {
 
         expect($response->getHeaderLine('X-Request-Id'))->toBe($existingId);
         expect($captured?->getAttribute('request_id'))->toBe($existingId);
+    });
+
+    it('populates RequestIdHolder with the resolved request ID', function (): void {
+        $factory    = new Psr17Factory();
+        $builder    = new ContainerBuilder();
+        $holder     = new RequestIdHolder();
+        $builder->addDefinitions([RequestIdHolder::class => $holder]);
+        $middleware = new RequestIdMiddleware($builder->build());
+
+        $request = new ServerRequest('GET', '/')->withHeader('X-Request-Id', 'upstream-id-xyz');
+        $middleware->process($request, makeHandler($factory));
+
+        expect($holder->get()->value)->toBe('upstream-id-xyz');
     });
 });

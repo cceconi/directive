@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Directive\Console;
 
-use Directive\Service\Logging\ConsoleLoggerInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -34,12 +34,14 @@ abstract class DirectiveCommand extends Command
 
         // Resolve structured logger lazily — container is always built before execute() runs.
         $logger = null;
-        if ($this->container->has(ConsoleLoggerInterface::class)) {
-            /** @var ConsoleLoggerInterface $logger */
-            $logger = $this->container->get(ConsoleLoggerInterface::class);
-            $logger->logRaw('Command: ' . $name);
-            $logger->logRaw('Arguments', $input->getArguments());
-            $logger->logRaw('Options', $input->getOptions());
+        if ($this->container->has(LoggerInterface::class)) {
+            /** @var LoggerInterface $logger */
+            $logger = $this->container->get(LoggerInterface::class);
+            $logger->info('console.command.start', [
+                'name'      => $name,
+                'arguments' => $input->getArguments(),
+                'options'   => $input->getOptions(),
+            ]);
         }
 
         $output->writeln(sprintf('[directive] Running command: <info>%s</info>', $name));
@@ -50,8 +52,10 @@ abstract class DirectiveCommand extends Command
         $output->writeln(sprintf('[directive] Command <comment>%s</comment> finished: %s', $name, $label));
 
         if ($logger !== null) {
-            $logger->logRaw('Result: ' . ($code === self::SUCCESS ? 'success' : 'failure'));
-            $logger->write();
+            $logger->info('console.command.end', [
+                'name'   => $name,
+                'result' => $code === self::SUCCESS ? 'success' : 'failure',
+            ]);
         }
 
         return $code;

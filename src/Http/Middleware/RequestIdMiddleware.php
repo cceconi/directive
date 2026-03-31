@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Directive\Http\Middleware;
 
+use Directive\Service\Logging\RequestId;
+use Directive\Service\Logging\RequestIdHolder;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -33,6 +35,10 @@ final class RequestIdMiddleware extends AbstractMiddleware
     ): ResponseInterface {
         $incoming = $request->getHeaderLine(self::HEADER);
         $requestId = ($incoming !== '') ? $incoming : Uuid::uuid7()->toString();
+
+        /** @var RequestIdHolder $holder */
+        $holder = $this->container->get(RequestIdHolder::class);
+        $holder->set(new RequestId($requestId));
 
         $request = $request->withAttribute(self::ATTRIBUTE, $requestId);
 
