@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Directive\ConsoleApplication;
+use Directive\Application\EventBus\DomainEventBusInterface;
+use Directive\Application\EventBus\NullDomainEventBus;
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Directive\Service\Configuration\AbstractConfiguration;
 use Directive\Service\Security\Antivirus\AntivirusConfigInterface;
@@ -93,6 +95,16 @@ describe('AbstractApplication service auto-binding', function (): void {
         $resolved = $app->getContainer()->get(AppIdentityConfigInterface::class);
 
         expect($resolved->getAppName())->toBe('Overridden Name');
+    });
+
+    it('auto-binds DomainEventBusInterface to NullDomainEventBus', function (): void {
+        $app = new BootTestApplication();
+        $app->setConfig(TestConfig::class);
+
+        $resolved = $app->getContainer()->get(DomainEventBusInterface::class);
+
+        expect($resolved)->toBeInstanceOf(DomainEventBusInterface::class);
+        expect($resolved)->toBeInstanceOf(NullDomainEventBus::class);
     });
 });
 

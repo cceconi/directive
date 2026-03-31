@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Directive;
 
+use Directive\Application\EventBus\DomainEventBusInterface;
+use Directive\Application\EventBus\NullDomainEventBus;
 use DI\ContainerBuilder;
 use Directive\Http\Middleware\DefaultHttpConfig;
 use Directive\Http\Middleware\HttpConfigInterface;
@@ -158,7 +160,7 @@ abstract class AbstractApplication implements ApplicationInterface
      */
     private function autoBindServiceDefaults(): LoggingConfigInterface
     {
-        /** @var array<class-string, AbstractConfiguration> $defaults */
+        /** @var array<class-string, AbstractConfiguration|object> $defaults */
         $defaults = [
             LoggingConfigInterface::class     => new DefaultLoggingConfig(),
             AppIdentityConfigInterface::class => new DefaultAppIdentityConfig(),
@@ -168,10 +170,20 @@ abstract class AbstractApplication implements ApplicationInterface
         ];
 
         foreach ($defaults as $interface => $impl) {
-            $impl->audit();
+            if ($impl instanceof AbstractConfiguration) {
+                $impl->audit();
+            }
             if (!in_array($interface, $this->userDefinedKeys, true)) {
                 $this->builder->addDefinitions([$interface => $impl]);
             }
+        }
+
+        // Application layer default: NullDomainEventBus (no-op).
+        // Override via addDefinitions([DomainEventBusInterface::class => ...]) before setConfig().
+        if (!in_array(DomainEventBusInterface::class, $this->userDefinedKeys, true)) {
+            $this->builder->addDefinitions([
+                DomainEventBusInterface::class => \DI\autowire(NullDomainEventBus::class),
+            ]);
         }
 
         /** @var LoggingConfigInterface $logging */
