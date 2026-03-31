@@ -189,9 +189,13 @@ final class Router
         $domain  = $this->manager->findDomain($args['domain'] ?? '');
         $version = $domain->findVersion($args['version'] ?? '');
         $version->checkAvailability();
-        $service = $version->findService($args['service'] ?? '');
 
-        return $service->findResource($args['resource'] ?? '');
+        if (array_key_exists('service', $args)) {
+            $service = $version->findService($args['service']);
+            return $service->findResource($args['resource'] ?? '');
+        }
+
+        return $version->findResource($args['resource'] ?? '');
     }
 
     /**
@@ -238,13 +242,23 @@ final class Router
     }
 
     /** @param array<string, string> $args */
+    /** @param array<string, string> $args */
     private function buildRoute(array $args): string
     {
+        if (array_key_exists('service', $args)) {
+            return sprintf(
+                '/%s/%s/%s/%s',
+                $args['domain'] ?? '',
+                $args['version'] ?? '',
+                $args['service'],
+                $args['resource'] ?? '',
+            );
+        }
+
         return sprintf(
-            '/%s/%s/%s/%s',
+            '/%s/%s/%s',
             $args['domain'] ?? '',
             $args['version'] ?? '',
-            $args['service'] ?? '',
             $args['resource'] ?? '',
         );
     }

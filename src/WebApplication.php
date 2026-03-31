@@ -145,6 +145,21 @@ class WebApplication extends AbstractApplication
             return $response;
         });
 
+        // -- API routes — 3-segment (Service-less) -----------------------
+        $app->map(
+            ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+            '/{domain}/{version}/{resource}',
+            function ($request, $response) {
+                // Epic 3: delegate to Rest\Router::resolve() (no service key in args)
+                return $response;
+            }
+        );
+
+        $app->options('/{domain}/{version}/{resource}', function ($request, $response) {
+            // Epic 3: delegate to Rest\Router::resolveOptions() (no service key in args)
+            return $response;
+        });
+
         // -- Built-in: maintenance ----------------------------------------
         $app->post('/maintenance', function ($request, $response) {
             // Epic 8: delegate to MaintenanceManager::resolve()

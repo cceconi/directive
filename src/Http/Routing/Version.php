@@ -21,6 +21,9 @@ class Version
     /** @var array<string, Service> */
     private array $services = [];
 
+    /** @var array<string, Resource> */
+    private array $directResources = [];
+
     public function __construct(
         public private(set) readonly string $name,
         public private(set) readonly VersionStatus $status = VersionStatus::Open,
@@ -91,7 +94,7 @@ class Version
     /**
      * Create a new Service and register it in this version.
      *
-     * @throws ApiDefinitionException on duplicate service name
+     * @throws ApiDefinitionException on duplicate service name or collision with a direct resource
      */
     public function service(string $name): Service
     {
@@ -101,10 +104,41 @@ class Version
             );
         }
 
+        if (isset($this->directResources[$name])) {
+            throw new ApiDefinitionException(
+                sprintf('Name "%s" is already registered as a direct resource in version "%s".', $name, $this->name),
+            );
+        }
+
         $service = new Service($name, $this->defaults);
         $this->services[$name] = $service;
 
         return $service;
+    }
+
+    /**
+     * Create a new Resource directly on this version (bypassing the Service layer).
+     *
+     * @throws ApiDefinitionException on duplicate name or collision with a service
+     */
+    public function resource(string $name): Resource
+    {
+        if (isset($this->directResources[$name])) {
+            throw new ApiDefinitionException(
+                sprintf('Direct resource "%s" is already registered in version "%s".', $name, $this->name),
+            );
+        }
+
+        if (isset($this->services[$name])) {
+            throw new ApiDefinitionException(
+                sprintf('Name "%s" is already registered as a service in version "%s".', $name, $this->name),
+            );
+        }
+
+        $resource = new Resource($name, $this->defaults);
+        $this->directResources[$name] = $resource;
+
+        return $resource;
     }
 
     /**
@@ -118,6 +152,16 @@ class Version
     }
 
     /**
+     * @throws NotFoundException
+     */
+    public function findResource(string $name): Resource
+    {
+        return $this->directResources[$name] ?? throw new NotFoundException(
+            sprintf('Direct resource "%s" not found in version "%s".', $name, $this->name),
+        );
+    }
+
+    /**
      * Return all registered services (used by the OpenAPI exporter).
      *
      * @return array<string, Service>
@@ -125,6 +169,16 @@ class Version
     public function getServices(): array
     {
         return $this->services;
+    }
+
+    /**
+     * Return all directly-registered resources (used by the OpenAPI exporter).
+     *
+     * @return array<string, Resource>
+     */
+    public function getDirectResources(): array
+    {
+        return $this->directResources;
     }
 
     /**

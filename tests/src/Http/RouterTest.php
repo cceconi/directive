@@ -131,3 +131,82 @@ describe('Router dispatch', function () {
         $this->assertResponseStatus($resp, 200);
     });
 });
+
+function buildRouterTreeWithDirectResource(): ApiDefinitionManager
+{
+    $manager = new ApiDefinitionManager();
+    $domain  = new Domain('api');
+    $version = $domain->version('v1', VersionStatus::Open);
+
+    // 4-level (service-level) resource — unchanged
+    $version->service('users')
+        ->resource('profile')
+        ->withRequestValidatorClass(StubRequestValidator::class)
+        ->withErrorClass(ErrorManager::class)
+        ->get(StubApi::class);
+
+    // 3-level (direct) resource — new
+    $version->resource('ping')
+        ->withRequestValidatorClass(StubRequestValidator::class)
+        ->withErrorClass(ErrorManager::class)
+        ->get(StubApi::class)
+        ->post(StubApi::class);
+
+    $manager->registerDomain($domain);
+
+    return $manager;
+}
+
+describe('Router dispatch — 3-segment (direct resource)', function () {
+    it('returns 200 for a valid GET request on a direct resource', function () {
+        $manager = buildRouterTreeWithDirectResource();
+        $extra   = [StubRequestValidator::class => new StubRequestValidator()];
+        $router  = $this->buildRouter($manager, null, $extra);
+        $resp    = $this->dispatch($router, 'GET', 'api', 'v1', '', 'ping');
+
+        $this->assertResponseStatus($resp, 200);
+    });
+
+    it('returns 404 for an unknown direct resource', function () {
+        $manager = buildRouterTreeWithDirectResource();
+        $router  = $this->buildRouter($manager);
+        $resp    = $this->dispatch($router, 'GET', 'api', 'v1', '', 'ghost');
+
+        $this->assertResponseStatus($resp, 404);
+    });
+
+    it('returns 405 for an unregistered method on a direct resource', function () {
+        $manager = buildRouterTreeWithDirectResource();
+        $router  = $this->buildRouter($manager);
+        $resp    = $this->dispatch($router, 'DELETE', 'api', 'v1', '', 'ping');
+
+        $this->assertResponseStatus($resp, 405);
+    });
+
+    it('4-level routes still resolve correctly when a direct resource also exists', function () {
+        $manager = buildRouterTreeWithDirectResource();
+        $extra   = [StubRequestValidator::class => new StubRequestValidator()];
+        $router  = $this->buildRouter($manager, null, $extra);
+        $resp    = $this->dispatch($router, 'GET', 'api', 'v1', 'users', 'profile');
+
+        $this->assertResponseStatus($resp, 200);
+    });
+});
+
+describe('Router OPTIONS — 3-segment (direct resource)', function () {
+    it('returns 204 with Allow header for a direct resource', function () {
+        $manager = buildRouterTreeWithDirectResource();
+        $router  = $this->buildRouter($manager);
+
+        $factory = new \Nyholm\Psr7\Factory\Psr17Factory();
+        $uri     = '/api/v1/ping';
+        $request = $factory->createServerRequest('OPTIONS', $uri);
+        $args    = ['domain' => 'api', 'version' => 'v1', 'resource' => 'ping'];
+        $resp    = $router->resolveOptions($request, $factory->createResponse(), $args);
+
+        $this->assertResponseStatus($resp, 204);
+        expect($resp->getHeaderLine('Allow'))->toContain('GET');
+        expect($resp->getHeaderLine('Allow'))->toContain('POST');
+        expect($resp->getHeaderLine('Allow'))->toContain('OPTIONS');
+    });
+});

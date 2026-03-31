@@ -85,20 +85,32 @@ trait DirectiveTestCase
         string $method,
         string $domain,
         string $version,
-        string $service,
-        string $resource,
+        string $service = '',
+        string $resource = '',
         array $body = [],
     ): ResponseInterface {
         $factory = new Psr17Factory();
-        $uri     = "/{$domain}/{$version}/{$service}/{$resource}";
+
+        if ($service === '') {
+            $uri  = "/{$domain}/{$version}/{$resource}";
+            $args = [
+                'domain'   => $domain,
+                'version'  => $version,
+                'resource' => $resource,
+            ];
+        } else {
+            $uri  = "/{$domain}/{$version}/{$service}/{$resource}";
+            $args = [
+                'domain'   => $domain,
+                'version'  => $version,
+                'service'  => $service,
+                'resource' => $resource,
+            ];
+        }
+
         $request = $this->createJsonRequest($method, $uri, $body);
 
-        return $router->resolve($request, $factory->createResponse(), [
-            'domain'   => $domain,
-            'version'  => $version,
-            'service'  => $service,
-            'resource' => $resource,
-        ]);
+        return $router->resolve($request, $factory->createResponse(), $args);
     }
 
     // ------------------------------------------------------------------
