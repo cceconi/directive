@@ -10,6 +10,7 @@ use Directive\Http\Response\HttpResponse;
 use Directive\Http\Router;
 use Directive\Service\Business\ErrorInterface;
 use Directive\Service\Business\ErrorManager;
+use Directive\Service\Security\Role\AbstractRole;
 use Directive\Service\Security\WebUserInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
@@ -22,8 +23,19 @@ use Psr\Http\Message\ServerRequestInterface;
  *
  * Must be a trait so Pest 3 properly mixes them into $this.
  */
-trait DirectiveTestCase
+trait DirectiveHttpTestCase
 {
+    private ?WebUserInterface $currentUser = null;
+    // ------------------------------------------------------------------
+    // Auth helper
+    // ------------------------------------------------------------------
+
+    public function actingAs(AbstractRole $role): static
+    {
+        $this->currentUser = (new StubWebUser())->withRole($role);
+        return $this;
+    }
+
     // ------------------------------------------------------------------
     // Request builders
     // ------------------------------------------------------------------
@@ -68,7 +80,7 @@ trait DirectiveTestCase
     ): Router {
         $factory  = new Psr17Factory();
         $httpResp = new HttpResponse($factory, $factory);
-        $user     = $webUser ?? new StubWebUser();
+        $user     = $webUser ?? $this->currentUser ?? new StubWebUser();
 
         $builder = new ContainerBuilder();
         $builder->addDefinitions(array_merge(
@@ -120,6 +132,19 @@ trait DirectiveTestCase
     public function assertResponseStatus(ResponseInterface $response, int $expected): void
     {
         expect($response->getStatusCode())->toBe($expected);
+    }
+
+    public function assertStatus(ResponseInterface $response, int $expected): void
+    {
+        $this->assertResponseStatus($response, $expected);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getJson(ResponseInterface $response): array
+    {
+        return $this->getBodyArray($response);
     }
 
     public function assertJsonBody(ResponseInterface $response, string $key, mixed $expected): void

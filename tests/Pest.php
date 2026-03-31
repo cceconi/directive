@@ -9,5 +9,5 @@ declare(strict_types=1);
 */
 
 uses(
-    Tests\Helpers\DirectiveTestCase::class,
+    Tests\Helpers\DirectiveHttpTestCase::class,
 )->in(__DIR__ . '/src');
