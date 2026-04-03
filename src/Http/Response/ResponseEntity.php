@@ -28,6 +28,8 @@ class ResponseEntity implements ResponseEntityInterface, JsonSerializable
 
     private int $filesize = 0;
 
+    private int $httpCode = 200;
+
     /** @var resource|null */
     private mixed $streamResource = null;
 
@@ -45,6 +47,16 @@ class ResponseEntity implements ResponseEntityInterface, JsonSerializable
     public function setData(array $data): void
     {
         $this->data = $data;
+    }
+
+    public function setHttpCode(int $code): void
+    {
+        $this->httpCode = $code;
+    }
+
+    public function getHttpCode(): int
+    {
+        return $this->httpCode;
     }
 
     public function isStream(): bool

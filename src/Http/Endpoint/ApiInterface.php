@@ -14,7 +14,7 @@ use Directive\Http\Response\ResponseEntity;
 interface ApiInterface
 {
     /**
-     * Execute the handler. Implementations may throw any DirectiveException.
+     * Execute the handler. Implementations may throw any DirectiveException or domain exception.
      *
      * @throws \Directive\Http\Exception\TooManyRequestsException
      * @throws \Directive\Http\Exception\BadRequestException
@@ -22,6 +22,7 @@ interface ApiInterface
      * @throws \Directive\Http\Exception\NotFoundException
      * @throws \Directive\Http\Exception\UnauthorizedException
      * @throws \Directive\Http\Exception\UnprocessableException
+     * @throws \DomainException May propagate domain exceptions from compute() implementations.
      */
     public function run(): void;
 

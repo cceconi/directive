@@ -33,6 +33,9 @@ abstract class AbstractApi implements ApiInterface
     // ApiInterface
     // ------------------------------------------------------------------
 
+    /**
+     * @throws \DomainException May propagate domain exceptions from compute() implementations.
+     */
     final public function run(): void
     {
         $this->preControl();

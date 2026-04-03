@@ -39,7 +39,14 @@ final class HttpResponse
             return $this->binaryResponse($entity);
         }
 
-        return $this->json(200, 'OK', $entity->getData(), $route, $method);
+        $code    = $entity->getHttpCode();
+        $message = match ($code) {
+            201     => 'Created',
+            202     => 'Accepted',
+            default => 'OK',
+        };
+
+        return $this->json($code, $message, $entity->getData(), $route, $method);
     }
 
     // ------------------------------------------------------------------
@@ -75,6 +82,11 @@ final class HttpResponse
     public function methodNotAllowed(string $route, string $method): ResponseInterface
     {
         return $this->json(405, 'Method Not Allowed', [], $route, $method);
+    }
+
+    public function conflict(string $route, string $method): ResponseInterface
+    {
+        return $this->json(409, 'Conflict', [], $route, $method);
     }
 
     /**

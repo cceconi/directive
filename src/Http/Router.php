@@ -12,6 +12,11 @@ use Directive\Http\Exception\GoneException;
 use Directive\Http\Exception\MethodNotAllowedException;
 use Directive\Http\Exception\NotFoundException;
 use Directive\Http\Exception\UnauthorizedException;
+use Directive\Application\Exception\AccessDeniedException;
+use Directive\Application\Exception\BusinessRuleException;
+use Directive\Application\Exception\ConflictException;
+use Directive\Application\Exception\EntityNotFoundException;
+use Directive\Application\Exception\ValidationException;
 use Directive\Application\Role\GuestRole;
 use Directive\Service\Security\WebUserInterface;
 use Directive\Http\Response\ResponseEntity;
@@ -85,6 +90,23 @@ final class Router
             return $this->httpResponse->tooManyRequests($route, $method, (string) $e->getResetIn());
         } catch (UnprocessableException $e) {
             return $this->httpResponse->unprocessable($route, $method, $e->getErrors());
+        } catch (EntityNotFoundException) {
+            return $this->httpResponse->notFound($route, $method);
+        } catch (AccessDeniedException) {
+            return $this->httpResponse->forbidden($route, $method);
+        } catch (ConflictException) {
+            return $this->httpResponse->conflict($route, $method);
+        } catch (ValidationException $e) {
+            $errors = array_map(
+                fn (string $field, string $msg) => ['field' => $field, 'message' => $msg],
+                array_keys($e->getErrors()),
+                array_values($e->getErrors()),
+            );
+            return $this->httpResponse->unprocessable($route, $method, $errors);
+        } catch (BusinessRuleException) {
+            return $this->httpResponse->unprocessable($route, $method);
+        } catch (\DomainException) {
+            return $this->httpResponse->badRequest($route, $method);
         } catch (\Throwable) {
             return $this->httpResponse->internalError($route, $method);
         }
@@ -134,6 +156,7 @@ final class Router
      * @throws BadRequestException
      * @throws UnprocessableException
      * @throws TooManyRequestsException
+     * @throws \DomainException May propagate from Api::run() → compute() implementations.
      */
     private function dispatch(
         ServerRequestInterface $request,

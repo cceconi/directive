@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Directive;
 
 use Directive\Application\EventBus\DomainEventBusInterface;
+use Directive\Application\EventBus\DirectiveDomainEventBus;
 use Directive\Application\EventBus\NullDomainEventBus;
 use DI\ContainerBuilder;
 use Directive\Http\Middleware\DefaultHttpConfig;
@@ -178,12 +179,28 @@ abstract class AbstractApplication implements ApplicationInterface
             }
         }
 
-        // Application layer default: NullDomainEventBus (no-op).
-        // Override via addDefinitions([DomainEventBusInterface::class => ...]) before setConfig().
+        // Application layer default: DomainEventBusInterface.
+        // If PSR-14 EventDispatcherInterface is resolvable, prefer DirectiveDomainEventBus.
+        // Otherwise fall back to NullDomainEventBus (no-op).
+        // Never overwrite an explicit user binding.
         if (!in_array(DomainEventBusInterface::class, $this->userDefinedKeys, true)) {
-            $this->builder->addDefinitions([
-                DomainEventBusInterface::class => \DI\autowire(NullDomainEventBus::class),
-            ]);
+            $psr14Resolvable = false;
+            try {
+                // Probe without building — check if user already registered a PSR-14 dispatcher.
+                $psr14Resolvable = in_array(\Psr\EventDispatcher\EventDispatcherInterface::class, $this->userDefinedKeys, true);
+            } catch (\Throwable) {
+                $psr14Resolvable = false;
+            }
+
+            if ($psr14Resolvable) {
+                $this->builder->addDefinitions([
+                    DomainEventBusInterface::class => \DI\autowire(DirectiveDomainEventBus::class),
+                ]);
+            } else {
+                $this->builder->addDefinitions([
+                    DomainEventBusInterface::class => \DI\autowire(NullDomainEventBus::class),
+                ]);
+            }
         }
 
         /** @var LoggingConfigInterface $logging */

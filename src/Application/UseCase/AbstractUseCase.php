@@ -10,6 +10,9 @@ use Directive\Application\Exception\AbstractDomainException;
 use Directive\Application\Exception\AccessDeniedException;
 use Directive\Application\Message\ResultInterface;
 use Directive\Application\Query\AbstractQuery;
+use Directive\Application\Role\AbstractRole;
+use Directive\Application\Role\Permission;
+use Directive\Application\User\DomainUser;
 use Psr\Log\LoggerInterface;
 
 abstract class AbstractUseCase implements UseCaseInterface
@@ -77,5 +80,55 @@ abstract class AbstractUseCase implements UseCaseInterface
     protected function onError(callable $callback): void
     {
         $this->errorCallbacks[] = $callback;
+    }
+
+    // ------------------------------------------------------------------
+    // UCAC — fine-grained permission control
+    // ------------------------------------------------------------------
+
+    /**
+     * Declare the permission matrix for this use-case.
+     * Keys are role class-strings, values are Permission enum cases.
+     * Roles not listed default to Permission::Allow.
+     *
+     * @return array<class-string<AbstractRole>, Permission>
+     */
+    protected function getPermissions(): array
+    {
+        return [];
+    }
+
+    /**
+     * Check if the caller is allowed to execute this use-case.
+     * Call explicitly at the top of execute() before any business logic.
+     *
+     * - Permission::Allow       → no-op
+     * - Permission::Forbidden   → throws AccessDeniedException
+     * - Permission::Complementary → evaluates the matching closure in $complementaryRules;
+     *                               throws AccessDeniedException if absent or returns false
+     *
+     * @param array<class-string<AbstractRole>, callable(): bool> $complementaryRules
+     */
+    protected function hasPermission(DomainUser $caller, array $complementaryRules = []): void
+    {
+        $permissions = $this->getPermissions();
+        $permission  = $permissions[$caller->role::class] ?? Permission::Allow;
+
+        match ($permission) {
+            Permission::Forbidden     => throw new AccessDeniedException(),
+            Permission::Allow         => null,
+            Permission::Complementary => $this->resolveComplementary($caller->role::class, $complementaryRules),
+        };
+    }
+
+    /**
+     * @param array<class-string<AbstractRole>, callable(): bool> $rules
+     */
+    private function resolveComplementary(string $roleClass, array $rules): void
+    {
+        $rule = $rules[$roleClass] ?? null;
+        if ($rule === null || !$rule()) {
+            throw new AccessDeniedException();
+        }
     }
 }
