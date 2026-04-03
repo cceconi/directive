@@ -12,6 +12,14 @@ use Directive\Console\ConfigListCommand;
 use Directive\Console\ConfigVerifyCommand;
 use Directive\Console\DirectiveCommand;
 use Directive\Console\FeatureListCommand;
+use Directive\Console\Generator\ConfigureDefaultCommand;
+use Directive\Console\Generator\GenerateEventCommand;
+use Directive\Console\Generator\GenerateExceptionCommand;
+use Directive\Console\Generator\GenerateRepositoryInterfaceCommand;
+use Directive\Console\Generator\GenerateRoleCommand;
+use Directive\Console\Generator\GenerateUidCommand;
+use Directive\Console\Generator\GenerateUseCaseCommandCommand;
+use Directive\Console\Generator\GenerateUseCaseQueryCommand;
 use Directive\Console\OpenApiCommand;
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Directive\Service\Configuration\AbstractConfiguration;
@@ -129,6 +137,14 @@ class ConsoleApplication extends AbstractApplication
         $this->console->addCommand(new ConfigCompileCommand($this->getContainer()));
         $this->console->addCommand(new FeatureListCommand($this->getContainer()));
         $this->console->addCommand(new ConfigVerifyCommand($this->getContainer()));
+        $this->console->addCommand(new ConfigureDefaultCommand($this->getContainer()));
+        $this->console->addCommand(new GenerateUseCaseCommandCommand($this->getContainer()));
+        $this->console->addCommand(new GenerateUseCaseQueryCommand($this->getContainer()));
+        $this->console->addCommand(new GenerateRoleCommand($this->getContainer()));
+        $this->console->addCommand(new GenerateEventCommand($this->getContainer()));
+        $this->console->addCommand(new GenerateRepositoryInterfaceCommand($this->getContainer()));
+        $this->console->addCommand(new GenerateExceptionCommand($this->getContainer()));
+        $this->console->addCommand(new GenerateUidCommand($this->getContainer()));
 
         // User-registered commands
         if ($this->userCommands !== []) {
