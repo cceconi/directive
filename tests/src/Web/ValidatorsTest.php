@@ -11,7 +11,7 @@ use Directive\Http\Upload\Validators\Size;
 
 function makeTmpFile(string $content = 'test'): FileInfo
 {
-    $tmp = tempnam(sys_get_temp_dir(), 'apisy_v_');
+    $tmp = tempnam(sys_get_temp_dir(), 'directive_v_');
     file_put_contents($tmp, $content);
     $fi = new FileInfo($tmp);
     $fi->setExtension('txt');
@@ -20,7 +20,7 @@ function makeTmpFile(string $content = 'test'): FileInfo
 
 afterEach(function () {
     // Clean up any leftover tmp files
-    foreach (glob(sys_get_temp_dir() . '/apisy_v_*') ?: [] as $f) {
+    foreach (glob(sys_get_temp_dir() . '/directive_v_*') ?: [] as $f) {
         @unlink($f);
     }
 });

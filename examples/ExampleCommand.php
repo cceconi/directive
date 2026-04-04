@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Bundled no-op command confirming the console is wired correctly.
  *
- * Run with: php bin/apisy app:dummy
+ * Run with: php bin/directive app:dummy
  */
 #[AsCommand(
     name: 'app:dummy',

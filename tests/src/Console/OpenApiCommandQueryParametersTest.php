@@ -61,7 +61,7 @@ function stubQueryParamsAppIdentity(): AppIdentityConfigInterface
     return new class implements AppIdentityConfigInterface {
         public function getAppCode(): string
         {
-            return 'apisy-test';
+            return 'directive-test';
         }
         public function getAppName(): string
         {
@@ -89,7 +89,7 @@ function stubQueryParamsAppIdentity(): AppIdentityConfigInterface
 describe('OpenApiCommand — QueryParametersValidator integration', function () {
     it('generates parameters block for endpoint using QueryParametersValidator', function () {
         $manager = buildQueryParamsOpenApiTree();
-        $outFile = tempnam(sys_get_temp_dir(), 'apisy_qpv_') . '.yaml';
+        $outFile = tempnam(sys_get_temp_dir(), 'directive_qpv_') . '.yaml';
 
         $container = $this->container([
             ApiDefinitionManager::class      => $manager,
@@ -118,7 +118,7 @@ describe('OpenApiCommand — QueryParametersValidator integration', function () 
 
     it('does not generate parameters block for standard AbstractRequestValidator endpoint', function () {
         $manager = buildQueryParamsOpenApiTree();
-        $outFile = tempnam(sys_get_temp_dir(), 'apisy_qpv_') . '.yaml';
+        $outFile = tempnam(sys_get_temp_dir(), 'directive_qpv_') . '.yaml';
 
         $container = $this->container([
             ApiDefinitionManager::class      => $manager,

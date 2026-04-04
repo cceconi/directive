@@ -56,7 +56,7 @@ describe('OpenApiCommand — x-rate-limit extension', function (): void {
             ->get(StubApi::class);
         $manager->registerDomain($domain);
 
-        $outFile = tempnam(sys_get_temp_dir(), 'apisy_rl_') . '.yaml';
+        $outFile = tempnam(sys_get_temp_dir(), 'directive_rl_') . '.yaml';
 
         $container = $this->container([
             ApiDefinitionManager::class   => $manager,
@@ -89,7 +89,7 @@ describe('OpenApiCommand — x-rate-limit extension', function (): void {
             ->get(StubApi::class);
         $manager->registerDomain($domain);
 
-        $outFile = tempnam(sys_get_temp_dir(), 'apisy_rl2_') . '.yaml';
+        $outFile = tempnam(sys_get_temp_dir(), 'directive_rl2_') . '.yaml';
 
         $container = $this->container([
             ApiDefinitionManager::class   => $manager,
@@ -122,7 +122,7 @@ describe('OpenApiCommand — x-rate-limit extension', function (): void {
             ->get(StubApi::class);
         $manager->registerDomain($domain);
 
-        $outFile = tempnam(sys_get_temp_dir(), 'apisy_rl3_') . '.yaml';
+        $outFile = tempnam(sys_get_temp_dir(), 'directive_rl3_') . '.yaml';
 
         $container = $this->container([
             ApiDefinitionManager::class       => $manager,

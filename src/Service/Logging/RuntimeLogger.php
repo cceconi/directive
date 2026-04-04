@@ -18,7 +18,7 @@ use Monolog\Registry;
  */
 final class RuntimeLogger
 {
-    private const string REGISTRY_KEY = 'apisy.runtime';
+    private const string REGISTRY_KEY = 'directive.runtime';
 
     public function __construct(string $name, string $logDir = '')
     {
@@ -28,7 +28,7 @@ final class RuntimeLogger
 
         $dir    = $logDir !== '' ? $logDir : sys_get_temp_dir();
         $logger = new Logger($name);
-        $logger->pushHandler(new RotatingFileHandler($dir . '/apisy_runtime.log', 30));
+        $logger->pushHandler(new RotatingFileHandler($dir . '/directive_runtime.log', 30));
 
         ErrorHandler::register($logger);
         Registry::addLogger($logger, self::REGISTRY_KEY);

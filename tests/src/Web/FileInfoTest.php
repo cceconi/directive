@@ -5,8 +5,8 @@ declare(strict_types=1);
 use Directive\Http\Upload\FileInfo;
 
 beforeEach(function () {
-    $this->tmpFile = tempnam(sys_get_temp_dir(), 'apisy_test_');
-    file_put_contents($this->tmpFile, 'hello apisy');
+    $this->tmpFile = tempnam(sys_get_temp_dir(), 'directive_test_');
+    file_put_contents($this->tmpFile, 'hello directive');
 });
 
 afterEach(function () {
@@ -18,7 +18,7 @@ afterEach(function () {
 describe('FileInfo', function () {
     it('reports correct size', function () {
         $fi = new FileInfo($this->tmpFile);
-        expect($fi->getSize())->toBe(11);
+        expect($fi->getSize())->toBe(15);
     });
 
     it('sanitizes a dangerous path to strip directory separators', function () {
@@ -47,7 +47,7 @@ describe('FileInfo', function () {
     });
 
     it('remove() deletes the file', function () {
-        $tmp = tempnam(sys_get_temp_dir(), 'apisy_rm_');
+        $tmp = tempnam(sys_get_temp_dir(), 'directive_rm_');
         file_put_contents($tmp, 'delete me');
         $fi = new FileInfo($tmp);
         $fi->remove();

@@ -21,8 +21,8 @@ use Symfony\Component\Yaml\Yaml;
  * Generates an OpenAPI 3.0 document from the live API tree.
  *
  * Usage:
- *   php bin/apisy app:openapi
- *   php bin/apisy app:openapi --output /path/to/openapi.yaml
+ *   php bin/directive app:openapi
+ *   php bin/directive app:openapi --output /path/to/openapi.yaml
  *
  * Tree introspection is best-effort: request/response schemas are annotated
  * with `x-policy` and `x-response-entity` extension fields rather than

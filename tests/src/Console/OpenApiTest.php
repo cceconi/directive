@@ -42,7 +42,7 @@ function stubAppIdentity(): AppIdentityConfigInterface
     return new class implements AppIdentityConfigInterface {
         public function getAppCode(): string
         {
-            return 'apisy-test';
+            return 'directive-test';
         }
         public function getAppName(): string
         {
@@ -66,7 +66,7 @@ function stubAppIdentity(): AppIdentityConfigInterface
 describe('OpenApiCommand', function () {
     it('generates an OpenAPI document with correct structure', function () {
         $manager = buildOpenApiTree();
-        $outFile = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
+        $outFile = tempnam(sys_get_temp_dir(), 'directive_oa_') . '.yaml';
 
         $container = $this->container([
             \Directive\Http\Endpoint\ApiDefinitionManager::class => $manager,
@@ -91,7 +91,7 @@ describe('OpenApiCommand', function () {
 
     it('includes security requirement on protected operations', function () {
         $manager = buildOpenApiTree();
-        $outFile = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
+        $outFile = tempnam(sys_get_temp_dir(), 'directive_oa_') . '.yaml';
 
         $container = $this->container([
             \Directive\Http\Endpoint\ApiDefinitionManager::class => $manager,
@@ -110,7 +110,7 @@ describe('OpenApiCommand', function () {
 
     it('marks deprecated versions in tag descriptions', function () {
         $manager = buildOpenApiTree();
-        $outFile = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
+        $outFile = tempnam(sys_get_temp_dir(), 'directive_oa_') . '.yaml';
 
         $container = $this->container([
             \Directive\Http\Endpoint\ApiDefinitionManager::class => $manager,
@@ -140,7 +140,7 @@ describe('OpenApiCommand — response codes (task 4.4)', function () {
             ->get(StubApi::class, overrides: new MethodDefaults(errorCodes: [400, 422, 503]));
 
         $manager->registerDomain($domain);
-        $outFile = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
+        $outFile = tempnam(sys_get_temp_dir(), 'directive_oa_') . '.yaml';
 
         $container = $this->container([
             ApiDefinitionManager::class      => $manager,
@@ -162,7 +162,7 @@ describe('OpenApiCommand — response codes (task 4.4)', function () {
 
     it('includes 500 in smart defaults when no explicit list', function () {
         $manager = buildOpenApiTree();
-        $outFile = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
+        $outFile = tempnam(sys_get_temp_dir(), 'directive_oa_') . '.yaml';
 
         $container = $this->container([
             ApiDefinitionManager::class      => $manager,
@@ -191,7 +191,7 @@ describe('OpenApiCommand — requestSchema / responseSchema (task 4.5)', functio
             ->post(StubApi::class, overrides: new MethodDefaults(requestSchema: 'schemas/upload-request.json'));
 
         $manager->registerDomain($domain);
-        $outFile = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
+        $outFile = tempnam(sys_get_temp_dir(), 'directive_oa_') . '.yaml';
 
         $container = $this->container([
             ApiDefinitionManager::class      => $manager,
@@ -219,7 +219,7 @@ describe('OpenApiCommand — requestSchema / responseSchema (task 4.5)', functio
             ->get(StubApi::class, overrides: new MethodDefaults(responseSchema: 'schemas/item-response.json'));
 
         $manager->registerDomain($domain);
-        $outFile = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
+        $outFile = tempnam(sys_get_temp_dir(), 'directive_oa_') . '.yaml';
 
         $container = $this->container([
             ApiDefinitionManager::class      => $manager,
@@ -247,7 +247,7 @@ describe('OpenApiCommand — requestSchema / responseSchema (task 4.5)', functio
             ->post(StubApi::class, overrides: new MethodDefaults(requestSchema: 'App\Web\Request\UploadRequest'));
 
         $manager->registerDomain($domain);
-        $outFile = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
+        $outFile = tempnam(sys_get_temp_dir(), 'directive_oa_') . '.yaml';
 
         $container = $this->container([
             ApiDefinitionManager::class      => $manager,
@@ -278,7 +278,7 @@ describe('OpenApiCommand — authenticated security flag (task 4.6)', function (
             ->get(StubApi::class);
 
         $manager->registerDomain($domain);
-        $outFile = tempnam(sys_get_temp_dir(), 'apisy_oa_') . '.yaml';
+        $outFile = tempnam(sys_get_temp_dir(), 'directive_oa_') . '.yaml';
 
         $container = $this->container([
             ApiDefinitionManager::class      => $manager,
