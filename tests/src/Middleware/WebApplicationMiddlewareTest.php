@@ -13,7 +13,7 @@ use Directive\Service\Maintenance\MaintenanceManagerInterface;
 use Directive\Service\Security\AccessManagerInterface;
 use Directive\Service\Security\CookiesManagerInterface;
 use Directive\Service\Security\HeaderManagerInterface;
-use Directive\WebApplication;
+use Directive\AbstractWebApplication;
 use Monolog\Handler\TestHandler;
 use Monolog\Level;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -106,7 +106,7 @@ final class StubAccessManager implements AccessManagerInterface
 // Full-stack test double: stubs all unimplemented middleware services.
 // ---------------------------------------------------------------------------
 
-final class FullStackWebApplication extends WebApplication
+final class FullStackWebApplication extends AbstractWebApplication
 {
     public bool $configureMiddlewareCalled = false;
 
@@ -187,7 +187,7 @@ describe('WebApplication middleware integration', function (): void {
 // Test double for HttpDebugLoggingMiddleware integration
 // ---------------------------------------------------------------------------
 
-final class DebugLoggingWebApplication extends WebApplication
+final class DebugLoggingWebApplication extends AbstractWebApplication
 {
     public TestHandler $testHandler;
 

@@ -93,4 +93,35 @@ describe('AbstractConfiguration', function (): void {
         expect($defs['APP_ENV']['required'])->toBe(true);
         expect($defs['APP_ENV']['type'])->toBe('string');
     });
+
+    it('loadCache() pre-populates resolved values and audit() skips them', function (): void {
+        // DB_PORT is required but absent from $_ENV — cache provides it
+        $_ENV['APP_ENV'] = 'production';
+        $config = new StubConfiguration();
+        $config->loadCache(['APP_ENV' => 'staging', 'DB_PORT' => 5432]);
+        $config->audit();
+        // Cache value wins over $_ENV
+        expect($config->get('APP_ENV'))->toBe('staging');
+        expect($config->get('DB_PORT'))->toBe(5432);
+    });
+
+    it('loadCache() source is tracked as cache', function (): void {
+        $_ENV['APP_ENV'] = 'production';
+        $_ENV['DB_PORT'] = '5432';
+        $config = new StubConfiguration();
+        $config->loadCache(['APP_ENV' => 'staging']);
+        $config->audit();
+        expect($config->getSource('APP_ENV'))->toBe('cache');
+        // DB_PORT resolved from $_ENV, not cache
+        expect($config->getSource('DB_PORT'))->not->toBe('cache');
+    });
+
+    it('loadCache() ignores unknown keys silently', function (): void {
+        $_ENV['APP_ENV'] = 'production';
+        $_ENV['DB_PORT'] = '5432';
+        $config = new StubConfiguration();
+        $config->loadCache(['UNKNOWN_KEY' => 'value']);
+        $config->audit();
+        expect($config->get('APP_ENV'))->toBe('production');
+    });
 });

@@ -76,7 +76,30 @@ abstract class AbstractConfiguration
     // ------------------------------------------------------------------
 
     /**
+     * Pre-populate resolved values from a compiled config cache.
+     *
+     * Keys present in $values are marked as resolved from 'cache' and will
+     * be skipped by audit() — no $_ENV lookup, no allowed-list check.
+     * Sensitive variables are never written to the cache by config:compile,
+     * so they will still be validated from $_ENV during audit().
+     *
+     * Only keys declared in define() are accepted; unknown keys are ignored.
+     *
+     * @param array<string, mixed> $values
+     */
+    public function loadCache(array $values): void
+    {
+        foreach ($values as $key => $value) {
+            if (array_key_exists($key, $this->definitions)) {
+                $this->resolved[$key] = $value;
+                $this->sources[$key]  = 'cache';
+            }
+        }
+    }
+
+    /**
      * Validate all declared keys against $_ENV and resolve their values.
+     * Keys already resolved via loadCache() are skipped.
      *
      * @throws ConfigurationException when required keys are missing or values are not in their allowed list.
      */
@@ -85,6 +108,11 @@ abstract class AbstractConfiguration
         $errors = [];
 
         foreach ($this->definitions as $key => $def) {
+            // Already resolved from compiled cache — skip $_ENV lookup.
+            if (array_key_exists($key, $this->resolved)) {
+                continue;
+            }
+
             $raw = $_ENV[$key] ?? null;
 
             if ($raw === null) {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Directive\Application\EventBus\DomainEventBusInterface;
 use Directive\Application\EventBus\NullDomainEventBus;
-use Directive\ConsoleApplication;
+use Directive\AbstractConsoleApplication;
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Directive\Service\Configuration\AbstractConfiguration;
 use Directive\Service\Security\Antivirus\AntivirusConfigInterface;
@@ -13,11 +13,11 @@ use Directive\Service\Security\SecurityConfigInterface;
 use Tests\Helpers\TestConfig;
 
 // ---------------------------------------------------------------------------
-// Minimal stub: extends ConsoleApplication to skip the full Symfony boot.
+// Minimal stub: extends AbstractConsoleApplication to skip the full Symfony boot.
 // We only call setConfig() — never run() — so bootConsole() is never reached.
 // ---------------------------------------------------------------------------
 
-final class BootTestApplication extends ConsoleApplication
+final class BootTestApplication extends AbstractConsoleApplication
 {
     protected function registerServices(AbstractConfiguration $config): void
     {
@@ -132,6 +132,44 @@ describe('AbstractApplication service auto-binding', function (): void {
 
         expect($resolved)->toBeInstanceOf(DomainEventBusInterface::class);
         expect($resolved)->toBeInstanceOf(NullDomainEventBus::class);
+    });
+
+    it('configureContainer() hook is called before build and can register bindings', function (): void {
+        $customConfig = new class implements AntivirusConfigInterface {
+            public function getHost(): string { return 'hook-host'; }
+            public function getPort(): int { return 9999; }
+            public function getTimeout(): int { return 1; }
+            public function getName(): string { return 'clamav'; }
+        };
+
+        $app = new class ($customConfig) extends AbstractConsoleApplication {
+            public function __construct(private AntivirusConfigInterface $custom)
+            {
+                parent::__construct();
+            }
+
+            protected function registerServices(AbstractConfiguration $config): void {}
+
+            protected function addServices(): void {}
+
+            protected function configureContainer(): void
+            {
+                $this->addDefinitions([AntivirusConfigInterface::class => $this->custom]);
+            }
+        };
+
+        $app->setConfig(TestConfig::class);
+
+        $resolved = $app->getContainer()->get(AntivirusConfigInterface::class);
+        expect($resolved->getHost())->toBe('hook-host');
+    });
+
+    it('addDefinitions() throws LogicException when called after setConfig()', function (): void {
+        $app = new BootTestApplication();
+        $app->setConfig(TestConfig::class);
+
+        expect(fn () => $app->define([AntivirusConfigInterface::class => new DefaultAntivirusConfig()]))
+            ->toThrow(\LogicException::class);
     });
 });
 

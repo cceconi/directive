@@ -58,6 +58,14 @@ abstract class AbstractApplication implements ApplicationInterface
     {
         /** @var AbstractConfiguration $config */
         $config = new $configClass();
+
+        // Inject compiled cache values before audit() so non-sensitive resolved
+        // variables skip $_ENV lookup (sensitive vars are never in the cache).
+        $cached = $this->loadConfigCache($configClass);
+        if ($cached !== null) {
+            $config->loadCache($cached);
+        }
+
         $config->audit();
 
         // Auto-bind the 5 default service configs (skip any already overridden by user).
@@ -72,6 +80,8 @@ abstract class AbstractApplication implements ApplicationInterface
         $this->builder->addDefinitions([$configClass => $config]);
 
         $this->registerServices($config);
+
+        $this->configureContainer();
 
         $this->container = $this->builder->build();
 
@@ -92,6 +102,18 @@ abstract class AbstractApplication implements ApplicationInterface
     // ------------------------------------------------------------------
     // Hooks for subclasses
     // ------------------------------------------------------------------
+
+    /**
+     * Override to register additional DI bindings before the container is built.
+     *
+     * Called in setConfig() after registerServices() and before the container
+     * is finalized. Use addDefinitions() here to bind application-specific
+     * interfaces to their implementations.
+     *
+     * Example:
+     *   $this->addDefinitions([MyInterface::class => new MyImpl()]);
+     */
+    protected function configureContainer(): void {}
 
     /**
      * Register DI definitions that depend on the configuration.
@@ -146,6 +168,10 @@ abstract class AbstractApplication implements ApplicationInterface
      */
     protected function addDefinitions(array $definitions): void
     {
+        if ($this->container !== null) {
+            throw new \LogicException('Cannot add definitions after the container has been built. Call addDefinitions() before setConfig().');
+        }
+
         foreach (array_keys($definitions) as $key) {
             $this->userDefinedKeys[] = $key;
         }
@@ -222,12 +248,40 @@ abstract class AbstractApplication implements ApplicationInterface
 
         if (!file_exists('var/cache/config.php')) {
             error_log('[Directive] Production environment detected but var/cache/config.php is missing.'
-                . ' Run "php artisan config:compile" to generate the cache.');
+                . ' Run "bin/directive config:compile" to generate the cache.');
         }
 
         if (isset($_ENV['DIRECTIVE_CONFIG_CACHE']) && $_ENV['DIRECTIVE_CONFIG_CACHE'] === '0') {
             error_log('[Directive] Security warning: configuration cache is explicitly disabled in'
                 . ' production (DIRECTIVE_CONFIG_CACHE=0).');
         }
+    }
+
+    /**
+     * Load the compiled config cache for a given config class.
+     *
+     * Returns the pre-resolved (non-sensitive) values array, or null if the
+     * cache is absent, disabled, or has no entry for the given class.
+     *
+     * The cache is disabled when DIRECTIVE_CONFIG_CACHE=0 in $_ENV.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function loadConfigCache(string $configClass): ?array
+    {
+        if (($_ENV['DIRECTIVE_CONFIG_CACHE'] ?? '1') === '0') {
+            return null;
+        }
+
+        $cacheFile = 'var/cache/config.php';
+
+        if (!file_exists($cacheFile)) {
+            return null;
+        }
+
+        /** @var array<string, array<string, mixed>> $cache */
+        $cache = include $cacheFile;
+
+        return $cache[$configClass] ?? null;
     }
 }

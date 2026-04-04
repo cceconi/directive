@@ -12,7 +12,7 @@ use Directive\Service\Maintenance\MaintenanceManagerInterface;
 use Directive\Service\Security\AccessManagerInterface;
 use Directive\Service\Security\CookiesManagerInterface;
 use Directive\Service\Security\HeaderManagerInterface;
-use Directive\WebApplication;
+use Directive\AbstractWebApplication;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
@@ -134,7 +134,7 @@ final class HRFailCheck extends AbstractHealthCheck
 // Base application for health route tests
 // ---------------------------------------------------------------------------
 
-class HealthRouteWebApplication extends WebApplication
+class HealthRouteWebApplication extends AbstractWebApplication
 {
     /** @var array<string, HealthCheckInterface> */
     public array $injectedChecks = [];

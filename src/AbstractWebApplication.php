@@ -37,14 +37,17 @@ use Slim\Factory\AppFactory;
 /**
  * HTTP entry point.
  *
- * Usage:
+ * Extend this class in your project:
+ *   class WebApplication extends AbstractWebApplication {}
+ *
+ * Then use:
  *   (new WebApplication())
  *       ->setConfig(MyConfig::class)
  *       ->run();
  *
  * For tests / process-mode, call resolve(ServerRequestInterface) instead of run().
  */
-class WebApplication extends AbstractApplication
+abstract class AbstractWebApplication extends AbstractApplication
 {
     /** @var App<\Psr\Container\ContainerInterface|null> */
     private App $slim;

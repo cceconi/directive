@@ -32,14 +32,17 @@ use Symfony\Component\Console\Application;
 /**
  * CLI entry point.
  *
- * Usage:
+ * Extend this class in your project:
+ *   class ConsoleApplication extends AbstractConsoleApplication {}
+ *
+ * Then use:
  *   $app = (new ConsoleApplication())
  *       ->setConfig(MyConfig::class)
  *       ->addCommands([new MyCommand()]);
  *
  *   $app->run();
  */
-class ConsoleApplication extends AbstractApplication
+abstract class AbstractConsoleApplication extends AbstractApplication
 {
     private Application $console;
 
