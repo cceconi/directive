@@ -13,6 +13,18 @@ use Directive\Exception\PersistenceException;
  * implements ClientInterface and wraps the SDK of its choice. This class only
  * handles injection, exception wrapping, and pattern documentation.
  *
+ * -------------------------------------------------------------------------
+ * Multi-document atomicity
+ * -------------------------------------------------------------------------
+ * This framework does not expose a transact() method on document repositories.
+ * Multi-document atomicity (e.g. MongoDB ClientSession, DynamoDB transactions)
+ * is a responsibility of the application adapter — not the framework — because
+ * the underlying APIs differ significantly across document stores.
+ *
+ * For cross-aggregate consistency, prefer publishing domain events and handling
+ * them asynchronously rather than relying on distributed transactions.
+ * -------------------------------------------------------------------------
+ *
  * Usage:
  *   final class ProductRepository extends AbstractDocumentRepository
  *       implements ProductRepositoryInterface

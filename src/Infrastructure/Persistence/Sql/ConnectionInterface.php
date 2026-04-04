@@ -36,4 +36,17 @@ interface ConnectionInterface
      * @param array<mixed> $params
      */
     public function execute(string $sql, array $params = []): int;
+
+    /**
+     * Execute a callable inside a database transaction.
+     *
+     * The driver implementation must begin a transaction before calling $fn,
+     * commit if $fn returns successfully, and rollback if $fn throws.
+     * Any exception thrown by $fn or by the driver itself must propagate
+     * so that AbstractSqlRepository::transact() can wrap it.
+     *
+     * @param callable(): mixed $fn
+     * @return mixed
+     */
+    public function transact(callable $fn): mixed;
 }

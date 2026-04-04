@@ -89,4 +89,28 @@ abstract class AbstractSqlRepository
             throw new PersistenceException($e->getMessage(), 0, $e);
         }
     }
+
+    /**
+     * Execute a callable inside a database transaction.
+     *
+     * Use only for writes belonging to the **same aggregate root**.
+     * If you need to coordinate two aggregate roots, use domain events instead.
+     *
+     * Note: The callable must not raise application-layer exceptions
+     * (EntityNotFoundException, AccessDeniedException, etc.). Any \Throwable
+     * thrown inside the callable will trigger a rollback and will be wrapped
+     * in a PersistenceException.
+     *
+     * @param callable(): mixed $fn
+     * @return mixed
+     * @throws PersistenceException
+     */
+    protected function transact(callable $fn): mixed
+    {
+        try {
+            return $this->connection->transact($fn);
+        } catch (\Throwable $e) {
+            throw new PersistenceException($e->getMessage(), 0, $e);
+        }
+    }
 }

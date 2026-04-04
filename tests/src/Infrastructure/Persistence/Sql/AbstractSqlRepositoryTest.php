@@ -26,6 +26,11 @@ final class ConcreteUserSqlRepository extends AbstractSqlRepository
     {
         return $this->execute($sql, $params);
     }
+
+    public function callTransact(callable $fn): mixed
+    {
+        return $this->transact($fn);
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -37,13 +42,15 @@ function makeSqlConnection(
     array $fetchAllResult = [],
     int $executeResult = 0,
     ?\Throwable $throws = null,
+    ?\Throwable $transactDriverThrows = null,
 ): ConnectionInterface {
-    return new class($fetchOneResult, $fetchAllResult, $executeResult, $throws) implements ConnectionInterface {
+    return new class($fetchOneResult, $fetchAllResult, $executeResult, $throws, $transactDriverThrows) implements ConnectionInterface {
         public function __construct(
             private readonly ?array $fetchOneResult,
             private readonly array $fetchAllResult,
             private readonly int $executeResult,
             private readonly ?\Throwable $throws,
+            private readonly ?\Throwable $transactDriverThrows,
         ) {}
 
         public function fetchOne(string $sql, array $params = []): ?array
@@ -62,6 +69,14 @@ function makeSqlConnection(
         {
             if ($this->throws !== null) { throw $this->throws; }
             return $this->executeResult;
+        }
+
+        public function transact(callable $fn): mixed
+        {
+            if ($this->transactDriverThrows !== null) {
+                throw $this->transactDriverThrows;
+            }
+            return $fn();
         }
     };
 }
@@ -140,5 +155,29 @@ describe('AbstractSqlRepository', function (): void {
         } catch (PersistenceException $e) {
             expect($e->getPrevious())->toBe($original);
         }
+    });
+
+    it('transact commit: callable return value is forwarded', function (): void {
+        $repo = new ConcreteUserSqlRepository(makeSqlConnection());
+
+        $result = $repo->callTransact(fn () => ['id' => '42']);
+
+        expect($result)->toBe(['id' => '42']);
+    });
+
+    it('transact rollback: callable exception is wrapped in PersistenceException', function (): void {
+        $repo = new ConcreteUserSqlRepository(makeSqlConnection());
+
+        expect(fn () => $repo->callTransact(fn () => throw new \RuntimeException('constraint violation')))
+            ->toThrow(PersistenceException::class, 'constraint violation');
+    });
+
+    it('transact driver exception is wrapped in PersistenceException', function (): void {
+        $repo = new ConcreteUserSqlRepository(
+            makeSqlConnection(transactDriverThrows: new \RuntimeException('deadlock on begin'))
+        );
+
+        expect(fn () => $repo->callTransact(fn () => 'unused'))
+            ->toThrow(PersistenceException::class, 'deadlock on begin');
     });
 });

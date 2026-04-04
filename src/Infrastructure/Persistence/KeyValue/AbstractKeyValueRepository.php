@@ -16,6 +16,18 @@ use Directive\Exception\PersistenceException;
  * The application provides a concrete adapter (e.g. RedisStorageAdapter) that
  * implements StorageInterface and wraps the SDK of its choice.
  *
+ * -------------------------------------------------------------------------
+ * Atomicity and eventual consistency
+ * -------------------------------------------------------------------------
+ * This framework does not expose a transact() or multi-exec() method.
+ * Redis MULTI/EXEC, Valkey pipelining, or DynamoDB conditional writes are
+ * out of scope for the framework — implement them in the application adapter.
+ *
+ * DDD recommendation: for cross-aggregate consistency with key-value stores,
+ * publish domain events and let handlers apply changes asynchronously
+ * (eventual consistency model).
+ * -------------------------------------------------------------------------
+ *
  * Usage:
  *   final class SessionRepository extends AbstractKeyValueRepository
  *       implements SessionRepositoryInterface
