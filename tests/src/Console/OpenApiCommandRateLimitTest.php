@@ -8,20 +8,35 @@ use Directive\Http\Routing\Domain;
 use Directive\Http\Routing\RateLimit;
 use Directive\Http\Routing\RateLimitKeyType;
 use Directive\Http\Routing\VersionStatus;
-use Directive\Service\Business\ErrorManager;
 use Directive\Http\Validator\NullRequestValidator;
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
+use Directive\Service\Business\ErrorManager;
 use Symfony\Component\Console\Tester\CommandTester;
 use Tests\Helpers\StubApi;
 
 function rlStubAppIdentity(): AppIdentityConfigInterface
 {
     return new class implements AppIdentityConfigInterface {
-        public function getAppCode(): string    { return 'test-rl'; }
-        public function getAppName(): string    { return 'RateLimitTest'; }
-        public function getAppVersion(): string { return '1.0.0'; }
-        public function getAppDescription(): string { return ''; }
-        public function getAppUrl(): string     { return ''; }
+        public function getAppCode(): string
+        {
+            return 'test-rl';
+        }
+        public function getAppName(): string
+        {
+            return 'RateLimitTest';
+        }
+        public function getAppVersion(): string
+        {
+            return '1.0.0';
+        }
+        public function getAppDescription(): string
+        {
+            return '';
+        }
+        public function getAppUrl(): string
+        {
+            return '';
+        }
     };
 }
 

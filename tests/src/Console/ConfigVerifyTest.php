@@ -22,15 +22,18 @@ function makeVerifyConfig(): AbstractConfiguration
 
 function makeVault(array $keys): ConfigurationVaultInterface
 {
-    return new class($keys) implements ConfigurationVaultInterface {
+    return new class ($keys) implements ConfigurationVaultInterface {
         public function __construct(private readonly array $keys) {}
-        public function getKeys(): array { return $this->keys; }
+        public function getKeys(): array
+        {
+            return $this->keys;
+        }
     };
 }
 
 function makeVerifyContainer(bool $hasConfig, bool $hasVault, array $vaultKeys = []): ContainerInterface
 {
-    return new class($hasConfig, $hasVault, $vaultKeys) implements ContainerInterface {
+    return new class ($hasConfig, $hasVault, $vaultKeys) implements ContainerInterface {
         public function __construct(
             private readonly bool $hasConfig,
             private readonly bool $hasVault,

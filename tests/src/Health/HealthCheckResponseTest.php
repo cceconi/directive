@@ -11,8 +11,8 @@ use Directive\Service\Health\HealthStatus;
 
 it('toArray() contains status, version, releaseId and checks keys', function (): void {
     $response = new HealthCheckResponse(
-        status:    HealthStatus::Pass,
-        version:   '1.0.0',
+        status: HealthStatus::Pass,
+        version: '1.0.0',
         releaseId: 'abc123',
     );
 
@@ -37,10 +37,10 @@ it('toArray() omits description key when description is null', function (): void
 
 it('toArray() includes description key when description is set', function (): void {
     $response = new HealthCheckResponse(
-        status:      HealthStatus::Pass,
-        version:     '1.0.0',
-        releaseId:   '',
-        checks:      [],
+        status: HealthStatus::Pass,
+        version: '1.0.0',
+        releaseId: '',
+        checks: [],
         description: 'All good',
     );
     expect($response->toArray())->toHaveKey('description', 'All good');

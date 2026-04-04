@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Directive\Service\Configuration\AbstractConfiguration;
 use Directive\Exception\ConfigurationException;
+use Directive\Service\Configuration\AbstractConfiguration;
 
 // ── Stub ─────────────────────────────────────────────────────────────────────
 
@@ -49,14 +49,14 @@ describe('AbstractConfiguration', function (): void {
         // DB_PORT is not set
         $_ENV['APP_ENV'] = 'production';
         $config = new StubConfiguration();
-        expect(fn () => $config->audit())->toThrow(ConfigurationException::class);
+        expect(fn() => $config->audit())->toThrow(ConfigurationException::class);
     });
 
     it('throws ConfigurationException when value is not in allowed list', function (): void {
         $_ENV['APP_ENV'] = 'unknown';
         $_ENV['DB_PORT'] = '5432';
         $config = new StubConfiguration();
-        expect(fn () => $config->audit())->toThrow(ConfigurationException::class);
+        expect(fn() => $config->audit())->toThrow(ConfigurationException::class);
     });
 
     it('throws ConfigurationException when getting undeclared key', function (): void {
@@ -64,7 +64,7 @@ describe('AbstractConfiguration', function (): void {
         $_ENV['DB_PORT'] = '5432';
         $config = new StubConfiguration();
         $config->audit();
-        expect(fn () => $config->get('UNDECLARED'))->toThrow(ConfigurationException::class);
+        expect(fn() => $config->get('UNDECLARED'))->toThrow(ConfigurationException::class);
     });
 
     it('casts bool env var correctly', function (): void {

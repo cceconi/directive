@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Directive\Console;
 
+use Directive\Cli\DirectiveCommand;
 use Directive\Http\Endpoint\ApiDefinitionManager;
 use Directive\Http\Routing\Method;
 use Directive\Http\Routing\VersionStatus;
+use Directive\Http\Validator\NullRequestValidator;
+use Directive\Http\Validator\QueryParametersValidator;
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Directive\Http\Validator\NullRequestValidator;
-use Directive\Http\Validator\QueryParametersValidator;
 use Symfony\Component\Yaml\Yaml;
 
 /**

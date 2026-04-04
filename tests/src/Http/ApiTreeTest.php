@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use Directive\Http\Endpoint\ApiDefinitionManager;
 use Directive\Http\Exception\ApiDefinitionException;
 use Directive\Http\Exception\NotFoundException;
-use Directive\Http\Endpoint\ApiDefinitionManager;
 use Directive\Http\Routing\Domain;
 use Directive\Http\Routing\VersionStatus;
 use Directive\Service\Business\ErrorManager;

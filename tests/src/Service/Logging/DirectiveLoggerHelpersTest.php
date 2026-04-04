@@ -83,15 +83,33 @@ describe('DirectiveLogger — semantic helpers', function (): void {
                     }
                 };
             }
-            public function isAuthenticated(): bool          { return false; }
-            public function isGuest(): bool                  { return true; }
-            public function getId(): string                   { return ''; }
-            public function getFullName(): string             { return ''; }
+            public function isAuthenticated(): bool
+            {
+                return false;
+            }
+            public function isGuest(): bool
+            {
+                return true;
+            }
+            public function getId(): string
+            {
+                return '';
+            }
+            public function getFullName(): string
+            {
+                return '';
+            }
             public function loadFromClaims(mixed $claims): void {}
             /** @return array<string, mixed> */
-            public function getAuthenticatedData(): array     { return []; }
+            public function getAuthenticatedData(): array
+            {
+                return [];
+            }
             /** @return array<string, mixed> */
-            public function getAnonymousData(): array         { return []; }
+            public function getAnonymousData(): array
+            {
+                return [];
+            }
         };
 
         $logger->logWebUser($user);

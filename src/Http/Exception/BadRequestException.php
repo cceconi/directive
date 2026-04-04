@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Directive\Http\Exception;
 
-use Directive\Exception\DirectiveException;
-
 /**
  * Maps to HTTP 400.
  * Thrown when Policy finds validation errors — inherits the errors payload from UnprocessableException.

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Directive\Http\Endpoint;
 
-use Directive\Http\Routing\Domain;
 use Directive\Http\Exception\ApiDefinitionException;
 use Directive\Http\Exception\NotFoundException;
+use Directive\Http\Routing\Domain;
 
 /**
  * Registry of Domain objects.

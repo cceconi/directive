@@ -35,7 +35,7 @@ class UseCaseTestResult extends AbstractResult
 
 function makeUseCase(callable $executeImpl): AbstractUseCase
 {
-    return new class($executeImpl, new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
+    return new class ($executeImpl, new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
         public function __construct(
             private readonly mixed $impl,
             \Psr\Log\LoggerInterface $logger,
@@ -57,7 +57,7 @@ function makeUseCase(callable $executeImpl): AbstractUseCase
 
 describe('AbstractUseCase', function () {
     it('handle() returns the result of execute()', function () {
-        $useCase = makeUseCase(fn ($input) => new UseCaseTestResult());
+        $useCase = makeUseCase(fn($input) => new UseCaseTestResult());
         $result = $useCase->handle(new UseCaseTestCommand());
         expect($result)->toBeInstanceOf(ResultInterface::class);
         expect($result->getData())->toBeInstanceOf(UseCasePayload::class);
@@ -65,7 +65,7 @@ describe('AbstractUseCase', function () {
 
     it('onSuccess() callback is called after successful execute()', function () {
         $called = false;
-        $useCase = new class(new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
+        $useCase = new class (new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
             public bool $callbackCalled = false;
 
             protected function execute(AbstractCommand|AbstractQuery $input): ResultInterface
@@ -84,7 +84,7 @@ describe('AbstractUseCase', function () {
 
     it('onError() callback is called when execute() throws', function () {
         $errorCaught = null;
-        $useCase = new class(new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
+        $useCase = new class (new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
             public mixed $caughtError = null;
 
             protected function execute(AbstractCommand|AbstractQuery $input): ResultInterface
@@ -107,20 +107,20 @@ describe('AbstractUseCase', function () {
     });
 
     it('handle() propagates AccessDeniedException', function () {
-        $useCase = makeUseCase(fn () => throw new AccessDeniedException('denied'));
-        expect(fn () => $useCase->handle(new UseCaseTestCommand()))
+        $useCase = makeUseCase(fn() => throw new AccessDeniedException('denied'));
+        expect(fn() => $useCase->handle(new UseCaseTestCommand()))
             ->toThrow(AccessDeniedException::class);
     });
 
     it('handle() propagates EntityNotFoundException', function () {
-        $useCase = makeUseCase(fn () => throw new EntityNotFoundException('not found'));
-        expect(fn () => $useCase->handle(new UseCaseTestCommand()))
+        $useCase = makeUseCase(fn() => throw new EntityNotFoundException('not found'));
+        expect(fn() => $useCase->handle(new UseCaseTestCommand()))
             ->toThrow(EntityNotFoundException::class);
     });
 
     it('onSuccess() callback is NOT called when execute() throws', function () {
         $called = false;
-        $useCase = new class(new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
+        $useCase = new class (new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
             public bool $successCalled = false;
 
             protected function execute(AbstractCommand|AbstractQuery $input): ResultInterface
@@ -135,7 +135,8 @@ describe('AbstractUseCase', function () {
 
         try {
             $useCase->handle(new UseCaseTestCommand());
-        } catch (EntityNotFoundException) {}
+        } catch (EntityNotFoundException) {
+        }
 
         expect($useCase->successCalled)->toBeFalse();
     });
@@ -150,12 +151,14 @@ describe('AbstractUseCase::hasPermission()', function () {
         $role   = new class extends AbstractRole {};
         $caller = new DomainUser('u-1', $role);
 
-        $useCase = new class($caller, new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
+        $useCase = new class ($caller, new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
             public function __construct(
                 private readonly DomainUser $caller,
                 \Psr\Log\LoggerInterface $logger,
                 DomainEventBusInterface $eventBus,
-            ) { parent::__construct($logger, $eventBus); }
+            ) {
+                parent::__construct($logger, $eventBus);
+            }
 
             protected function execute(AbstractCommand|AbstractQuery $input): ResultInterface
             {
@@ -164,19 +167,21 @@ describe('AbstractUseCase::hasPermission()', function () {
             }
         };
 
-        expect(fn () => $useCase->handle(new UseCaseTestCommand()))->not->toThrow(AccessDeniedException::class);
+        expect(fn() => $useCase->handle(new UseCaseTestCommand()))->not->toThrow(AccessDeniedException::class);
     });
 
     it('allows access when role maps to Permission::Allow', function () {
         $role   = new class extends AbstractRole {};
         $caller = new DomainUser('u-1', $role);
 
-        $useCase = new class($caller, new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
+        $useCase = new class ($caller, new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
             public function __construct(
                 private readonly DomainUser $caller,
                 \Psr\Log\LoggerInterface $logger,
                 DomainEventBusInterface $eventBus,
-            ) { parent::__construct($logger, $eventBus); }
+            ) {
+                parent::__construct($logger, $eventBus);
+            }
 
             protected function getPermissions(): array
             {
@@ -190,19 +195,21 @@ describe('AbstractUseCase::hasPermission()', function () {
             }
         };
 
-        expect(fn () => $useCase->handle(new UseCaseTestCommand()))->not->toThrow(AccessDeniedException::class);
+        expect(fn() => $useCase->handle(new UseCaseTestCommand()))->not->toThrow(AccessDeniedException::class);
     });
 
     it('throws AccessDeniedException when role maps to Permission::Forbidden', function () {
         $role   = new class extends AbstractRole {};
         $caller = new DomainUser('u-2', $role);
 
-        $useCase = new class($caller, new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
+        $useCase = new class ($caller, new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
             public function __construct(
                 private readonly DomainUser $caller,
                 \Psr\Log\LoggerInterface $logger,
                 DomainEventBusInterface $eventBus,
-            ) { parent::__construct($logger, $eventBus); }
+            ) {
+                parent::__construct($logger, $eventBus);
+            }
 
             protected function getPermissions(): array
             {
@@ -216,19 +223,21 @@ describe('AbstractUseCase::hasPermission()', function () {
             }
         };
 
-        expect(fn () => $useCase->handle(new UseCaseTestCommand()))->toThrow(AccessDeniedException::class);
+        expect(fn() => $useCase->handle(new UseCaseTestCommand()))->toThrow(AccessDeniedException::class);
     });
 
     it('allows access when Complementary closure returns true', function () {
         $role   = new class extends AbstractRole {};
         $caller = new DomainUser('u-3', $role);
 
-        $useCase = new class($caller, new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
+        $useCase = new class ($caller, new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
             public function __construct(
                 private readonly DomainUser $caller,
                 \Psr\Log\LoggerInterface $logger,
                 DomainEventBusInterface $eventBus,
-            ) { parent::__construct($logger, $eventBus); }
+            ) {
+                parent::__construct($logger, $eventBus);
+            }
 
             protected function getPermissions(): array
             {
@@ -237,24 +246,26 @@ describe('AbstractUseCase::hasPermission()', function () {
 
             protected function execute(AbstractCommand|AbstractQuery $input): ResultInterface
             {
-                $this->hasPermission($this->caller, [$this->caller->role::class => fn () => true]);
+                $this->hasPermission($this->caller, [$this->caller->role::class => fn() => true]);
                 return new UseCaseTestResult();
             }
         };
 
-        expect(fn () => $useCase->handle(new UseCaseTestCommand()))->not->toThrow(AccessDeniedException::class);
+        expect(fn() => $useCase->handle(new UseCaseTestCommand()))->not->toThrow(AccessDeniedException::class);
     });
 
     it('throws AccessDeniedException when Complementary closure returns false', function () {
         $role   = new class extends AbstractRole {};
         $caller = new DomainUser('u-4', $role);
 
-        $useCase = new class($caller, new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
+        $useCase = new class ($caller, new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
             public function __construct(
                 private readonly DomainUser $caller,
                 \Psr\Log\LoggerInterface $logger,
                 DomainEventBusInterface $eventBus,
-            ) { parent::__construct($logger, $eventBus); }
+            ) {
+                parent::__construct($logger, $eventBus);
+            }
 
             protected function getPermissions(): array
             {
@@ -263,24 +274,26 @@ describe('AbstractUseCase::hasPermission()', function () {
 
             protected function execute(AbstractCommand|AbstractQuery $input): ResultInterface
             {
-                $this->hasPermission($this->caller, [$this->caller->role::class => fn () => false]);
+                $this->hasPermission($this->caller, [$this->caller->role::class => fn() => false]);
                 return new UseCaseTestResult();
             }
         };
 
-        expect(fn () => $useCase->handle(new UseCaseTestCommand()))->toThrow(AccessDeniedException::class);
+        expect(fn() => $useCase->handle(new UseCaseTestCommand()))->toThrow(AccessDeniedException::class);
     });
 
     it('throws AccessDeniedException when Complementary rule is absent', function () {
         $role   = new class extends AbstractRole {};
         $caller = new DomainUser('u-5', $role);
 
-        $useCase = new class($caller, new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
+        $useCase = new class ($caller, new NullLogger(), new NullDomainEventBus()) extends AbstractUseCase {
             public function __construct(
                 private readonly DomainUser $caller,
                 \Psr\Log\LoggerInterface $logger,
                 DomainEventBusInterface $eventBus,
-            ) { parent::__construct($logger, $eventBus); }
+            ) {
+                parent::__construct($logger, $eventBus);
+            }
 
             protected function getPermissions(): array
             {
@@ -294,6 +307,6 @@ describe('AbstractUseCase::hasPermission()', function () {
             }
         };
 
-        expect(fn () => $useCase->handle(new UseCaseTestCommand()))->toThrow(AccessDeniedException::class);
+        expect(fn() => $useCase->handle(new UseCaseTestCommand()))->toThrow(AccessDeniedException::class);
     });
 });

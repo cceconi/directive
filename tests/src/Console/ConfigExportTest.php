@@ -23,8 +23,14 @@ function makeExportConfig(): AbstractConfiguration
 function makeExportContainer(): ContainerInterface
 {
     return new class implements ContainerInterface {
-        public function get(string $id): mixed { return makeExportConfig(); }
-        public function has(string $id): bool  { return $id === AbstractConfiguration::class; }
+        public function get(string $id): mixed
+        {
+            return makeExportConfig();
+        }
+        public function has(string $id): bool
+        {
+            return $id === AbstractConfiguration::class;
+        }
     };
 }
 
@@ -78,8 +84,14 @@ describe('ConfigExportCommand', function (): void {
 
     it('succeeds gracefully when no AbstractConfiguration is bound', function (): void {
         $container = new class implements ContainerInterface {
-            public function get(string $id): mixed { return null; }
-            public function has(string $id): bool  { return false; }
+            public function get(string $id): mixed
+            {
+                return null;
+            }
+            public function has(string $id): bool
+            {
+                return false;
+            }
         };
         $command = new ConfigExportCommand($container);
         $tester  = new CommandTester($command);

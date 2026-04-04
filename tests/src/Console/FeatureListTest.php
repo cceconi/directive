@@ -20,8 +20,14 @@ function makeFeatures(): AbstractFeatures
 function makeFeatureContainer(): ContainerInterface
 {
     return new class implements ContainerInterface {
-        public function get(string $id): mixed { return makeFeatures(); }
-        public function has(string $id): bool  { return $id === AbstractFeatures::class; }
+        public function get(string $id): mixed
+        {
+            return makeFeatures();
+        }
+        public function has(string $id): bool
+        {
+            return $id === AbstractFeatures::class;
+        }
     };
 }
 
@@ -38,8 +44,14 @@ describe('FeatureListCommand', function (): void {
 
     it('succeeds gracefully when no AbstractFeatures is bound', function (): void {
         $container = new class implements ContainerInterface {
-            public function get(string $id): mixed { return null; }
-            public function has(string $id): bool  { return false; }
+            public function get(string $id): mixed
+            {
+                return null;
+            }
+            public function has(string $id): bool
+            {
+                return false;
+            }
         };
         $command = new FeatureListCommand($container);
         $tester  = new CommandTester($command);

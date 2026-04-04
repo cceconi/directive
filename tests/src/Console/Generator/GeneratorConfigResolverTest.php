@@ -23,7 +23,7 @@ describe('GeneratorConfigResolver', function (): void {
             json_encode(['namespace' => 'App', 'src' => 'src']),
         );
 
-        $result = (new GeneratorConfigResolver())->resolve();
+        $result = new GeneratorConfigResolver()->resolve();
 
         expect($result)->toBe(['namespace' => 'App', 'src' => 'src']);
     });
@@ -34,7 +34,7 @@ describe('GeneratorConfigResolver', function (): void {
             json_encode(['autoload' => ['psr-4' => ['MyApp\\' => 'src/']]]),
         );
 
-        $result = (new GeneratorConfigResolver())->resolve();
+        $result = new GeneratorConfigResolver()->resolve();
 
         expect($result)->toBe(['namespace' => 'MyApp', 'src' => 'src']);
     });
@@ -49,13 +49,13 @@ describe('GeneratorConfigResolver', function (): void {
             json_encode(['autoload' => ['psr-4' => ['ComposerApp\\' => 'src/']]]),
         );
 
-        $result = (new GeneratorConfigResolver())->resolve();
+        $result = new GeneratorConfigResolver()->resolve();
 
         expect($result)->toBe(['namespace' => 'DevApp', 'src' => 'app']);
     });
 
     it('returns null when neither file exists', function (): void {
-        $result = (new GeneratorConfigResolver())->resolve();
+        $result = new GeneratorConfigResolver()->resolve();
 
         expect($result)->toBeNull();
     });

@@ -4,39 +4,26 @@ declare(strict_types=1);
 
 namespace Directive\Http\Validator;
 
-use Directive\Http\Exception\RequestValidatorException;
 use Directive\Http\Input\InterfaceDataInterface;
 use Directive\Http\Request\RequestEntity;
+use Directive\Validator\AbstractInputValidator;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Abstract base for all request validators.
+ * Abstract base for all HTTP request validators.
+ *
+ * Extends AbstractInputValidator which owns the field registry and error
+ * collection. This class adds HTTP-specific concerns: reading from a
+ * ServerRequestInterface, hydrating a RequestEntity, and handling file uploads.
  *
  * Lifecycle:
- *   1. setRequest($request)
- *   2. register() → calls scalar() / file() / object() / array() helpers
- *   3. getRequestEntity() → hydrates, validates, collects errors
- *
- * Concrete subclasses implement the single register() hook.
+ *   1. setRequest($request)          — stores request, resets state
+ *   2. register()                    → calls scalar() / file() / object() / array()
+ *   3. getRequestEntity()            → hydrates, validates, collects errors
  */
-abstract class AbstractRequestValidator implements RequestValidatorInterface
+abstract class AbstractRequestValidator extends AbstractInputValidator implements RequestValidatorInterface
 {
     private ServerRequestInterface $request;
-
-    /** @var array<string, array{field: InterfaceDataInterface, required: bool}> */
-    private array $scalars = [];
-
-    /** @var array<string, array{field: InterfaceDataInterface, required: bool}> */
-    private array $files = [];
-
-    /** @var array<string, array{field: InterfaceDataInterface, required: bool}> */
-    private array $objects = [];
-
-    /** @var array<string, array{field: InterfaceDataInterface, required: bool}> */
-    private array $arrays = [];
-
-    /** @var array<array<string, string>> */
-    private array $errors = [];
 
     // ------------------------------------------------------------------
     // RequestValidatorInterface
@@ -45,11 +32,7 @@ abstract class AbstractRequestValidator implements RequestValidatorInterface
     final public function setRequest(ServerRequestInterface $request): void
     {
         $this->request = $request;
-        $this->errors  = [];
-        $this->scalars = [];
-        $this->files   = [];
-        $this->objects = [];
-        $this->arrays  = [];
+        $this->reset();
     }
 
     final public function getRequestEntity(): RequestEntity
@@ -64,30 +47,22 @@ abstract class AbstractRequestValidator implements RequestValidatorInterface
 
         $entity = $this->createRequestEntity();
 
-        $this->hydrateAndValidate($this->scalars, $bodyArray, $entity);
-        $this->hydrateAndValidate($this->objects, $bodyArray, $entity);
-        $this->hydrateAndValidate($this->arrays, $bodyArray, $entity);
+        $this->hydrateAndValidate($this->getRegisteredScalars(), $bodyArray, $entity);
+        $this->hydrateAndValidate($this->getRegisteredObjects(), $bodyArray, $entity);
+        $this->hydrateAndValidate($this->getRegisteredArrays(), $bodyArray, $entity);
 
-        // File inputs
-        foreach ($this->files as $name => $entry) {
+        // File inputs — handled separately because source is uploadedFiles, not parsed body.
+        foreach ($this->getRegisteredFiles() as $name => $entry) {
             $raw = $uploads[$name] ?? null;
             if ($raw === null) {
                 if ($entry['required']) {
-                    $this->errors[] = [
-                        'property' => $name,
-                        'message'  => sprintf('Field "%s" is required.', $name),
-                        'type'     => 'missing',
-                    ];
+                    $this->addError($name, sprintf('Field "%s" is required.', $name), 'missing');
                 }
                 continue;
             }
             $entry['field']->hydrate($raw);
             if (!$entry['field']->validate()) {
-                $this->errors[] = [
-                    'property' => $name,
-                    'message'  => $entry['field']->getErrorLabel(),
-                    'type'     => 'invalid',
-                ];
+                $this->addError($name, $entry['field']->getErrorLabel());
             } else {
                 $this->injectIntoEntity($entity, $name, $entry['field']);
             }
@@ -95,75 +70,6 @@ abstract class AbstractRequestValidator implements RequestValidatorInterface
 
         return $entity;
     }
-
-    /** @return array<array<string, string>> */
-    final public function getErrors(): array
-    {
-        return $this->errors;
-    }
-
-    final public function hasErrors(): bool
-    {
-        return $this->errors !== [];
-    }
-
-    // ------------------------------------------------------------------
-    // Registration helpers (call inside register())
-    // ------------------------------------------------------------------
-
-    /**
-     * Register a scalar input field (string, numeric, boolean, date…).
-     */
-    final protected function scalar(
-        string $name,
-        InterfaceDataInterface $field,
-        bool $required = false,
-    ): void {
-        $this->guardDuplicate($name);
-        $this->scalars[$name] = ['field' => $field, 'required' => $required];
-    }
-
-    /**
-     * Register a file upload field.
-     */
-    final protected function file(
-        string $name,
-        InterfaceDataInterface $field,
-        bool $required = false,
-    ): void {
-        $this->guardDuplicate($name);
-        $this->files[$name] = ['field' => $field, 'required' => $required];
-    }
-
-    /**
-     * Register a nested object (JSON sub-object decoded as array).
-     */
-    final protected function object(
-        string $name,
-        InterfaceDataInterface $field,
-        bool $required = false,
-    ): void {
-        $this->guardDuplicate($name);
-        $this->objects[$name] = ['field' => $field, 'required' => $required];
-    }
-
-    /**
-     * Register an array input.
-     */
-    final protected function array(
-        string $name,
-        InterfaceDataInterface $field,
-        bool $required = false,
-    ): void {
-        $this->guardDuplicate($name);
-        $this->arrays[$name] = ['field' => $field, 'required' => $required];
-    }
-
-    // ------------------------------------------------------------------
-    // Abstract registration hook
-    // ------------------------------------------------------------------
-
-    abstract protected function register(): void;
 
     // ------------------------------------------------------------------
     // Hooks for subclasses
@@ -186,20 +92,6 @@ abstract class AbstractRequestValidator implements RequestValidatorInterface
         return $this->request;
     }
 
-    /**
-     * Allows subclasses to push validation errors into the shared error list.
-     *
-     * @param 'invalid'|'missing' $type
-     */
-    final protected function addError(string $property, string $message, string $type = 'invalid'): void
-    {
-        $this->errors[] = [
-            'property' => $property,
-            'message'  => $message,
-            'type'     => $type,
-        ];
-    }
-
     // ------------------------------------------------------------------
     // Internal
     // ------------------------------------------------------------------
@@ -215,11 +107,7 @@ abstract class AbstractRequestValidator implements RequestValidatorInterface
 
             if ($raw === null) {
                 if ($entry['required']) {
-                    $this->errors[] = [
-                        'property' => $name,
-                        'message'  => sprintf('Field "%s" is required.', $name),
-                        'type'     => 'missing',
-                    ];
+                    $this->addError($name, sprintf('Field "%s" is required.', $name), 'missing');
                 }
                 continue;
             }
@@ -227,13 +115,11 @@ abstract class AbstractRequestValidator implements RequestValidatorInterface
             $entry['field']->hydrate($raw);
 
             if (!$entry['field']->validate()) {
-                $this->errors[] = [
-                    'property' => $name,
-                    'message'  => $entry['field']->getErrorLabel() !== ''
-                        ? $entry['field']->getErrorLabel()
-                        : sprintf('Field "%s" is invalid.', $name),
-                    'type'     => 'invalid',
-                ];
+                $label = $entry['field']->getErrorLabel();
+                $this->addError(
+                    $name,
+                    $label !== '' ? $label : sprintf('Field "%s" is invalid.', $name),
+                );
             } else {
                 $this->injectIntoEntity($entity, $name, $entry['field']);
             }
@@ -250,20 +136,6 @@ abstract class AbstractRequestValidator implements RequestValidatorInterface
         $setter = 'set' . ucfirst($name);
         if (method_exists($entity, $setter)) {
             $entity->$setter($field);
-        }
-    }
-
-    private function guardDuplicate(string $name): void
-    {
-        $all = array_merge(
-            array_keys($this->scalars),
-            array_keys($this->files),
-            array_keys($this->objects),
-            array_keys($this->arrays),
-        );
-
-        if (in_array($name, $all, true)) {
-            throw new RequestValidatorException(sprintf('Field "%s" is already registered in this validator.', $name));
         }
     }
 }

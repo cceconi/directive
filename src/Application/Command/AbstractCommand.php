@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Directive\Application\Command;
 
-use Directive\Application\Model\AbstractUid;
 use Ramsey\Uuid\Uuid;
 
 abstract class AbstractCommand implements CommandInterface

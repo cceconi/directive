@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Directive;
 
-use Directive\Application\EventBus\DomainEventBusInterface;
-use Directive\Application\EventBus\DirectiveDomainEventBus;
-use Directive\Application\EventBus\NullDomainEventBus;
 use DI\ContainerBuilder;
+use Directive\Application\EventBus\DirectiveDomainEventBus;
+use Directive\Application\EventBus\DomainEventBusInterface;
+use Directive\Application\EventBus\NullDomainEventBus;
 use Directive\Http\Middleware\DefaultHttpConfig;
 use Directive\Http\Middleware\HttpConfigInterface;
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;

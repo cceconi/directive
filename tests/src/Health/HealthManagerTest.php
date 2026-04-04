@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 use Directive\Service\AppManagement\AppInfoInterface;
 use Directive\Service\Health\AbstractHealthCheck;
-use Directive\Service\Health\HealthCheckInterface;
 use Directive\Service\Health\HealthManager;
-use Directive\Service\Health\HealthStatus;
 use Directive\Service\Maintenance\MaintenanceManagerInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
-use Psr\Http\Message\ServerRequestInterface;
 
 // ---------------------------------------------------------------------------
 // Stubs
@@ -18,37 +15,70 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class HMStubAppInfo implements AppInfoInterface
 {
-    public function getVersion(): string { return '1.2.3'; }
-    public function getName(): string    { return 'test-app'; }
+    public function getVersion(): string
+    {
+        return '1.2.3';
+    }
+    public function getName(): string
+    {
+        return 'test-app';
+    }
 }
 
 final class HMStubMaintenanceOff implements MaintenanceManagerInterface
 {
-    public function isActive(): bool  { return false; }
-    public function getMessage(): string { return ''; }
-    public function getPeriod(): string  { return ''; }
+    public function isActive(): bool
+    {
+        return false;
+    }
+    public function getMessage(): string
+    {
+        return '';
+    }
+    public function getPeriod(): string
+    {
+        return '';
+    }
 }
 
 final class HMStubMaintenanceOn implements MaintenanceManagerInterface
 {
-    public function isActive(): bool  { return true; }
-    public function getMessage(): string { return 'Scheduled maintenance'; }
-    public function getPeriod(): string  { return ''; }
+    public function isActive(): bool
+    {
+        return true;
+    }
+    public function getMessage(): string
+    {
+        return 'Scheduled maintenance';
+    }
+    public function getPeriod(): string
+    {
+        return '';
+    }
 }
 
 final class PassCheck extends AbstractHealthCheck
 {
-    protected function run(): array { return ['status' => 'pass']; }
+    protected function run(): array
+    {
+        return ['status' => 'pass'];
+    }
 }
 
 final class WarnCheck extends AbstractHealthCheck
 {
-    protected function run(): array { return ['status' => 'warn']; }
+    protected function run(): array
+    {
+        return ['status' => 'warn'];
+    }
 }
 
 final class FailCheck extends AbstractHealthCheck
 {
-    protected function run(): array { return ['status' => 'fail']; }
+    protected function run(): array
+    {
+        return ['status' => 'fail'];
+    }
 }
 
 // ---------------------------------------------------------------------------

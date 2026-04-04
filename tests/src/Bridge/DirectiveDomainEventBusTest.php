@@ -16,7 +16,10 @@ final class StubBridgeDomainEvent extends AbstractDomainEvent {}
 describe('DirectiveDomainEventBus', function () {
     it('implements DomainEventBusInterface', function () {
         $dispatcher = new class implements EventDispatcherInterface {
-            public function dispatch(object $event): object { return $event; }
+            public function dispatch(object $event): object
+            {
+                return $event;
+            }
         };
 
         $bus = new DirectiveDomainEventBus($dispatcher);
@@ -26,7 +29,11 @@ describe('DirectiveDomainEventBus', function () {
     it('delegates dispatch() to the PSR-14 EventDispatcherInterface', function () {
         $recorder = new class implements EventDispatcherInterface {
             public ?object $lastReceived = null;
-            public function dispatch(object $event): object { $this->lastReceived = $event; return $event; }
+            public function dispatch(object $event): object
+            {
+                $this->lastReceived = $event;
+                return $event;
+            }
         };
 
         $bus   = new DirectiveDomainEventBus($recorder);
@@ -40,7 +47,11 @@ describe('DirectiveDomainEventBus', function () {
         $recorder = new class implements EventDispatcherInterface {
             /** @var list<object> */
             public array $received = [];
-            public function dispatch(object $event): object { $this->received[] = $event; return $event; }
+            public function dispatch(object $event): object
+            {
+                $this->received[] = $event;
+                return $event;
+            }
         };
 
         $bus    = new DirectiveDomainEventBus($recorder);

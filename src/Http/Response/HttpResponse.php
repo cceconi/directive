@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Directive\Http\Response;
 
-use Directive\Http\Response\ResponseEntity;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Directive\Service\Configuration;
 
 use Directive\Exception\ConfigurationException;
-use Directive\Service\Configuration\ConfigSourceTracker;
 
 /**
  * Base class for application-level configuration backed by environment variables.

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Console;
 
+use Directive\Cli\DirectiveCommand;
 use Directive\Service\Configuration\AbstractConfiguration;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;

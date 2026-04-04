@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Console;
 
+use Directive\Cli\DirectiveCommand;
 use Directive\Http\Middleware\HttpConfigInterface;
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Directive\Service\Configuration\AbstractConfiguration;

@@ -18,7 +18,7 @@ describe('MethodDefaults — rate-limit with* methods', function (): void {
 
     it('withRateLimit returns new instance and preserves other fields', function (): void {
         $rl       = new RateLimit(60, 100, RateLimitKeyType::Ip);
-        $original = (new MethodDefaults())->withErrorClass('App\\Errors');
+        $original = new MethodDefaults()->withErrorClass('App\\Errors');
         $updated  = $original->withRateLimit($rl);
 
         expect($updated->rateLimit)->toBe($rl);
@@ -44,7 +44,7 @@ describe('MethodDefaults — rate-limit with* methods', function (): void {
 
     it('other with* methods carry rateLimit fields through', function (): void {
         $rl = new RateLimit(30, 20, RateLimitKeyType::ApiKey);
-        $d  = (new MethodDefaults())
+        $d  = new MethodDefaults()
             ->withRateLimit($rl)
             ->withRateLimitEnabled(true)
             ->withErrorClass('App\\Errors'); // triggers internal new self(...)

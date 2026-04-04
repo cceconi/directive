@@ -50,7 +50,7 @@ final class CodeGeneratorService
         $content = str_replace(array_keys($replacements), array_values($replacements), $raw);
 
         if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0775, true);
+            mkdir($targetDir, 0o775, true);
         }
 
         $classType = ClassType::from($type);

@@ -99,7 +99,7 @@ final class RateLimitMiddleware extends AbstractMiddleware
         // 8. Reject with 429
         if (!$result->allowed) {
             return new Response(
-                status:  429,
+                status: 429,
                 headers: [
                     'Content-Type'          => 'application/json',
                     'Retry-After'           => (string) $result->resetIn,

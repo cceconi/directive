@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Directive\Http\Validator\AbstractRequestValidator;
 use Directive\Http\Input\SimpleString;
+use Directive\Http\Validator\AbstractRequestValidator;
 use Nyholm\Psr7\ServerRequest;
 
 /** @param array<string, mixed> $body */

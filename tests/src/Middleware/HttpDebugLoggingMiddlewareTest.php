@@ -118,7 +118,7 @@ describe('HttpDebugLoggingMiddleware', function (): void {
 
         $record = current(array_filter(
             $handler->getRecords(),
-            fn ($r) => $r['message'] === 'http.request',
+            fn($r) => $r['message'] === 'http.request',
         ));
 
         expect($record['context']['method'])->toBe('DELETE');

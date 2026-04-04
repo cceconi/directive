@@ -26,8 +26,7 @@ abstract class AbstractUseCase implements UseCaseInterface
     public function __construct(
         protected readonly LoggerInterface $logger,
         protected readonly DomainEventBusInterface $eventBus,
-    ) {
-    }
+    ) {}
 
     abstract protected function execute(AbstractCommand|AbstractQuery $input): ResultInterface;
 

@@ -30,10 +30,10 @@ final class HealthManager
         }
 
         $healthResponse = new HealthCheckResponse(
-            status:    HealthStatus::Pass,
-            version:   $this->appInfo->getVersion(),
+            status: HealthStatus::Pass,
+            version: $this->appInfo->getVersion(),
             releaseId: '',
-            checks:    [],
+            checks: [],
         );
 
         return $this->buildJsonResponse($response, $healthResponse);
@@ -75,10 +75,10 @@ final class HealthManager
         $globalStatus = HealthStatus::worst(...$statuses !== [] ? $statuses : [HealthStatus::Pass]);
 
         $healthResponse = new HealthCheckResponse(
-            status:    $globalStatus,
-            version:   $this->appInfo->getVersion(),
+            status: $globalStatus,
+            version: $this->appInfo->getVersion(),
             releaseId: '',
-            checks:    $aggregatedChecks,
+            checks: $aggregatedChecks,
         );
 
         return $this->buildJsonResponse($response, $healthResponse);

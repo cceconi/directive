@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Directive\Service\Logging;
 
+use Directive\Service\Security\WebUserInterface;
 use Monolog\Formatter\JsonFormatter;
-use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
+use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Directive\Service\Security\WebUserInterface;
 
 /**
  * Framework logger built on top of Monolog.

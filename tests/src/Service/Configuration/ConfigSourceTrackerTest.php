@@ -34,7 +34,7 @@ describe('ConfigSourceTracker', function (): void {
         unset($_ENV['DIRECTIVE_TRACKER_PRE']);
 
         $tmpDir = sys_get_temp_dir() . '/directive-tracker-pre-' . uniqid();
-        mkdir($tmpDir, 0755, true);
+        mkdir($tmpDir, 0o755, true);
         file_put_contents($tmpDir . '/.env', "DIRECTIVE_TRACKER_PRE=from-env\n");
 
         $dotenv = new Dotenv();
@@ -52,7 +52,7 @@ describe('ConfigSourceTracker', function (): void {
 
     it('loadTracked() tracks variables from .env as ".env"', function (): void {
         $tmpDir = sys_get_temp_dir() . '/directive-tracker-env-' . uniqid();
-        mkdir($tmpDir, 0755, true);
+        mkdir($tmpDir, 0o755, true);
         file_put_contents($tmpDir . '/.env', "DIRECTIVE_FROM_ENV=hello\n");
 
         $dotenv = new Dotenv();
@@ -67,7 +67,7 @@ describe('ConfigSourceTracker', function (): void {
 
     it('loadTracked() tracks variables from .env.local as ".env.local"', function (): void {
         $tmpDir = sys_get_temp_dir() . '/directive-tracker-local-' . uniqid();
-        mkdir($tmpDir, 0755, true);
+        mkdir($tmpDir, 0o755, true);
         file_put_contents($tmpDir . '/.env.local', "DIRECTIVE_FROM_LOCAL=world\n");
 
         $dotenv = new Dotenv();
@@ -82,7 +82,7 @@ describe('ConfigSourceTracker', function (): void {
 
     it('loadTracked() skips files that do not exist (no error)', function (): void {
         $tmpDir = sys_get_temp_dir() . '/directive-tracker-nofiles-' . uniqid();
-        mkdir($tmpDir, 0755, true);
+        mkdir($tmpDir, 0o755, true);
 
         $dotenv = new Dotenv();
 

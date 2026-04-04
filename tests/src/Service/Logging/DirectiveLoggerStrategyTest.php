@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Directive\Service\Logging\DefaultLoggingConfig;
 use Directive\Service\Logging\DirectiveLogger;
-use Directive\Service\Logging\LogStrategy;
 use Directive\Service\Logging\RequestIdHolder;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\StreamHandler;

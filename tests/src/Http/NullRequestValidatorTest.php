@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Directive\Http\Validator\NullRequestValidator;
 use Directive\Http\Request\RequestEntity;
+use Directive\Http\Validator\NullRequestValidator;
 use Nyholm\Psr7\ServerRequest;
 
 describe('NullRequestValidator', function () {
@@ -14,11 +14,11 @@ describe('NullRequestValidator', function () {
     });
 
     it('hasErrors returns false even without setRequest being called', function () {
-        expect((new NullRequestValidator())->hasErrors())->toBeFalse();
+        expect(new NullRequestValidator()->hasErrors())->toBeFalse();
     });
 
     it('getErrors always returns empty array', function () {
-        expect((new NullRequestValidator())->getErrors())->toBe([]);
+        expect(new NullRequestValidator()->getErrors())->toBe([]);
     });
 
     it('getRequestEntity returns a RequestEntity instance', function () {

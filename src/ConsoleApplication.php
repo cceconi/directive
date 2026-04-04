@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Directive;
 
+use Directive\Cli\DirectiveCommand;
 use Directive\Console\ConfigAuditCommand;
 use Directive\Console\ConfigCheckCommand;
 use Directive\Console\ConfigCompileCommand;
 use Directive\Console\ConfigExportCommand;
 use Directive\Console\ConfigListCommand;
 use Directive\Console\ConfigVerifyCommand;
-use Directive\Console\DirectiveCommand;
 use Directive\Console\FeatureListCommand;
 use Directive\Console\Generator\ConfigureDefaultCommand;
 use Directive\Console\Generator\GenerateEventCommand;

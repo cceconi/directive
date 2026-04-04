@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Directive\Service\Security;
 
-use Directive\Service\Security\SecurityConfigInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 

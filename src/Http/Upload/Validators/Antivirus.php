@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Directive\Http\Upload\Validators;
 
-use Directive\Service\Security\Antivirus\AntivirusServiceInterface;
-use Directive\Service\Security\Antivirus\Exception\AntivirusException;
 use Directive\Http\Upload\FileInfo;
 use Directive\Http\Upload\ValidatorException;
 use Directive\Http\Upload\ValidatorInterface;
+use Directive\Service\Security\Antivirus\AntivirusServiceInterface;
+use Directive\Service\Security\Antivirus\Exception\AntivirusException;
 
 /**
  * Scans a file through the configured antivirus service.

@@ -7,10 +7,10 @@ use Directive\Http\Endpoint\ApiDefinitionManager;
 use Directive\Http\Routing\Domain;
 use Directive\Http\Routing\MethodDefaults;
 use Directive\Http\Routing\VersionStatus;
-use Symfony\Component\Console\Tester\CommandTester;
-use Directive\Service\Business\ErrorManager;
-use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Directive\Http\Validator\NullRequestValidator;
+use Directive\Service\AppIdentity\AppIdentityConfigInterface;
+use Directive\Service\Business\ErrorManager;
+use Symfony\Component\Console\Tester\CommandTester;
 use Tests\Helpers\StubApi;
 use Tests\Helpers\StubRequestValidator;
 
@@ -40,11 +40,26 @@ function buildOpenApiTree(): ApiDefinitionManager
 function stubAppIdentity(): AppIdentityConfigInterface
 {
     return new class implements AppIdentityConfigInterface {
-        public function getAppCode(): string { return 'apisy-test'; }
-        public function getAppName(): string { return 'DirectiveTestApp'; }
-        public function getAppVersion(): string { return '3.0.0'; }
-        public function getAppDescription(): string { return 'Test application'; }
-        public function getAppUrl(): string { return ''; }
+        public function getAppCode(): string
+        {
+            return 'apisy-test';
+        }
+        public function getAppName(): string
+        {
+            return 'DirectiveTestApp';
+        }
+        public function getAppVersion(): string
+        {
+            return '3.0.0';
+        }
+        public function getAppDescription(): string
+        {
+            return 'Test application';
+        }
+        public function getAppUrl(): string
+        {
+            return '';
+        }
     };
 }
 

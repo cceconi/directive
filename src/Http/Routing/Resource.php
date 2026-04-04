@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Directive\Http\Routing;
 
-use Directive\Http\Validator\NullRequestValidator;
 use Directive\Http\Exception\ApiDefinitionException;
 use Directive\Http\Exception\MethodNotAllowedException;
+use Directive\Http\Validator\NullRequestValidator;
 use Directive\Service\Business\ErrorManager;
 
 /**
@@ -274,16 +274,16 @@ class Resource
         }
 
         return new MethodDefaults(
-            errorClass:            $overrides->errorClass            ?? $this->defaults->errorClass,
+            errorClass: $overrides->errorClass            ?? $this->defaults->errorClass,
             requestValidatorClass: $overrides->requestValidatorClass ?? $this->defaults->requestValidatorClass,
-            allowedRoles:          $overrides->allowedRoles          ?? $this->defaults->allowedRoles,
-            errorCodes:            $overrides->errorCodes            ?? $this->defaults->errorCodes,
-            authenticated:         $overrides->authenticated         ?? $this->defaults->authenticated,
-            rateLimit:             $overrides->rateLimit             ?? $this->defaults->rateLimit,
-            rateLimitKeyType:      $overrides->rateLimitKeyType      ?? $this->defaults->rateLimitKeyType,
-            rateLimitEnabled:      $overrides->rateLimitEnabled      ?? $this->defaults->rateLimitEnabled,
-            requestSchema:         $overrides->requestSchema         ?? $this->defaults->requestSchema,
-            responseSchema:        $overrides->responseSchema        ?? $this->defaults->responseSchema,
+            allowedRoles: $overrides->allowedRoles          ?? $this->defaults->allowedRoles,
+            errorCodes: $overrides->errorCodes            ?? $this->defaults->errorCodes,
+            authenticated: $overrides->authenticated         ?? $this->defaults->authenticated,
+            rateLimit: $overrides->rateLimit             ?? $this->defaults->rateLimit,
+            rateLimitKeyType: $overrides->rateLimitKeyType      ?? $this->defaults->rateLimitKeyType,
+            rateLimitEnabled: $overrides->rateLimitEnabled      ?? $this->defaults->rateLimitEnabled,
+            requestSchema: $overrides->requestSchema         ?? $this->defaults->requestSchema,
+            responseSchema: $overrides->responseSchema        ?? $this->defaults->responseSchema,
         );
     }
 }

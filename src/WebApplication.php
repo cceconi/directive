@@ -17,6 +17,8 @@ use Directive\Http\Middleware\RequestIdMiddleware;
 use Directive\Service\Configuration\AbstractConfiguration;
 use Directive\Service\Configuration\AbstractFeatures;
 use Directive\Service\Configuration\DirectiveFeatures;
+use Directive\Service\Health\HealthCheckInterface;
+use Directive\Service\Health\HealthManager;
 use Directive\Service\Logging\DefaultLoggingConfig;
 use Directive\Service\Logging\DirectiveLogger;
 use Directive\Service\Logging\RequestIdHolder;
@@ -24,8 +26,6 @@ use Directive\Service\RateLimit\DefaultRateLimitConfig;
 use Directive\Service\RateLimit\RateLimitConfigInterface;
 use Directive\Service\RateLimit\RateLimiterInterface;
 use Directive\Service\RateLimit\RedisRateLimiter;
-use Directive\Service\Health\HealthCheckInterface;
-use Directive\Service\Health\HealthManager;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
 use Psr\Http\Message\ResponseInterface;
@@ -149,7 +149,7 @@ class WebApplication extends AbstractApplication
             function ($request, $response) {
                 // Epic 3: delegate to Rest\Router::resolve()
                 return $response;
-            }
+            },
         );
 
         // -- CORS OPTIONS preflight ---------------------------------------
@@ -165,7 +165,7 @@ class WebApplication extends AbstractApplication
             function ($request, $response) {
                 // Epic 3: delegate to Rest\Router::resolve() (no service key in args)
                 return $response;
-            }
+            },
         );
 
         $app->options('/{domain}/{version}/{resource}', function ($request, $response) {

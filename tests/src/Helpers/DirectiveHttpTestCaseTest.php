@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
+use Directive\Application\Role\AbstractRole;
+use Directive\Application\Role\Permission;
 use Directive\Http\Endpoint\ApiDefinitionManager;
 use Directive\Http\Routing\Domain;
 use Directive\Http\Validator\NullRequestValidator;
 use Directive\Service\Business\ErrorManager;
-use Directive\Application\Role\AbstractRole;
-use Directive\Application\Role\GuestRole;
-use Directive\Application\Role\Permission;
 use Tests\Helpers\StubApi;
 use Tests\Helpers\StubWebUser;
 
@@ -88,7 +87,7 @@ describe('DirectiveHttpTestCase — assertStatus()', function (): void {
         $factory  = new \Nyholm\Psr7\Factory\Psr17Factory();
         $response = $factory->createResponse(404);
 
-        expect(fn () => $this->assertStatus($response, 200))->toThrow(\Exception::class);
+        expect(fn() => $this->assertStatus($response, 200))->toThrow(\Exception::class);
     });
 });
 

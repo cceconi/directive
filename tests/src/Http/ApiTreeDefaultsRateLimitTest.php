@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-use Directive\Http\Endpoint\ApiDefinitionManager;
 use Directive\Http\Routing\Domain;
 use Directive\Http\Routing\RateLimit;
 use Directive\Http\Routing\RateLimitKeyType;
-use Directive\Service\Business\ErrorManager;
 use Directive\Http\Validator\NullRequestValidator;
+use Directive\Service\Business\ErrorManager;
 use Tests\Helpers\StubApi;
 
 describe('API-tree rate-limit cascade', function (): void {
@@ -15,7 +14,7 @@ describe('API-tree rate-limit cascade', function (): void {
     it('propagates RateLimit set on Domain down to Method', function (): void {
         $rl = new RateLimit(60, 100, RateLimitKeyType::Ip);
 
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->withRateLimit($rl)
             ->version('v1')
             ->service('svc')
@@ -29,7 +28,7 @@ describe('API-tree rate-limit cascade', function (): void {
     });
 
     it('propagates rateLimitKeyType set on Domain down to Method', function (): void {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->withRateLimitKeyType(RateLimitKeyType::UserId)
             ->version('v1')
             ->service('svc')
@@ -43,7 +42,7 @@ describe('API-tree rate-limit cascade', function (): void {
     });
 
     it('propagates rateLimitEnabled=false set on Domain down to Method', function (): void {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->withRateLimitEnabled(false)
             ->version('v1')
             ->service('svc')
@@ -60,7 +59,7 @@ describe('API-tree rate-limit cascade', function (): void {
         $domainRl   = new RateLimit(60, 100, RateLimitKeyType::Ip);
         $resourceRl = new RateLimit(30, 10, RateLimitKeyType::ApiKey);
 
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->withRateLimit($domainRl)
             ->version('v1')
             ->service('svc')
@@ -75,7 +74,7 @@ describe('API-tree rate-limit cascade', function (): void {
     });
 
     it('null rateLimit stays null when not set anywhere', function (): void {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->version('v1')
             ->service('svc')
             ->resource('res')

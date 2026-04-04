@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use Directive\Http\Exception\BadRequestException;
 use Directive\Exception\DirectiveException;
-use Directive\Http\Exception\UnprocessableException;
+use Directive\Http\Exception\BadRequestException;
 use Directive\Http\Exception\ForbiddenException;
 use Directive\Http\Exception\GoneException;
 use Directive\Http\Exception\MethodNotAllowedException;
 use Directive\Http\Exception\NotFoundException;
 use Directive\Http\Exception\UnauthorizedException;
+use Directive\Http\Exception\UnprocessableException;
 use Directive\Service\Security\WebUserException;
 
 describe('DirectiveException hierarchy', function () {

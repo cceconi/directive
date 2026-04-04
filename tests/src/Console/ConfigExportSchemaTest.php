@@ -38,15 +38,30 @@ function makeSchemaContainer(bool $hasIdentity = false, string $version = '1.2.3
                 return new class ($ver) implements AppIdentityConfigInterface {
                     public function __construct(private string $v) {}
 
-                    public function getAppCode(): string { return 'test'; }
+                    public function getAppCode(): string
+                    {
+                        return 'test';
+                    }
 
-                    public function getAppName(): string { return 'test-app'; }
+                    public function getAppName(): string
+                    {
+                        return 'test-app';
+                    }
 
-                    public function getAppVersion(): string { return $this->v; }
+                    public function getAppVersion(): string
+                    {
+                        return $this->v;
+                    }
 
-                    public function getAppDescription(): string { return 'Test app'; }
+                    public function getAppDescription(): string
+                    {
+                        return 'Test app';
+                    }
 
-                    public function getAppUrl(): string { return 'https://example.com'; }
+                    public function getAppUrl(): string
+                    {
+                        return 'https://example.com';
+                    }
                 };
             }
 
@@ -67,7 +82,7 @@ function makeSchemaContainer(bool $hasIdentity = false, string $version = '1.2.3
 function runExportSchema(ContainerInterface $container, array $input = []): CommandTester
 {
     $tmpDir = sys_get_temp_dir() . '/directive-schema-test-' . uniqid();
-    mkdir($tmpDir, 0755, true);
+    mkdir($tmpDir, 0o755, true);
     $originalCwd = getcwd();
     chdir($tmpDir);
 
@@ -91,7 +106,7 @@ describe('ConfigExportCommand --schema', function (): void {
 
     it('generates a valid config-schema.json', function (): void {
         $tmpDir = sys_get_temp_dir() . '/directive-schema-valid-' . uniqid();
-        mkdir($tmpDir, 0755, true);
+        mkdir($tmpDir, 0o755, true);
         $cwd = getcwd();
         chdir($tmpDir);
 
@@ -117,7 +132,7 @@ describe('ConfigExportCommand --schema', function (): void {
 
     it('embeds appVersion from AppIdentityConfigInterface when available', function (): void {
         $tmpDir = sys_get_temp_dir() . '/directive-schema-version-' . uniqid();
-        mkdir($tmpDir, 0755, true);
+        mkdir($tmpDir, 0o755, true);
         $cwd = getcwd();
         chdir($tmpDir);
 
@@ -136,7 +151,7 @@ describe('ConfigExportCommand --schema', function (): void {
 
     it('overrides appVersion via --version flag', function (): void {
         $tmpDir = sys_get_temp_dir() . '/directive-schema-override-' . uniqid();
-        mkdir($tmpDir, 0755, true);
+        mkdir($tmpDir, 0o755, true);
         $cwd = getcwd();
         chdir($tmpDir);
 
@@ -155,7 +170,7 @@ describe('ConfigExportCommand --schema', function (): void {
 
     it('falls back to 0.0.0 when no identity config bound', function (): void {
         $tmpDir = sys_get_temp_dir() . '/directive-schema-fallback-' . uniqid();
-        mkdir($tmpDir, 0755, true);
+        mkdir($tmpDir, 0o755, true);
         $cwd = getcwd();
         chdir($tmpDir);
 
@@ -174,7 +189,7 @@ describe('ConfigExportCommand --schema', function (): void {
 
     it('includes allowed values in schema for constrained variables', function (): void {
         $tmpDir = sys_get_temp_dir() . '/directive-schema-allowed-' . uniqid();
-        mkdir($tmpDir, 0755, true);
+        mkdir($tmpDir, 0o755, true);
         $cwd = getcwd();
         chdir($tmpDir);
 
@@ -185,7 +200,7 @@ describe('ConfigExportCommand --schema', function (): void {
         chdir((string) $cwd);
 
         $json = json_decode((string) file_get_contents($tmpDir . '/config-schema.json'), true);
-        $logLevel = array_filter($json['variables'], fn ($v) => $v['key'] === 'LOG_LEVEL');
+        $logLevel = array_filter($json['variables'], fn($v) => $v['key'] === 'LOG_LEVEL');
         $logLevel = array_values($logLevel)[0] ?? null;
 
         expect($logLevel)->not->toBeNull();
@@ -198,7 +213,7 @@ describe('ConfigExportCommand --schema', function (): void {
 
     it('marks required variables correctly in schema', function (): void {
         $tmpDir = sys_get_temp_dir() . '/directive-schema-required-' . uniqid();
-        mkdir($tmpDir, 0755, true);
+        mkdir($tmpDir, 0o755, true);
         $cwd = getcwd();
         chdir($tmpDir);
 
@@ -209,9 +224,9 @@ describe('ConfigExportCommand --schema', function (): void {
         chdir((string) $cwd);
 
         $json     = json_decode((string) file_get_contents($tmpDir . '/config-schema.json'), true);
-        $appEnv   = array_filter($json['variables'], fn ($v) => $v['key'] === 'APP_ENV');
+        $appEnv   = array_filter($json['variables'], fn($v) => $v['key'] === 'APP_ENV');
         $appEnv   = array_values($appEnv)[0] ?? null;
-        $cacheTtl = array_filter($json['variables'], fn ($v) => $v['key'] === 'CACHE_TTL');
+        $cacheTtl = array_filter($json['variables'], fn($v) => $v['key'] === 'CACHE_TTL');
         $cacheTtl = array_values($cacheTtl)[0] ?? null;
 
         expect($appEnv['required'])->toBeTrue();

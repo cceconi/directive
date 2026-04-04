@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Console\Generator;
 
-use Directive\Console\DirectiveCommand;
+use Directive\Cli\DirectiveCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -57,10 +57,10 @@ final class GenerateUseCaseCommandCommand extends DirectiveCommand
         $useCaseDir    = $src . '/UseCase/' . $business;
         $interfaceDir  = $src . '/Api/' . $business;
 
-        $this->generator->generate($business, $name, $useCaseDir,   $namespace, ClassType::USE_CASE->value, ['input' => 'Command']);
-        $this->generator->generate($business, $name, $useCaseDir,   $namespace, ClassType::COMMAND->value);
-        $this->generator->generate($business, $name, $useCaseDir,   $namespace, ClassType::PAYLOAD->value);
-        $this->generator->generate($business, $name, $useCaseDir,   $namespace, ClassType::RESULT->value);
+        $this->generator->generate($business, $name, $useCaseDir, $namespace, ClassType::USE_CASE->value, ['input' => 'Command']);
+        $this->generator->generate($business, $name, $useCaseDir, $namespace, ClassType::COMMAND->value);
+        $this->generator->generate($business, $name, $useCaseDir, $namespace, ClassType::PAYLOAD->value);
+        $this->generator->generate($business, $name, $useCaseDir, $namespace, ClassType::RESULT->value);
         $this->generator->generate($business, $name, $interfaceDir, $namespace, ClassType::USE_CASE_INTERFACE->value);
 
         $output->writeln(sprintf('<info>✓</info> Scaffolded <comment>%s</comment> UseCase (command) in <comment>%s</comment>', $name, $useCaseDir));

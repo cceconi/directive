@@ -40,13 +40,13 @@ describe('MethodDefaults', function () {
     });
 
     it('empty array for allowedRoles is a concrete value (not null)', function () {
-        $d = (new MethodDefaults())->withAllowedRoles([]);
+        $d = new MethodDefaults()->withAllowedRoles([]);
         expect($d->allowedRoles)->toBe([]);
         expect($d->allowedRoles)->not->toBeNull();
     });
 
     it('chained with* calls accumulate correctly', function () {
-        $d = (new MethodDefaults())
+        $d = new MethodDefaults()
             ->withErrorClass('App\\ErrorManager')
             ->withRequestValidatorClass('App\\Validator')
             ->withAllowedRoles(['admin']);
@@ -57,7 +57,7 @@ describe('MethodDefaults', function () {
     });
 
     it('withAllowedRoles replaces rather than merges', function () {
-        $first  = (new MethodDefaults())->withAllowedRoles(['admin']);
+        $first  = new MethodDefaults()->withAllowedRoles(['admin']);
         $second = $first->withAllowedRoles(['user']);
 
         expect($second->allowedRoles)->toBe(['user']);
@@ -87,13 +87,13 @@ describe('MethodDefaults', function () {
     });
 
     it('withErrorCodes with empty array is a concrete value — not null', function () {
-        $d = (new MethodDefaults())->withErrorCodes([]);
+        $d = new MethodDefaults()->withErrorCodes([]);
         expect($d->errorCodes)->toBe([]);
         expect($d->errorCodes)->not->toBeNull();
     });
 
     it('withErrorCodes replaces rather than merges', function () {
-        $first  = (new MethodDefaults())->withErrorCodes([400, 500]);
+        $first  = new MethodDefaults()->withErrorCodes([400, 500]);
         $second = $first->withErrorCodes([422]);
 
         expect($second->errorCodes)->toBe([422]);
@@ -101,7 +101,7 @@ describe('MethodDefaults', function () {
     });
 
     it('chained with* calls preserve all fields including new ones', function () {
-        $d = (new MethodDefaults())
+        $d = new MethodDefaults()
             ->withErrorClass('App\\ErrorManager')
             ->withErrorCodes([400, 404])
             ->withAuthenticated(true);

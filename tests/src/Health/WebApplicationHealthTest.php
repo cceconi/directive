@@ -12,7 +12,6 @@ use Directive\Service\Maintenance\MaintenanceManagerInterface;
 use Directive\Service\Security\AccessManagerInterface;
 use Directive\Service\Security\CookiesManagerInterface;
 use Directive\Service\Security\HeaderManagerInterface;
-use Directive\Service\Security\WebUserInterface;
 use Directive\WebApplication;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
@@ -28,8 +27,14 @@ use Tests\Helpers\TestConfig;
 
 final class HRStubAppInfo implements AppInfoInterface
 {
-    public function getVersion(): string { return '0.0.0-test'; }
-    public function getName(): string    { return 'test'; }
+    public function getVersion(): string
+    {
+        return '0.0.0-test';
+    }
+    public function getName(): string
+    {
+        return 'test';
+    }
 }
 
 final class HRStubHeaderManager implements HeaderManagerInterface
@@ -38,35 +43,68 @@ final class HRStubHeaderManager implements HeaderManagerInterface
     {
         return $response;
     }
-    public function validateSecurityHeader(ServerRequestInterface $request): bool { return true; }
-    public function updateSecurityHeader(ResponseInterface $response): ResponseInterface { return $response; }
-    public function getError(): string { return ''; }
+    public function validateSecurityHeader(ServerRequestInterface $request): bool
+    {
+        return true;
+    }
+    public function updateSecurityHeader(ResponseInterface $response): ResponseInterface
+    {
+        return $response;
+    }
+    public function getError(): string
+    {
+        return '';
+    }
 }
 
 final class HRStubMaintenanceOff implements MaintenanceManagerInterface
 {
-    public function isActive(): bool     { return false; }
-    public function getMessage(): string { return ''; }
-    public function getPeriod(): string  { return ''; }
+    public function isActive(): bool
+    {
+        return false;
+    }
+    public function getMessage(): string
+    {
+        return '';
+    }
+    public function getPeriod(): string
+    {
+        return '';
+    }
 }
 
 final class HRStubMaintenanceOn implements MaintenanceManagerInterface
 {
-    public function isActive(): bool     { return true; }
-    public function getMessage(): string { return 'Down for maintenance'; }
-    public function getPeriod(): string  { return ''; }
+    public function isActive(): bool
+    {
+        return true;
+    }
+    public function getMessage(): string
+    {
+        return 'Down for maintenance';
+    }
+    public function getPeriod(): string
+    {
+        return '';
+    }
 }
 
 final class HRStubClientHeaders implements ClientHeadersInterface
 {
     public function load(ServerRequestInterface $request): void {}
-    public function get(string $headerName): ?string { return null; }
+    public function get(string $headerName): ?string
+    {
+        return null;
+    }
 }
 
 final class HRStubCookiesManager implements CookiesManagerInterface
 {
     public function storeFromRequest(ServerRequestInterface $request): void {}
-    public function setResponseCookies(ResponseInterface $response): ResponseInterface { return $response; }
+    public function setResponseCookies(ResponseInterface $response): ResponseInterface
+    {
+        return $response;
+    }
     public function addResponseCookie(string $name, string $value, ?int $maxAge = null, ?string $domain = null): void {}
     public function addResponseAccessTokenCookie(string $value, ?int $maxAge = null, ?string $domain = null): void {}
 }
@@ -78,12 +116,18 @@ final class HRStubAccessManager implements AccessManagerInterface
 
 final class HRPassCheck extends AbstractHealthCheck
 {
-    protected function run(): array { return ['status' => 'pass']; }
+    protected function run(): array
+    {
+        return ['status' => 'pass'];
+    }
 }
 
 final class HRFailCheck extends AbstractHealthCheck
 {
-    protected function run(): array { return ['status' => 'fail']; }
+    protected function run(): array
+    {
+        return ['status' => 'fail'];
+    }
 }
 
 // ---------------------------------------------------------------------------

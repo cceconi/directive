@@ -31,7 +31,7 @@ final class InMemoryCache implements CacheInterface
         $expiresAt = null;
 
         if ($ttl instanceof \DateInterval) {
-            $expiresAt = microtime(true) + (float) (new \DateTime())->add($ttl)->getTimestamp() - (float) (new \DateTime())->getTimestamp();
+            $expiresAt = microtime(true) + (float) new \DateTime()->add($ttl)->getTimestamp() - (float) new \DateTime()->getTimestamp();
         } elseif (is_int($ttl)) {
             $expiresAt = microtime(true) + $ttl;
         }

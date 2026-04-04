@@ -10,8 +10,14 @@ use Symfony\Component\Console\Tester\CommandTester;
 function makeUcQueryContainer(): ContainerInterface
 {
     return new class implements ContainerInterface {
-        public function get(string $id): mixed { return null; }
-        public function has(string $id): bool  { return false; }
+        public function get(string $id): mixed
+        {
+            return null;
+        }
+        public function has(string $id): bool
+        {
+            return false;
+        }
     };
 }
 

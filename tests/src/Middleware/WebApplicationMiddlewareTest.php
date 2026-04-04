@@ -13,7 +13,6 @@ use Directive\Service\Maintenance\MaintenanceManagerInterface;
 use Directive\Service\Security\AccessManagerInterface;
 use Directive\Service\Security\CookiesManagerInterface;
 use Directive\Service\Security\HeaderManagerInterface;
-use Directive\Service\Security\WebUserInterface;
 use Directive\WebApplication;
 use Monolog\Handler\TestHandler;
 use Monolog\Level;

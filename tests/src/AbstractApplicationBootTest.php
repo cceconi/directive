@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Directive\ConsoleApplication;
 use Directive\Application\EventBus\DomainEventBusInterface;
 use Directive\Application\EventBus\NullDomainEventBus;
+use Directive\ConsoleApplication;
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Directive\Service\Configuration\AbstractConfiguration;
 use Directive\Service\Security\Antivirus\AntivirusConfigInterface;
@@ -63,10 +63,22 @@ describe('AbstractApplication service auto-binding', function (): void {
 
     it('respects user-supplied definition over auto-binding', function (): void {
         $customConfig = new class implements AntivirusConfigInterface {
-            public function getHost(): string { return 'custom-host'; }
-            public function getPort(): int { return 3310; }
-            public function getTimeout(): int { return 5; }
-            public function getName(): string { return 'clamav'; }
+            public function getHost(): string
+            {
+                return 'custom-host';
+            }
+            public function getPort(): int
+            {
+                return 3310;
+            }
+            public function getTimeout(): int
+            {
+                return 5;
+            }
+            public function getName(): string
+            {
+                return 'clamav';
+            }
         };
 
         $app = new BootTestApplication();
@@ -81,11 +93,26 @@ describe('AbstractApplication service auto-binding', function (): void {
 
     it('does not override user-supplied AppIdentityConfigInterface', function (): void {
         $custom = new class implements AppIdentityConfigInterface {
-            public function getAppCode(): string { return 'myapp'; }
-            public function getAppName(): string { return 'Overridden Name'; }
-            public function getAppVersion(): string { return '1.0.0'; }
-            public function getAppDescription(): string { return ''; }
-            public function getAppUrl(): string { return ''; }
+            public function getAppCode(): string
+            {
+                return 'myapp';
+            }
+            public function getAppName(): string
+            {
+                return 'Overridden Name';
+            }
+            public function getAppVersion(): string
+            {
+                return '1.0.0';
+            }
+            public function getAppDescription(): string
+            {
+                return '';
+            }
+            public function getAppUrl(): string
+            {
+                return '';
+            }
         };
 
         $app = new BootTestApplication();
@@ -136,7 +163,7 @@ describe('AbstractApplication production cache warnings', function (): void {
 
         if (!file_exists($cacheFile)) {
             if (!is_dir($cacheDir)) {
-                mkdir($cacheDir, 0755, true);
+                mkdir($cacheDir, 0o755, true);
             }
             file_put_contents($cacheFile, '<?php return [];');
             $created = true;

@@ -25,8 +25,14 @@ function makeListConfig(): AbstractConfiguration
 function makeListContainer(): ContainerInterface
 {
     return new class implements ContainerInterface {
-        public function get(string $id): mixed { return makeListConfig(); }
-        public function has(string $id): bool  { return $id === AbstractConfiguration::class; }
+        public function get(string $id): mixed
+        {
+            return makeListConfig();
+        }
+        public function has(string $id): bool
+        {
+            return $id === AbstractConfiguration::class;
+        }
     };
 }
 

@@ -59,11 +59,26 @@ function buildQueryParamsOpenApiTree(): ApiDefinitionManager
 function stubQueryParamsAppIdentity(): AppIdentityConfigInterface
 {
     return new class implements AppIdentityConfigInterface {
-        public function getAppCode(): string { return 'apisy-test'; }
-        public function getAppName(): string { return 'DirectiveTestApp'; }
-        public function getAppVersion(): string { return '3.0.0'; }
-        public function getAppDescription(): string { return ''; }
-        public function getAppUrl(): string { return ''; }
+        public function getAppCode(): string
+        {
+            return 'apisy-test';
+        }
+        public function getAppName(): string
+        {
+            return 'DirectiveTestApp';
+        }
+        public function getAppVersion(): string
+        {
+            return '3.0.0';
+        }
+        public function getAppDescription(): string
+        {
+            return '';
+        }
+        public function getAppUrl(): string
+        {
+            return '';
+        }
     };
 }
 

@@ -3,14 +3,14 @@
 declare(strict_types=1);
 
 use Directive\Console\ConfigCheckCommand;
-use Directive\Service\Configuration\AbstractConfiguration;
 use Directive\Exception\ConfigurationException;
+use Directive\Service\Configuration\AbstractConfiguration;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
 function makeConfig(bool $throws = false): AbstractConfiguration
 {
-    return new class($throws) extends AbstractConfiguration {
+    return new class ($throws) extends AbstractConfiguration {
         public function __construct(private readonly bool $throws) {}
         protected function define(): void {}
         public function audit(): void
@@ -24,7 +24,7 @@ function makeConfig(bool $throws = false): AbstractConfiguration
 
 function makeContainer(bool $hasConfig, bool $configThrows = false): ContainerInterface
 {
-    return new class($hasConfig, $configThrows) implements ContainerInterface {
+    return new class ($hasConfig, $configThrows) implements ContainerInterface {
         public function __construct(
             private readonly bool $hasConfig,
             private readonly bool $configThrows,

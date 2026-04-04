@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Directive\Service\Configuration\AbstractFeatures;
 use Directive\Exception\ConfigurationException;
+use Directive\Service\Configuration\AbstractFeatures;
 
 // ── Stub ─────────────────────────────────────────────────────────────────────
 
@@ -11,9 +11,9 @@ final class StubFeatures extends AbstractFeatures
 {
     protected function define(): void
     {
-        $this->feature('dark_mode',    'FEATURE_DARK_MODE',    false);
-        $this->feature('beta_ui',      'FEATURE_BETA_UI',      true);
-        $this->feature('maintenance',  'FEATURE_MAINTENANCE',  false);
+        $this->feature('dark_mode', 'FEATURE_DARK_MODE', false);
+        $this->feature('beta_ui', 'FEATURE_BETA_UI', true);
+        $this->feature('maintenance', 'FEATURE_MAINTENANCE', false);
     }
 }
 
@@ -51,7 +51,7 @@ describe('AbstractFeatures', function (): void {
 
     it('throws ConfigurationException for undeclared flag', function (): void {
         $features = new StubFeatures();
-        expect(fn () => $features->isEnabled('not_declared'))->toThrow(ConfigurationException::class);
+        expect(fn() => $features->isEnabled('not_declared'))->toThrow(ConfigurationException::class);
     });
 
     it('returns all flags via getAll()', function (): void {

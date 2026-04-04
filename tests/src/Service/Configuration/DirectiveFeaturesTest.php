@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use Directive\Exception\ConfigurationException;
 use Directive\Service\Configuration\AbstractFeatures;
 use Directive\Service\Configuration\DirectiveFeatures;
-use Directive\Exception\ConfigurationException;
 
 describe('DirectiveFeatures', function (): void {
 
@@ -38,7 +38,7 @@ describe('DirectiveFeatures', function (): void {
 
     it('throws ConfigurationException for unknown flag', function (): void {
         $features = new DirectiveFeatures();
-        expect(fn () => $features->isEnabled('unknown_flag'))->toThrow(ConfigurationException::class);
+        expect(fn() => $features->isEnabled('unknown_flag'))->toThrow(ConfigurationException::class);
     });
 
     it('getAll includes rate_limit flag', function (): void {

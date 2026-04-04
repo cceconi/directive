@@ -10,10 +10,10 @@ use Tests\Helpers\StubApi;
 describe('Method — construction defaults', function () {
     it('defaults new optional properties to empty / false / null', function () {
         $method = new Method(
-            httpMethod:            'GET',
-            apiClass:              StubApi::class,
+            httpMethod: 'GET',
+            apiClass: StubApi::class,
             requestValidatorClass: NullRequestValidator::class,
-            errorClass:            ErrorManager::class,
+            errorClass: ErrorManager::class,
         );
 
         expect($method->requestSchema)->toBeNull();
@@ -24,14 +24,14 @@ describe('Method — construction defaults', function () {
 
     it('accepts all new properties when provided', function () {
         $method = new Method(
-            httpMethod:            'POST',
-            apiClass:              StubApi::class,
+            httpMethod: 'POST',
+            apiClass: StubApi::class,
             requestValidatorClass: NullRequestValidator::class,
-            errorClass:            ErrorManager::class,
-            requestSchema:         'App\\Web\\Request\\CreateUserRequest',
-            responseSchema:        'schemas/create-user-response.json',
-            errorCodes:            [400, 422, 500],
-            authenticated:         true,
+            errorClass: ErrorManager::class,
+            requestSchema: 'App\\Web\\Request\\CreateUserRequest',
+            responseSchema: 'schemas/create-user-response.json',
+            errorCodes: [400, 422, 500],
+            authenticated: true,
         );
 
         expect($method->requestSchema)->toBe('App\\Web\\Request\\CreateUserRequest');
@@ -42,12 +42,12 @@ describe('Method — construction defaults', function () {
 
     it('is backward-compatible: existing params still work without new ones', function () {
         $method = new Method(
-            httpMethod:            'DELETE',
-            apiClass:              StubApi::class,
+            httpMethod: 'DELETE',
+            apiClass: StubApi::class,
             requestValidatorClass: NullRequestValidator::class,
-            errorClass:            ErrorManager::class,
-            allowedRoles:          ['admin'],
-            responseEntityClass:   null,
+            errorClass: ErrorManager::class,
+            allowedRoles: ['admin'],
+            responseEntityClass: null,
         );
 
         expect($method->httpMethod)->toBe('DELETE');

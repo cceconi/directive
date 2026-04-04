@@ -50,7 +50,7 @@ function runCompileInTmpDir(ContainerInterface $container, string $tmpRoot): int
 
     chdir($tmpRoot);
 
-    mkdir($tmpRoot . '/var/cache', 0755, true);
+    mkdir($tmpRoot . '/var/cache', 0o755, true);
 
     $command = new ConfigCompileCommand($container);
     $tester  = new CommandTester($command);
@@ -81,7 +81,7 @@ describe('ConfigCompileCommand', function (): void {
         $_ENV['APP_ENV'] = 'production';
 
         $tmpRoot = sys_get_temp_dir() . '/directive-compile-test-' . uniqid();
-        mkdir($tmpRoot, 0755, true);
+        mkdir($tmpRoot, 0o755, true);
 
         $exitCode = runCompileInTmpDir(makeCompileContainer(), $tmpRoot);
 
@@ -105,7 +105,7 @@ describe('ConfigCompileCommand', function (): void {
         $_ENV['APP_KEY']    = 'real-key-value';
 
         $tmpRoot = sys_get_temp_dir() . '/directive-compile-secret-' . uniqid();
-        mkdir($tmpRoot, 0755, true);
+        mkdir($tmpRoot, 0o755, true);
 
         runCompileInTmpDir(makeCompileContainer(), $tmpRoot);
 
@@ -126,7 +126,7 @@ describe('ConfigCompileCommand', function (): void {
         $_ENV['APP_ENV'] = 'production';
 
         $tmpRoot = sys_get_temp_dir() . '/directive-compile-overwrite-' . uniqid();
-        mkdir($tmpRoot . '/var/cache', 0755, true);
+        mkdir($tmpRoot . '/var/cache', 0o755, true);
         file_put_contents($tmpRoot . '/var/cache/config.php', '<?php return ["old" => true];');
 
         $originalCwd = getcwd();
@@ -155,7 +155,7 @@ describe('ConfigCompileCommand', function (): void {
         $_ENV['APP_ENV'] = 'production';
 
         $tmpRoot = sys_get_temp_dir() . '/directive-compile-nodir-' . uniqid();
-        mkdir($tmpRoot, 0755, true);
+        mkdir($tmpRoot, 0o755, true);
         // Do NOT create var/cache/
 
         $originalCwd = getcwd();
@@ -176,7 +176,7 @@ describe('ConfigCompileCommand', function (): void {
 
     it('exits successfully with a message when no config is bound', function (): void {
         $tmpRoot = sys_get_temp_dir() . '/directive-compile-noconf-' . uniqid();
-        mkdir($tmpRoot . '/var/cache', 0755, true);
+        mkdir($tmpRoot . '/var/cache', 0o755, true);
 
         $originalCwd = getcwd();
         chdir($tmpRoot);

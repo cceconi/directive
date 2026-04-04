@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Directive\Service\Security;
 
-use Directive\Service\Security\Authentication\AuthInterface;
 use Directive\Application\Role\AbstractRole;
 use Directive\Application\Role\GuestRole;
+use Directive\Service\Security\Authentication\AuthInterface;
 use Psr\Container\ContainerInterface;
 
 /**

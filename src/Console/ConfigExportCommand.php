@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Console;
 
+use Directive\Cli\DirectiveCommand;
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Directive\Service\Configuration\AbstractConfiguration;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -152,7 +153,7 @@ final class ConfigExportCommand extends DirectiveCommand
 
         $schema = [
             'appVersion'  => $appVersion,
-            'generatedAt' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+            'generatedAt' => new \DateTimeImmutable()->format(\DateTimeInterface::ATOM),
             'variables'   => $variables,
         ];
 

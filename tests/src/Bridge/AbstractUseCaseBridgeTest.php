@@ -33,8 +33,8 @@ function makeBridgeContainer(?WebUserInterface $webUser = null): \Psr\Container\
 {
     $builder = new ContainerBuilder();
     $builder->addDefinitions([
-        ErrorInterface::class   => \DI\factory(fn () => new ErrorManager()),
-        WebUserInterface::class => \DI\factory(fn () => $webUser ?? new StubWebUser()),
+        ErrorInterface::class   => \DI\factory(fn() => new ErrorManager()),
+        WebUserInterface::class => \DI\factory(fn() => $webUser ?? new StubWebUser()),
     ]);
     return $builder->build();
 }

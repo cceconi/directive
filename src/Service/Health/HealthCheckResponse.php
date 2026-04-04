@@ -25,14 +25,14 @@ readonly class HealthCheckResponse
     public function toArray(): array
     {
         $data = [
-            "status"    => $this->status->value(),
-            "version"   => $this->version,
-            "releaseId" => $this->releaseId,
-            "checks"    => $this->checks,
+            'status'    => $this->status->value(),
+            'version'   => $this->version,
+            'releaseId' => $this->releaseId,
+            'checks'    => $this->checks,
         ];
 
         if ($this->description !== null) {
-            $data["description"] = $this->description;
+            $data['description'] = $this->description;
         }
 
         return $data;

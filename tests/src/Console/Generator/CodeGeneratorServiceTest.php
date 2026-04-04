@@ -80,7 +80,7 @@ describe('CodeGeneratorService', function (): void {
 
     it('does not overwrite an existing file', function (): void {
         $dir  = $this->tmpDir . '/UseCase/Order';
-        mkdir($dir, 0775, true);
+        mkdir($dir, 0o775, true);
         file_put_contents($dir . '/CreateOrderCommand.php', '<?php // original');
 
         $this->generator->generate('Order', 'CreateOrder', $dir, 'App', ClassType::COMMAND->value);
@@ -96,7 +96,7 @@ describe('CodeGeneratorService', function (): void {
     });
 
     it('throws on unknown template type', function (): void {
-        expect(fn () => $this->generator->generate('', 'Foo', $this->tmpDir, 'App', 'nonexistent.tpl'))
+        expect(fn() => $this->generator->generate('', 'Foo', $this->tmpDir, 'App', 'nonexistent.tpl'))
             ->toThrow(\RuntimeException::class);
     });
 

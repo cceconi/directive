@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Console\Generator;
 
-use Directive\Console\DirectiveCommand;
+use Directive\Cli\DirectiveCommand;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;

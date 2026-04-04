@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Tests\Helpers;
 
 use DI\ContainerBuilder;
+use Directive\Application\Role\AbstractRole;
 use Directive\Http\Endpoint\ApiDefinitionManager;
 use Directive\Http\Response\HttpResponse;
 use Directive\Http\Router;
 use Directive\Service\Business\ErrorInterface;
 use Directive\Service\Business\ErrorManager;
-use Directive\Application\Role\AbstractRole;
 use Directive\Service\Security\WebUserInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
@@ -32,7 +32,7 @@ trait DirectiveHttpTestCase
 
     public function actingAs(AbstractRole $role): static
     {
-        $this->currentUser = (new StubWebUser())->withRole($role);
+        $this->currentUser = new StubWebUser()->withRole($role);
         return $this;
     }
 
@@ -84,7 +84,7 @@ trait DirectiveHttpTestCase
 
         $builder = new ContainerBuilder();
         $builder->addDefinitions(array_merge(
-            [ErrorInterface::class => \DI\factory(fn () => new ErrorManager())],
+            [ErrorInterface::class => \DI\factory(fn() => new ErrorManager())],
             $extraDefinitions,
         ));
         $container = $builder->build();

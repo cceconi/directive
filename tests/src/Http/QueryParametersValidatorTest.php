@@ -56,9 +56,18 @@ describe('QueryParametersValidator — filters', function () {
 
     it('accepts a declared filter with a passing constraint', function () {
         $minLength = new class implements GenericConstraintInterface {
-            public function checkConstraint(mixed $value): bool { return strlen((string) $value) >= 2; }
-            public function checkType(mixed $value): bool { return true; }
-            public function checkValue(mixed $value): bool { return strlen((string) $value) >= 2; }
+            public function checkConstraint(mixed $value): bool
+            {
+                return strlen((string) $value) >= 2;
+            }
+            public function checkType(mixed $value): bool
+            {
+                return true;
+            }
+            public function checkValue(mixed $value): bool
+            {
+                return strlen((string) $value) >= 2;
+            }
         };
 
         $validator = new class ($minLength) extends QueryParametersValidator {

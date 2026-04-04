@@ -18,8 +18,8 @@ abstract class AbstractHealthCheck implements HealthCheckInterface
         $durationMs = (int) ((hrtime(true) - $start) / 1_000_000);
 
         return array_merge($result, [
-            "time"        => date("c"),
-            "duration_ms" => $durationMs,
+            'time'        => date('c'),
+            'duration_ms' => $durationMs,
         ]);
     }
 

@@ -5,8 +5,8 @@ declare(strict_types=1);
 use Directive\Http\Routing\RateLimit;
 use Directive\Http\Routing\RateLimitKeyType;
 use Directive\Service\RateLimit\DefaultRateLimitConfig;
-use Directive\Service\RateLimit\RedisRateLimiter;
 use Directive\Service\RateLimit\RateLimitResult;
+use Directive\Service\RateLimit\RedisRateLimiter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
@@ -18,7 +18,7 @@ describe('RedisRateLimiter (in-memory cache)', function (): void {
     function makeRateLimiter(): RedisRateLimiter
     {
         return new RedisRateLimiter(
-            config:    new DefaultRateLimitConfig(),
+            config: new DefaultRateLimitConfig(),
             cachePool: new ArrayAdapter(),
         );
     }

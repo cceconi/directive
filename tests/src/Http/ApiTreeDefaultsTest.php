@@ -7,7 +7,6 @@ use Directive\Http\Routing\MethodDefaults;
 use Directive\Http\Routing\RateLimit;
 use Directive\Http\Routing\RateLimitKeyType;
 use Directive\Http\Validator\NullRequestValidator;
-use Directive\Http\Routing\VersionStatus;
 use Directive\Service\Business\ErrorManager;
 use Tests\Helpers\StubApi;
 use Tests\Helpers\StubErrorManager;
@@ -15,7 +14,7 @@ use Tests\Helpers\StubRequestValidator;
 
 describe('MethodDefaults cascade — Domain level', function () {
     it('propagates errorClass set on Domain down to Method', function () {
-        $domain = (new Domain('d'))
+        $domain = new Domain('d')
             ->withErrorClass(StubErrorManager::class);
         $method = $domain->version('v1')
             ->service('svc')
@@ -27,7 +26,7 @@ describe('MethodDefaults cascade — Domain level', function () {
     });
 
     it('propagates requestValidatorClass set on Domain down to Method', function () {
-        $domain = (new Domain('d'))
+        $domain = new Domain('d')
             ->withRequestValidatorClass(StubRequestValidator::class);
         $method = $domain->version('v1')
             ->service('svc')
@@ -39,7 +38,7 @@ describe('MethodDefaults cascade — Domain level', function () {
     });
 
     it('propagates allowedRoles set on Domain down to Method', function () {
-        $domain = (new Domain('d'))
+        $domain = new Domain('d')
             ->withAllowedRoles(['admin']);
         $method = $domain->version('v1')
             ->service('svc')
@@ -53,7 +52,7 @@ describe('MethodDefaults cascade — Domain level', function () {
 
 describe('MethodDefaults cascade — Version level', function () {
     it('propagates errorClass set on Version down to Method', function () {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->version('v1')
             ->withErrorClass(StubErrorManager::class)
             ->service('svc')
@@ -65,7 +64,7 @@ describe('MethodDefaults cascade — Version level', function () {
     });
 
     it('propagates requestValidatorClass set on Version down to Method', function () {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->version('v1')
             ->withRequestValidatorClass(StubRequestValidator::class)
             ->service('svc')
@@ -79,7 +78,7 @@ describe('MethodDefaults cascade — Version level', function () {
 
 describe('MethodDefaults cascade — Service level', function () {
     it('propagates errorClass set on Service down to Method', function () {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->version('v1')
             ->service('svc')
             ->withErrorClass(StubErrorManager::class)
@@ -91,7 +90,7 @@ describe('MethodDefaults cascade — Service level', function () {
     });
 
     it('propagates allowedRoles set on Service down to Method', function () {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->version('v1')
             ->service('svc')
             ->withAllowedRoles(['editor'])
@@ -105,7 +104,7 @@ describe('MethodDefaults cascade — Service level', function () {
 
 describe('MethodDefaults cascade — Resource level', function () {
     it('Resource with* overrides cascaded Domain default', function () {
-        $domain = (new Domain('d'))
+        $domain = new Domain('d')
             ->withErrorClass(ErrorManager::class);
         $method = $domain->version('v1')
             ->service('svc')
@@ -118,7 +117,7 @@ describe('MethodDefaults cascade — Resource level', function () {
     });
 
     it('Resource with* overrides only specified field, leaves others cascaded', function () {
-        $domain = (new Domain('d'))
+        $domain = new Domain('d')
             ->withErrorClass(ErrorManager::class)
             ->withAllowedRoles(['admin']);
         $method = $domain->version('v1')
@@ -135,7 +134,7 @@ describe('MethodDefaults cascade — Resource level', function () {
 
 describe('MethodDefaults — framework fallback defaults', function () {
     it('uses NullRequestValidator when no requestValidatorClass is set anywhere', function () {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->version('v1')
             ->service('svc')
             ->resource('res')
@@ -146,7 +145,7 @@ describe('MethodDefaults — framework fallback defaults', function () {
     });
 
     it('uses ErrorManager when no errorClass is set anywhere', function () {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->version('v1')
             ->service('svc')
             ->resource('res')
@@ -157,7 +156,7 @@ describe('MethodDefaults — framework fallback defaults', function () {
     });
 
     it('uses empty allowedRoles when no allowedRoles are set anywhere', function () {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->version('v1')
             ->service('svc')
             ->resource('res')
@@ -183,7 +182,7 @@ describe('MethodDefaults — isolation: with* on Domain clone does not affect or
 
 describe('allowedRoles strict replacement', function () {
     it('withAllowedRoles([]) marks route as public (empty array, not null)', function () {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->withAllowedRoles(['admin'])
             ->version('v1')
             ->service('svc')
@@ -196,7 +195,7 @@ describe('allowedRoles strict replacement', function () {
     });
 
     it('Service withAllowedRoles replaces Domain roles — no merge', function () {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->withAllowedRoles(['admin'])
             ->version('v1')
             ->service('svc')
@@ -212,7 +211,7 @@ describe('allowedRoles strict replacement', function () {
 
 describe('MethodDefaults cascade — sibling isolation', function () {
     it('Service-level override does not affect sibling service', function () {
-        $domain = (new Domain('d'))->withErrorClass(ErrorManager::class);
+        $domain = new Domain('d')->withErrorClass(ErrorManager::class);
         $v1     = $domain->version('v1');
 
         $m1 = $v1->service('svc-a')
@@ -233,7 +232,7 @@ describe('MethodDefaults cascade — sibling isolation', function () {
 
 describe('errorCodes cascade — strict replacement', function () {
     it('propagates errorCodes set on Domain down to Method', function () {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->withErrorCodes([400, 404])
             ->version('v1')
             ->service('svc')
@@ -245,7 +244,7 @@ describe('errorCodes cascade — strict replacement', function () {
     });
 
     it('Service-level errorCodes replace Domain-level — no merge', function () {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->withErrorCodes([400, 500])
             ->version('v1')
             ->service('svc')
@@ -259,7 +258,7 @@ describe('errorCodes cascade — strict replacement', function () {
     });
 
     it('withErrorCodes([]) on Resource stops fall-through (public, no error codes)', function () {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->withErrorCodes([400, 500])
             ->version('v1')
             ->service('svc')
@@ -272,7 +271,7 @@ describe('errorCodes cascade — strict replacement', function () {
     });
 
     it('uses empty errorCodes by default when nothing is set', function () {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->version('v1')
             ->service('svc')
             ->resource('res')
@@ -285,7 +284,7 @@ describe('errorCodes cascade — strict replacement', function () {
 
 describe('authenticated cascade — fall-through', function () {
     it('propagates authenticated set on Domain down to Method', function () {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->withAuthenticated(true)
             ->version('v1')
             ->service('svc')
@@ -297,7 +296,7 @@ describe('authenticated cascade — fall-through', function () {
     });
 
     it('Service-level authenticated overrides Domain-level', function () {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->withAuthenticated(true)
             ->version('v1')
             ->service('svc')
@@ -310,7 +309,7 @@ describe('authenticated cascade — fall-through', function () {
     });
 
     it('defaults to false when nothing is set', function () {
-        $method = (new Domain('d'))
+        $method = new Domain('d')
             ->version('v1')
             ->service('svc')
             ->resource('res')
@@ -323,7 +322,7 @@ describe('authenticated cascade — fall-through', function () {
 
 describe('per-verb MethodDefaults overrides', function () {
     it('no overrides — all fields inherited from Resource defaults', function () {
-        $resource = (new Domain('d'))
+        $resource = new Domain('d')
             ->withAllowedRoles(['user'])
             ->withErrorCodes([400, 500])
             ->withAuthenticated(true)
@@ -339,7 +338,7 @@ describe('per-verb MethodDefaults overrides', function () {
     });
 
     it('per-verb allowedRoles shadows Resource-level default, other verbs unaffected', function () {
-        $resource = (new Domain('d'))
+        $resource = new Domain('d')
             ->version('v1')
             ->service('svc')
             ->resource('res')
@@ -353,7 +352,7 @@ describe('per-verb MethodDefaults overrides', function () {
     });
 
     it('per-verb rateLimit shadows Resource-level withRateLimit', function () {
-        $resource = (new Domain('d'))
+        $resource = new Domain('d')
             ->version('v1')
             ->service('svc')
             ->resource('res')
@@ -370,7 +369,7 @@ describe('per-verb MethodDefaults overrides', function () {
     });
 
     it('per-verb rateLimitEnabled false overrides Resource-level true', function () {
-        $resource = (new Domain('d'))
+        $resource = new Domain('d')
             ->version('v1')
             ->service('svc')
             ->resource('res')
@@ -384,7 +383,7 @@ describe('per-verb MethodDefaults overrides', function () {
     });
 
     it('partial overrides — unset fields fall through to Resource defaults', function () {
-        $resource = (new Domain('d'))
+        $resource = new Domain('d')
             ->version('v1')
             ->service('svc')
             ->resource('res')
@@ -399,7 +398,7 @@ describe('per-verb MethodDefaults overrides', function () {
     });
 
     it('withMethod registers non-standard verb', function () {
-        $resource = (new Domain('d'))
+        $resource = new Domain('d')
             ->version('v1')
             ->service('svc')
             ->resource('res');
@@ -409,7 +408,7 @@ describe('per-verb MethodDefaults overrides', function () {
     });
 
     it('withMethod with overrides applies resolution chain', function () {
-        $resource = (new Domain('d'))
+        $resource = new Domain('d')
             ->version('v1')
             ->service('svc')
             ->resource('res')

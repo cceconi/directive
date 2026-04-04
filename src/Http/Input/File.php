@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Directive\Http\Input;
 
 use Directive\Exception\ConfigurationException;
-use Directive\Http\Middleware\HttpConfigInterface;
 use Directive\Http\Input\Constraint\FileConstraint;
+use Directive\Http\Middleware\HttpConfigInterface;
 use Directive\Http\Upload\FileInfo;
 use Psr\Http\Message\UploadedFileInterface;
 

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Directive\Http\Endpoint;
 
 use Directive\Http\Exception\UnprocessableException;
-use Directive\Service\Business\ErrorInterface;
 use Directive\Http\Request\RequestEntity;
 use Directive\Http\Response\ResponseEntity;
+use Directive\Service\Business\ErrorInterface;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -26,8 +26,7 @@ abstract class AbstractApi implements ApiInterface
         protected readonly ResponseEntity $responseEntity,
         protected readonly RequestEntity $requestEntity,
         protected readonly ErrorInterface $businessError,
-    ) {
-    }
+    ) {}
 
     // ------------------------------------------------------------------
     // ApiInterface

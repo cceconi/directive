@@ -6,9 +6,9 @@ namespace Tests\Bridge;
 
 use Directive\Application\Message\ResultInterface;
 use Directive\Http\Endpoint\AbstractUseCaseApi;
-use Directive\Service\Business\ErrorInterface;
 use Directive\Http\Request\RequestEntity;
 use Directive\Http\Response\ResponseEntity;
+use Directive\Service\Business\ErrorInterface;
 use Psr\Container\ContainerInterface;
 
 final class GetUserApi extends AbstractUseCaseApi

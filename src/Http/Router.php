@@ -4,31 +4,31 @@ declare(strict_types=1);
 
 namespace Directive\Http;
 
-use Directive\Http\Exception\BadRequestException;
-use Directive\Http\Exception\TooManyRequestsException;
-use Directive\Http\Exception\UnprocessableException;
-use Directive\Http\Exception\ForbiddenException;
-use Directive\Http\Exception\GoneException;
-use Directive\Http\Exception\MethodNotAllowedException;
-use Directive\Http\Exception\NotFoundException;
-use Directive\Http\Exception\UnauthorizedException;
 use Directive\Application\Exception\AccessDeniedException;
 use Directive\Application\Exception\BusinessRuleException;
 use Directive\Application\Exception\ConflictException;
 use Directive\Application\Exception\EntityNotFoundException;
 use Directive\Application\Exception\ValidationException;
 use Directive\Application\Role\GuestRole;
-use Directive\Service\Security\WebUserInterface;
-use Directive\Http\Response\ResponseEntity;
-use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Directive\Http\Endpoint\ApiDefinitionManager;
 use Directive\Http\Endpoint\ApiInterface;
+use Directive\Http\Exception\BadRequestException;
+use Directive\Http\Exception\ForbiddenException;
+use Directive\Http\Exception\GoneException;
+use Directive\Http\Exception\MethodNotAllowedException;
+use Directive\Http\Exception\NotFoundException;
+use Directive\Http\Exception\TooManyRequestsException;
+use Directive\Http\Exception\UnauthorizedException;
+use Directive\Http\Exception\UnprocessableException;
 use Directive\Http\Response\HttpResponse;
+use Directive\Http\Response\ResponseEntity;
 use Directive\Http\Routing\Method;
 use Directive\Http\Routing\Resource;
 use Directive\Http\Validator\RequestValidatorInterface;
+use Directive\Service\Security\WebUserInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Core request dispatcher.
@@ -98,7 +98,7 @@ final class Router
             return $this->httpResponse->conflict($route, $method);
         } catch (ValidationException $e) {
             $errors = array_map(
-                fn (string $field, string $msg) => ['field' => $field, 'message' => $msg],
+                fn(string $field, string $msg) => ['field' => $field, 'message' => $msg],
                 array_keys($e->getErrors()),
                 array_values($e->getErrors()),
             );

@@ -8,15 +8,15 @@ use Directive\Http\Middleware\RateLimitMiddleware;
 use Directive\Http\Routing\Domain;
 use Directive\Http\Routing\RateLimit;
 use Directive\Http\Routing\RateLimitKeyType;
+use Directive\Http\Validator\NullRequestValidator;
 use Directive\Service\Business\ErrorManager;
 use Directive\Service\Configuration\AbstractFeatures;
 use Directive\Service\Configuration\DirectiveFeatures;
-use Directive\Http\Validator\NullRequestValidator;
 use Directive\Service\RateLimit\DefaultRateLimitConfig;
 use Directive\Service\RateLimit\NullRateLimiter;
 use Directive\Service\RateLimit\RateLimitConfigInterface;
-use Directive\Service\RateLimit\RateLimitResult;
 use Directive\Service\RateLimit\RateLimiterInterface;
+use Directive\Service\RateLimit\RateLimitResult;
 use Directive\Service\Security\WebUserInterface;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\ServerRequest;
@@ -232,7 +232,7 @@ describe('RateLimitMiddleware', function (): void {
     it('uses X-Forwarded-For IP when present', function (): void {
         $container  = buildRlContainer(buildRlManager());
         $middleware = new RateLimitMiddleware($container);
-        $request    = (new ServerRequest('GET', '/d/v1/svc/res'))
+        $request    = new ServerRequest('GET', '/d/v1/svc/res')
             ->withHeader('X-Forwarded-For', '203.0.113.1, 10.0.0.1');
 
         $response = $middleware->process($request, okHandler());

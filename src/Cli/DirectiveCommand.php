@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Directive\Console;
+namespace Directive\Cli;
 
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;

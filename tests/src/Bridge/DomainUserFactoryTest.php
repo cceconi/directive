@@ -27,7 +27,7 @@ describe('DomainUserFactory::fromWebUser()', function () {
 
     it('preserves the exact role instance', function () {
         $role    = new GuestRole();
-        $webUser = (new StubWebUser())->withRole($role);
+        $webUser = new StubWebUser()->withRole($role);
 
         $domainUser = DomainUserFactory::fromWebUser($webUser);
 

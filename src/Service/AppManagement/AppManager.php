@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Directive\Service\AppManagement;
 
-use Directive\Http\Exception\UnprocessableException;
 use Directive\Exception\DirectiveException;
+use Directive\Http\Exception\UnprocessableException;
 use Directive\Service\Utils\Json;
 
 final class AppManager

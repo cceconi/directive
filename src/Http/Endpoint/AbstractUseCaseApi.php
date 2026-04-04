@@ -6,7 +6,6 @@ namespace Directive\Http\Endpoint;
 
 use Directive\Application\Message\ResultInterface;
 use Directive\Application\User\DomainUser;
-use Directive\Service\Business\ErrorInterface;
 use Directive\Service\Security\WebUserInterface;
 
 /**

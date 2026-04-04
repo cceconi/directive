@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Directive\Http\Endpoint;
 
-use Psr\Container\ContainerInterface;
 use Directive\Http\Routing\Domain;
+use Psr\Container\ContainerInterface;
 
 /**
  * Contract for user-defined API declaration classes.

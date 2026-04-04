@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Directive\Http\Middleware;
 
-use Directive\Http\Middleware\HttpConfigInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;

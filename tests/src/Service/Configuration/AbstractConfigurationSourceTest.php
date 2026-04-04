@@ -44,7 +44,7 @@ describe('AbstractConfiguration source tracking', function (): void {
         unset($_ENV['APP_ENV']);
 
         $tmpDir = sys_get_temp_dir() . '/directive-source-test-' . uniqid();
-        mkdir($tmpDir, 0755, true);
+        mkdir($tmpDir, 0o755, true);
         file_put_contents($tmpDir . '/.env.local', "APP_ENV=production\n");
 
         $dotenv = new Symfony\Component\Dotenv\Dotenv();
@@ -78,13 +78,13 @@ describe('AbstractConfiguration source tracking', function (): void {
         $config = new SourceTrackingConfig();
         $config->audit();
 
-        expect(fn () => $config->getSource('UNDECLARED'))->toThrow(ConfigurationException::class);
+        expect(fn() => $config->getSource('UNDECLARED'))->toThrow(ConfigurationException::class);
     });
 
     it('getSource() throws ConfigurationException before audit() is called', function (): void {
         $config = new SourceTrackingConfig();
 
-        expect(fn () => $config->getSource('APP_ENV'))->toThrow(ConfigurationException::class);
+        expect(fn() => $config->getSource('APP_ENV'))->toThrow(ConfigurationException::class);
     });
 
     it('getAll() still returns correct values after source tracking is added', function (): void {
