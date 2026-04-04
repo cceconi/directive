@@ -7,6 +7,7 @@ namespace Directive\Http\Input;
 use Directive\Exception\ConfigurationException;
 use Directive\Http\Input\Constraint\FileConstraint;
 use Directive\Http\Middleware\HttpConfigInterface;
+use Directive\Input\InterfaceData;
 use Directive\Http\Upload\FileInfo;
 use Psr\Http\Message\UploadedFileInterface;
 

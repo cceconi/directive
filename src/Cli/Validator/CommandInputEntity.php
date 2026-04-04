@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Cli\Validator;
 
-use Directive\Http\Input\InterfaceDataInterface;
+use Directive\Input\InterfaceDataInterface;
 
 /**
  * DTO carrying the validated, hydrated input fields for a CLI command.

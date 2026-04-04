@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Directive\Cli\Validator\AbstractCommandInputValidator;
 use Directive\Cli\Validator\CommandInputEntity;
-use Directive\Http\Input\SimpleString;
+use Directive\Input\SimpleString;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;

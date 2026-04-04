@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Directive\Http\Input;
+namespace Directive\Input;
 
-use Directive\Http\Input\Constraint\GenericConstraintInterface;
-use Directive\Http\Input\Constraint\NoConstraint;
+use Directive\Input\Constraint\GenericConstraintInterface;
+use Directive\Input\Constraint\NoConstraint;
 
 /** Plain string: strip_tags + collapse whitespace. */
 final class SimpleString extends InterfaceData

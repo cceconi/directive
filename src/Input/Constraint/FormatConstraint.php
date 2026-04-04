@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Directive\Http\Input\Constraint;
+namespace Directive\Input\Constraint;
 
-use Directive\Http\Exception\ConstraintException;
+use Directive\Exception\ConstraintException;
 
 /** Validates that a string matches a regex pattern. */
 final class FormatConstraint extends GenericConstraint

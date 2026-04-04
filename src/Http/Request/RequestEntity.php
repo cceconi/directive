@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Http\Request;
 
-use Directive\Http\Input\InterfaceDataInterface;
+use Directive\Input\InterfaceDataInterface;
 
 /**
  * Base DTO for incoming validated data.

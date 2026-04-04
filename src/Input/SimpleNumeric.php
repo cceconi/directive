@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Directive\Http\Input;
+namespace Directive\Input;
 
-use Directive\Http\Input\Constraint\GenericConstraintInterface;
-use Directive\Http\Input\Constraint\NoConstraint;
+use Directive\Input\Constraint\GenericConstraintInterface;
+use Directive\Input\Constraint\NoConstraint;
 
 /** Numeric input — accepts int or float strings, returns int|float|null. */
 final class SimpleNumeric extends InterfaceData

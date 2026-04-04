@@ -94,7 +94,7 @@ describe('AbstractConsoleCommand — validation lifecycle', function () {
         $validator = new class extends AbstractCommandInputValidator {
             protected function register(): void
             {
-                $this->scalar('name', new \Directive\Http\Input\SimpleString(), required: true);
+                $this->scalar('name', new \Directive\Input\SimpleString(), required: true);
             }
         };
         // No input given — required field is missing.

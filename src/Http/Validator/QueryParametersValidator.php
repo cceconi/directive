@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Directive\Http\Validator;
 
-use Directive\Http\Input\Constraint\GenericConstraintInterface;
-use Directive\Http\Input\SimpleString;
+use Directive\Input\Constraint\GenericConstraintInterface;
+use Directive\Input\SimpleString;
 use Directive\Http\Request\RequestEntity;
 
 /**

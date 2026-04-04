@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Http\Validator;
 
-use Directive\Http\Input\InterfaceDataInterface;
+use Directive\Input\InterfaceDataInterface;
 use Directive\Http\Request\RequestEntity;
 use Directive\Validator\AbstractInputValidator;
 use Psr\Http\Message\ServerRequestInterface;

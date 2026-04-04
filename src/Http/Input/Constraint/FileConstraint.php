@@ -7,6 +7,7 @@ namespace Directive\Http\Input\Constraint;
 use Directive\Http\Upload\FileInfo;
 use Directive\Http\Upload\ValidatorException;
 use Directive\Http\Upload\ValidatorInterface;
+use Directive\Input\Constraint\GenericConstraint;
 
 /**
  * Constraint that delegates to an ordered list of ValidatorInterface instances.

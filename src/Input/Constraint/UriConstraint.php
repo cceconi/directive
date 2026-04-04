@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Directive\Http\Input\Constraint;
+namespace Directive\Input\Constraint;
 
 /** Validates a URI (allows any scheme). */
 final class UriConstraint extends GenericConstraint

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Directive\Http\Input\Constraint;
+namespace Directive\Input\Constraint;
 
 /** Value must be in an explicit allowed list (enum-style). */
 final class ListValuesConstraint extends GenericConstraint

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Directive\Http\Input;
+namespace Directive\Input;
 
 /**
  * Contract for typed input wrappers.

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Cli\Validator;
 
-use Directive\Http\Input\InterfaceDataInterface;
+use Directive\Input\InterfaceDataInterface;
 use Directive\Validator\AbstractInputValidator;
 use Symfony\Component\Console\Input\InputInterface;
 

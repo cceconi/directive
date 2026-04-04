@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Directive\Validator;
 
-use Directive\Http\Input\InterfaceDataInterface;
+use Directive\Input\InterfaceDataInterface;
 
 /**
  * Shared base for all input validators (HTTP and CLI).

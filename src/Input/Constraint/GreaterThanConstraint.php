@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Directive\Http\Input\Constraint;
+namespace Directive\Input\Constraint;
 
-final class LesserThanConstraint extends GenericNumericConstraint
+final class GreaterThanConstraint extends GenericNumericConstraint
 {
     public function __construct(
         private readonly int|float $reference,
@@ -15,6 +15,6 @@ final class LesserThanConstraint extends GenericNumericConstraint
 
     public function checkValue(mixed $value): bool
     {
-        return (is_int($value) || is_float($value)) && $value < $this->reference;
+        return (is_int($value) || is_float($value)) && $value > $this->reference;
     }
 }

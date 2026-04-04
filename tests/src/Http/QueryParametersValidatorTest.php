@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Directive\Http\Input\Constraint\GenericConstraintInterface;
+use Directive\Input\Constraint\GenericConstraintInterface;
 use Directive\Http\Validator\PaginationMode;
 use Directive\Http\Validator\QueryParametersValidator;
 use Nyholm\Psr7\ServerRequest;

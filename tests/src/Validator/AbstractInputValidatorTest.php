@@ -96,7 +96,7 @@ describe('AbstractInputValidator — reset()', function () {
 
 describe('AbstractInputValidator — duplicate field guard', function () {
     it('throws InvalidArgumentException when the same field name is registered twice', function () {
-        $scalar = new \Directive\Http\Input\SimpleString();
+        $scalar = new \Directive\Input\SimpleString();
 
         $v = makeValidator(function (AbstractInputValidator $v) use ($scalar): void {
             $refScalar = new \ReflectionMethod($v, 'scalar');
@@ -122,7 +122,7 @@ describe('AbstractCommandInputValidator — file() not supported in CLI', functi
         $validator = new class extends \Directive\Cli\Validator\AbstractCommandInputValidator {
             protected function register(): void
             {
-                $this->file('upload', new \Directive\Http\Input\SimpleString());
+                $this->file('upload', new \Directive\Input\SimpleString());
             }
         };
 

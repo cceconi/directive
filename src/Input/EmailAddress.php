@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Directive\Http\Input;
+namespace Directive\Input;
 
-use Directive\Http\Input\Constraint\FormatConstraint;
-use Directive\Http\Input\Constraint\GenericConstraintInterface;
+use Directive\Input\Constraint\FormatConstraint;
+use Directive\Input\Constraint\GenericConstraintInterface;
 
 /** Email address field: strips tags, lowercases, validates format. */
 final class EmailAddress extends InterfaceData

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Directive\Http\Input\Constraint;
+namespace Directive\Input\Constraint;
 
 /** Base for all numeric constraints. */
 abstract class GenericNumericConstraint extends GenericConstraint

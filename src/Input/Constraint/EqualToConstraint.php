@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Directive\Http\Input\Constraint;
+namespace Directive\Input\Constraint;
 
-final class NotEqualToConstraint extends GenericConstraint
+final class EqualToConstraint extends GenericConstraint
 {
     public function __construct(
         private readonly mixed $reference,
@@ -15,6 +15,6 @@ final class NotEqualToConstraint extends GenericConstraint
 
     public function checkValue(mixed $value): bool
     {
-        return $value !== $this->reference;
+        return $value === $this->reference;
     }
 }

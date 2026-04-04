@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Directive\Http\Input\Constraint;
+namespace Directive\Input\Constraint;
 
 /** Validates a date string against a given format (default: Y-m-d). */
 final class DateConstraint extends GenericConstraint

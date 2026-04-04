@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Directive\Http\Input;
+namespace Directive\Input;
 
-use Directive\Http\Input\Constraint\GenericConstraintInterface;
-use Directive\Http\Input\Constraint\NoConstraint;
+use Directive\Input\Constraint\GenericConstraintInterface;
+use Directive\Input\Constraint\NoConstraint;
 
 /** Boolean input. Accepts true/false/1/0/"true"/"false"/"1"/"0". */
 final class Boolean extends InterfaceData

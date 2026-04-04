@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Directive\Http\Input;
+namespace Directive\Input;
 
-use Directive\Http\Input\Constraint\GenericConstraintInterface;
-use Directive\Http\Input\Constraint\NoConstraint;
+use Directive\Input\Constraint\GenericConstraintInterface;
+use Directive\Input\Constraint\NoConstraint;
 
-/** Username/pseudo: strip tags + collapse whitespace. */
-final class Pseudo extends InterfaceData
+/** Base64-encoded string: validates and decodes on clean. */
+final class EncodedString extends InterfaceData
 {
     public function __construct(
         GenericConstraintInterface $constraint = new NoConstraint(),
@@ -23,6 +23,8 @@ final class Pseudo extends InterfaceData
             return null;
         }
 
-        return trim((string) preg_replace('/\s+/', ' ', strip_tags($raw)));
+        $decoded = base64_decode($raw, strict: true);
+
+        return $decoded !== false ? $decoded : null;
     }
 }

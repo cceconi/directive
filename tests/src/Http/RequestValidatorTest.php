@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Directive\Http\Input\SimpleString;
+use Directive\Input\SimpleString;
 use Directive\Http\Validator\AbstractRequestValidator;
 use Nyholm\Psr7\ServerRequest;
 
@@ -45,7 +45,7 @@ describe('AbstractRequestValidator field registration', function () {
         $validator = new class extends AbstractRequestValidator {
             protected function register(): void
             {
-                $this->scalar('email', new \Directive\Http\Input\EmailAddress());
+                $this->scalar('email', new \Directive\Input\EmailAddress());
             }
         };
         $validator->setRequest(makeRequest(['email' => 'not-an-email']));
