@@ -177,6 +177,29 @@ abstract class AbstractRequestValidator implements RequestValidatorInterface
         return new class extends RequestEntity {};
     }
 
+    /**
+     * Provides subclasses read access to the current request.
+     * Only valid after setRequest() has been called (i.e., inside register() or later).
+     */
+    final protected function getRequest(): ServerRequestInterface
+    {
+        return $this->request;
+    }
+
+    /**
+     * Allows subclasses to push validation errors into the shared error list.
+     *
+     * @param 'invalid'|'missing' $type
+     */
+    final protected function addError(string $property, string $message, string $type = 'invalid'): void
+    {
+        $this->errors[] = [
+            'property' => $property,
+            'message'  => $message,
+            'type'     => $type,
+        ];
+    }
+
     // ------------------------------------------------------------------
     // Internal
     // ------------------------------------------------------------------

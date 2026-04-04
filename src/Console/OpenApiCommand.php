@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Directive\Http\Validator\NullRequestValidator;
+use Directive\Http\Validator\QueryParametersValidator;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -219,6 +220,17 @@ final class OpenApiCommand extends DirectiveCommand
         // Response schema annotated inline (class-string only — path-based refs live in buildResponses)
         if ($method->responseSchema !== null && !str_contains($method->responseSchema, '/')) {
             $op['x-response-schema-class'] = $method->responseSchema;
+        }
+
+        // Query parameters — auto-generated from QueryParametersValidator subclasses
+        if (is_a($method->requestValidatorClass, QueryParametersValidator::class, true)) {
+            $validatorClass = $method->requestValidatorClass;
+            /** @var QueryParametersValidator $validator */
+            $validator   = new $validatorClass();
+            $queryParams = $validator->getOpenApiParameters();
+            if ($queryParams !== []) {
+                $op['parameters'] = $queryParams;
+            }
         }
 
         // Retain class references for tooling
