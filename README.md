@@ -3,6 +3,9 @@
 [![Packagist Version](https://img.shields.io/packagist/v/cceconi/directive)](https://packagist.org/packages/cceconi/directive)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
+> **🚧 Early-stage project — not production-ready.**
+> Directive has not undergone a security audit. The API is unstable and may introduce breaking changes without notice between releases. Use at your own risk in experimental or learning contexts only.
+
 # Directive
 
 Directive is a PHP 8.4 framework for AI-assisted development built around strict hexagonal architecture. It provides zero-ambiguity conventions — from HTTP routing to persistence — so AI agents can write reliable, testable code from specs rather than guesses.
