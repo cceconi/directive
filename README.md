@@ -60,7 +60,7 @@ Add the PSR-4 autoload mapping in your `composer.json`:
 
 ## Bootstrap
 
-Subclass `WebApplication` and override `registerServices()` to wire your DI bindings, then boot from your entry point:
+Subclass `AbstractWebApplication` and declare `configureContainer()` to wire your DI bindings and `addServices()` to register your APIs:
 
 ```php
 <?php
@@ -75,16 +75,13 @@ use App\Security\JwtWebUser;
 use Directive\Http\Endpoint\ApiDefinitionManager;
 use Directive\Service\Business\ErrorInterface;
 use Directive\Service\Business\ErrorManager;
-use Directive\Service\Configuration\AbstractConfiguration;
 use Directive\Service\Security\WebUserInterface;
-use Directive\WebApplication;
+use Directive\AbstractWebApplication;
 
-final class MyApplication extends WebApplication
+final class MyApplication extends AbstractWebApplication
 {
-    protected function registerServices(AbstractConfiguration $config): void
+    protected function configureContainer(): void
     {
-        parent::registerServices($config);
-
         $this->addDefinitions([
             // Required — no default provided by the framework
             ErrorInterface::class   => ErrorManager::class,
@@ -105,22 +102,6 @@ final class MyApplication extends WebApplication
         $manager->registerDomain((new UserApiDefinition())->createApi($container));
     }
 }
-```
-
-```php
-<?php
-
-// public/index.php
-declare(strict_types=1);
-
-require __DIR__ . '/../vendor/autoload.php';
-
-use App\Config\AppConfig;
-use App\MyApplication;
-
-(new MyApplication())
-    ->setConfig(AppConfig::class)
-    ->run();
 ```
 
 **Required bindings** — must be declared; the framework provides no default:
