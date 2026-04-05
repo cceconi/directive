@@ -25,6 +25,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Tests\Helpers\StubApi;
 use Tests\Helpers\StubWebUser;
+use Tests\Helpers\TestConfig;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -40,11 +41,12 @@ function buildRlContainer(
     array $overrides = [],
 ): Psr\Container\ContainerInterface {
     $builder = new ContainerBuilder();
+    $config = new TestConfig();
     $builder->addDefinitions(array_merge(
         [
             ApiDefinitionManager::class   => $manager,
             AbstractFeatures::class       => new DirectiveFeatures(),
-            RateLimitConfigInterface::class => new DefaultRateLimitConfig(),
+            RateLimitConfigInterface::class => new DefaultRateLimitConfig($config),
             RateLimiterInterface::class   => new NullRateLimiter(),
             WebUserInterface::class       => new StubWebUser(),
         ],
@@ -84,7 +86,7 @@ function buildRlManager(array $withMethods = []): ApiDefinitionManager
         ->withRequestValidatorClass(NullRequestValidator::class);
 
     foreach ($withMethods as $method) {
-        $resource->addMethod($method, StubApi::class);
+        $resource->withMethod($method, StubApi::class);
     }
 
     if ($withMethods === []) {
@@ -184,7 +186,7 @@ describe('RateLimitMiddleware', function (): void {
     });
 
     it('skips rate limiting when global feature flag is disabled', function (): void {
-        $_ENV['DIRECTIVE_RATE_LIMIT_ENABLED'] = '0';
+        $_ENV['RATE_LIMIT_ENABLED'] = '0';
 
         $container  = buildRlContainer(buildRlManager(), [
             AbstractFeatures::class     => new DirectiveFeatures(),
@@ -195,13 +197,13 @@ describe('RateLimitMiddleware', function (): void {
 
         $response = $middleware->process($request, okHandler());
 
-        unset($_ENV['DIRECTIVE_RATE_LIMIT_ENABLED']);
+        unset($_ENV['RATE_LIMIT_ENABLED']);
 
         expect($response->getStatusCode())->toBe(200);
     });
 
     it('enforces rate limiting when rateLimitEnabled is true even if global feature is disabled', function (): void {
-        $_ENV['DIRECTIVE_RATE_LIMIT_ENABLED'] = '0';
+        $_ENV['RATE_LIMIT_ENABLED'] = '0';
 
         $manager = new ApiDefinitionManager();
         $domain  = new Domain('d');
@@ -223,7 +225,7 @@ describe('RateLimitMiddleware', function (): void {
 
         $response = $middleware->process($request, okHandler());
 
-        unset($_ENV['DIRECTIVE_RATE_LIMIT_ENABLED']);
+        unset($_ENV['RATE_LIMIT_ENABLED']);
 
         // Force-enabled per route overrides the global disabled flag → RejectingLimiter fires → 429
         expect($response->getStatusCode())->toBe(429);

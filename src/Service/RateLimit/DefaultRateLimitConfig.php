@@ -13,39 +13,43 @@ use Directive\Service\Configuration\AbstractConfiguration;
  * All variables are optional with sane defaults suitable for production use.
  *
  * Environment variables:
- *   DIRECTIVE_RATE_LIMIT_REDIS_DSN    string  default: 'tcp://127.0.0.1:6379'
- *   DIRECTIVE_RATE_LIMIT_WINDOW       int     default: 60  (seconds)
- *   DIRECTIVE_RATE_LIMIT_MAX_REQUESTS int     default: 100
- *   DIRECTIVE_RATE_LIMIT_KEY_TYPE     string  default: 'ip'  (ip|user_id|api_key)
+ *   RATE_LIMIT_REDIS_DSN    string  default: 'tcp://127.0.0.1:6379'
+ *   RATE_LIMIT_WINDOW       int     default: 60  (seconds)
+ *   RATE_LIMIT_MAX_REQUESTS int     default: 100
+ *   RATE_LIMIT_KEY_TYPE     string  default: 'ip'  (ip|user_id|api_key)
  */
-class DefaultRateLimitConfig extends AbstractConfiguration implements RateLimitConfigInterface
+class DefaultRateLimitConfig implements RateLimitConfigInterface
 {
+    public function __construct(private AbstractConfiguration $config) {
+        $this->define();
+    }
+
     protected function define(): void
     {
-        $this->optional('DIRECTIVE_RATE_LIMIT_REDIS_DSN', 'tcp://127.0.0.1:6379', 'string');
-        $this->optional('DIRECTIVE_RATE_LIMIT_WINDOW', 60, 'int');
-        $this->optional('DIRECTIVE_RATE_LIMIT_MAX_REQUESTS', 100, 'int');
-        $this->optional('DIRECTIVE_RATE_LIMIT_KEY_TYPE', 'ip', 'string', ['ip', 'user_id', 'api_key']);
+        $this->config->optional('RATE_LIMIT_REDIS_DSN', 'tcp://127.0.0.1:6379', 'string');
+        $this->config->optional('RATE_LIMIT_WINDOW', 60, 'int');
+        $this->config->optional('RATE_LIMIT_MAX_REQUESTS', 100, 'int');
+        $this->config->optional('RATE_LIMIT_KEY_TYPE', 'ip', 'string', ['ip', 'user_id', 'api_key']);
     }
 
     public function getRedisDsn(): string
     {
-        return (string) $this->get('DIRECTIVE_RATE_LIMIT_REDIS_DSN');
+        return (string) $this->config->get('RATE_LIMIT_REDIS_DSN');
     }
 
     public function getDefaultWindow(): int
     {
-        return (int) $this->get('DIRECTIVE_RATE_LIMIT_WINDOW');
+        return (int) $this->config->get('RATE_LIMIT_WINDOW');
     }
 
     public function getDefaultMaxRequests(): int
     {
-        return (int) $this->get('DIRECTIVE_RATE_LIMIT_MAX_REQUESTS');
+        return (int) $this->config->get('RATE_LIMIT_MAX_REQUESTS');
     }
 
     public function getDefaultKeyType(): RateLimitKeyType
     {
-        $raw = (string) $this->get('DIRECTIVE_RATE_LIMIT_KEY_TYPE');
+        $raw = (string) $this->config->get('RATE_LIMIT_KEY_TYPE');
         return RateLimitKeyType::from($raw);
     }
 }

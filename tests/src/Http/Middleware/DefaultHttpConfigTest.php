@@ -4,26 +4,29 @@ declare(strict_types=1);
 
 use Directive\Http\Middleware\DefaultHttpConfig;
 use Directive\Http\Middleware\HttpConfigInterface;
+use Tests\Helpers\TestConfig;
 
 describe('DefaultHttpConfig', function (): void {
 
     beforeEach(function (): void {
         unset(
-            $_ENV['DIRECTIVE_RESPONSE_COMPRESS'],
-            $_ENV['DIRECTIVE_UPLOAD_TMPDIR'],
-            $_ENV['DIRECTIVE_CLIENT_HEADERS'],
+            $_ENV['RESPONSE_COMPRESS'],
+            $_ENV['UPLOAD_TMPDIR'],
+            $_ENV['CLIENT_HEADERS'],
         );
     });
 
     it('implements HttpConfigInterface', function (): void {
-        $config = new DefaultHttpConfig();
-        $config->audit();
+        $shared = new TestConfig();
+        $config = new DefaultHttpConfig($shared);
+        $shared->audit();
         expect($config)->toBeInstanceOf(HttpConfigInterface::class);
     });
 
     it('returns default values when no env vars are set', function (): void {
-        $config = new DefaultHttpConfig();
-        $config->audit();
+        $shared = new TestConfig();
+        $config = new DefaultHttpConfig($shared);
+        $shared->audit();
 
         expect($config->isCompressionEnabled())->toBeFalse();
         expect($config->getUploadTmpDir())->toBe(sys_get_temp_dir());
@@ -31,28 +34,31 @@ describe('DefaultHttpConfig', function (): void {
     });
 
     it('reads compression flag from env', function (): void {
-        $_ENV['DIRECTIVE_RESPONSE_COMPRESS'] = 'true';
+        $_ENV['RESPONSE_COMPRESS'] = 'true';
 
-        $config = new DefaultHttpConfig();
-        $config->audit();
+        $shared = new TestConfig();
+        $config = new DefaultHttpConfig($shared);
+        $shared->audit();
 
         expect($config->isCompressionEnabled())->toBeTrue();
     });
 
     it('reads upload tmpdir from env', function (): void {
-        $_ENV['DIRECTIVE_UPLOAD_TMPDIR'] = '/tmp/uploads';
+        $_ENV['UPLOAD_TMPDIR'] = '/tmp/uploads';
 
-        $config = new DefaultHttpConfig();
-        $config->audit();
+        $shared = new TestConfig();
+        $config = new DefaultHttpConfig($shared);
+        $shared->audit();
 
         expect($config->getUploadTmpDir())->toBe('/tmp/uploads');
     });
 
     it('parses comma-separated client headers', function (): void {
-        $_ENV['DIRECTIVE_CLIENT_HEADERS'] = 'X-Client-Id, X-App-Version, X-Request-Source';
+        $_ENV['CLIENT_HEADERS'] = 'X-Client-Id, X-App-Version, X-Request-Source';
 
-        $config = new DefaultHttpConfig();
-        $config->audit();
+        $shared = new TestConfig();
+        $config = new DefaultHttpConfig($shared);
+        $shared->audit();
 
         expect($config->getClientHeaderList())->toBe(['X-Client-Id', 'X-App-Version', 'X-Request-Source']);
     });

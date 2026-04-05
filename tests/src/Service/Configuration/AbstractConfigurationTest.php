@@ -12,6 +12,7 @@ final class StubConfiguration extends AbstractConfiguration
     protected function define(): void
     {
         $this->required('APP_ENV', 'string', ['development', 'staging', 'production']);
+        $this->optional('APP_ENV_PROD_NAME', 'production', 'string');
         $this->required('DB_PORT', 'int');
         $this->optional('DEBUG', false, 'bool');
         $this->optional('APP_NAME', 'Directive', 'string');

@@ -6,6 +6,7 @@ namespace Directive\Service\Logging;
 
 use Monolog\ErrorHandler;
 use Monolog\Handler\RotatingFileHandler;
+use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Registry;
 
@@ -29,6 +30,7 @@ final class RuntimeLogger
         $dir    = $logDir !== '' ? $logDir : sys_get_temp_dir();
         $logger = new Logger($name);
         $logger->pushHandler(new RotatingFileHandler($dir . '/directive_runtime.log', 30));
+        $logger->pushHandler(new StreamHandler(STDERR, Logger::WARNING));
 
         ErrorHandler::register($logger);
         Registry::addLogger($logger, self::REGISTRY_KEY);

@@ -6,33 +6,37 @@ namespace Directive\Service\Security\Antivirus;
 
 use Directive\Service\Configuration\AbstractConfiguration;
 
-final class DefaultAntivirusConfig extends AbstractConfiguration implements AntivirusConfigInterface
+final class DefaultAntivirusConfig implements AntivirusConfigInterface
 {
+    public function __construct(private AbstractConfiguration $config) {
+        $this->define();
+    }
+
     protected function define(): void
     {
-        $this->optional('DIRECTIVE_ANTIVIRUS_NAME', 'clamav', 'string');
-        $this->optional('DIRECTIVE_ANTIVIRUS_HOST', '127.0.0.1', 'string');
-        $this->optional('DIRECTIVE_ANTIVIRUS_PORT', 3310, 'int');
-        $this->optional('DIRECTIVE_ANTIVIRUS_TIMEOUT', 5, 'int');
+        $this->config->optional('ANTIVIRUS_NAME', 'clamav', 'string');
+        $this->config->optional('ANTIVIRUS_HOST', '127.0.0.1', 'string');
+        $this->config->optional('ANTIVIRUS_PORT', 3310, 'int');
+        $this->config->optional('ANTIVIRUS_TIMEOUT', 5, 'int');
     }
 
     public function getName(): string
     {
-        return (string) $this->get('DIRECTIVE_ANTIVIRUS_NAME');
+        return (string) $this->config->get('ANTIVIRUS_NAME');
     }
 
     public function getHost(): string
     {
-        return (string) $this->get('DIRECTIVE_ANTIVIRUS_HOST');
+        return (string) $this->config->get('ANTIVIRUS_HOST');
     }
 
     public function getPort(): int
     {
-        return (int) $this->get('DIRECTIVE_ANTIVIRUS_PORT');
+        return (int) $this->config->get('ANTIVIRUS_PORT');
     }
 
     public function getTimeout(): int
     {
-        return (int) $this->get('DIRECTIVE_ANTIVIRUS_TIMEOUT');
+        return (int) $this->config->get('ANTIVIRUS_TIMEOUT');
     }
 }

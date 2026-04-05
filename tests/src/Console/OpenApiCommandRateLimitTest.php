@@ -25,6 +25,10 @@ function rlStubAppIdentity(): AppIdentityConfigInterface
         {
             return 'RateLimitTest';
         }
+        public function getAppEnv(): string
+        {
+            return 'test';
+        }
         public function getAppVersion(): string
         {
             return '1.0.0';

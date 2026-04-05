@@ -66,20 +66,23 @@ abstract class AbstractApplication implements ApplicationInterface
             $config->loadCache($cached);
         }
 
-        $config->audit();
-
         // Auto-bind the 5 default service configs (skip any already overridden by user).
-        $loggingConfig = $this->autoBindServiceDefaults();
+        $loggingConfig = $this->autoBindServiceDefaults($config);
 
         // Re-init RuntimeLogger now that we know the real log directory.
         new RuntimeLogger($this->runtimeLoggerName(), $loggingConfig->getLogPath());
 
         // Warn if running in production without a compiled config cache.
-        $this->checkProductionCacheConfig();
+        $this->checkProductionCacheConfig($config);
 
-        $this->builder->addDefinitions([$configClass => $config]);
+        $this->builder->addDefinitions([
+            $configClass                 => $config,
+            AbstractConfiguration::class => $config,
+        ]);
 
         $this->registerServices($config);
+
+        $config->audit();
 
         $this->configureContainer();
 
@@ -185,15 +188,15 @@ abstract class AbstractApplication implements ApplicationInterface
      *
      * Returns the resolved LoggingConfigInterface for RuntimeLogger re-init.
      */
-    private function autoBindServiceDefaults(): LoggingConfigInterface
+    private function autoBindServiceDefaults(AbstractConfiguration $config): LoggingConfigInterface
     {
         /** @var array<class-string, AbstractConfiguration|object> $defaults */
         $defaults = [
-            LoggingConfigInterface::class     => new DefaultLoggingConfig(),
-            AppIdentityConfigInterface::class => new DefaultAppIdentityConfig(),
-            AntivirusConfigInterface::class   => new DefaultAntivirusConfig(),
-            SecurityConfigInterface::class    => new DefaultSecurityConfig(),
-            HttpConfigInterface::class        => new DefaultHttpConfig(),
+            LoggingConfigInterface::class     => new DefaultLoggingConfig($config),
+            AppIdentityConfigInterface::class => new DefaultAppIdentityConfig($config),
+            AntivirusConfigInterface::class   => new DefaultAntivirusConfig($config),
+            SecurityConfigInterface::class    => new DefaultSecurityConfig($config),
+            HttpConfigInterface::class        => new DefaultHttpConfig($config),
         ];
 
         foreach ($defaults as $interface => $impl) {
@@ -238,22 +241,17 @@ abstract class AbstractApplication implements ApplicationInterface
     /**
      * Emit warnings when running in production without a config cache.
      */
-    private function checkProductionCacheConfig(): void
+    private function checkProductionCacheConfig(AbstractConfiguration $config): void
     {
-        $appEnv = $_ENV['APP_ENV'] ?? '';
+        $appEnv = $config->get('APP_ENV');
 
-        if ($appEnv !== 'production') {
+        if ($appEnv !== $config->get('APP_ENV_PROD_NAME')) {
             return;
         }
 
         if (!file_exists('var/cache/config.php')) {
             error_log('[Directive] Production environment detected but var/cache/config.php is missing.'
                 . ' Run "bin/directive config:compile" to generate the cache.');
-        }
-
-        if (isset($_ENV['DIRECTIVE_CONFIG_CACHE']) && $_ENV['DIRECTIVE_CONFIG_CACHE'] === '0') {
-            error_log('[Directive] Security warning: configuration cache is explicitly disabled in'
-                . ' production (DIRECTIVE_CONFIG_CACHE=0).');
         }
     }
 
@@ -263,16 +261,10 @@ abstract class AbstractApplication implements ApplicationInterface
      * Returns the pre-resolved (non-sensitive) values array, or null if the
      * cache is absent, disabled, or has no entry for the given class.
      *
-     * The cache is disabled when DIRECTIVE_CONFIG_CACHE=0 in $_ENV.
-     *
      * @return array<string, mixed>|null
      */
     private function loadConfigCache(string $configClass): ?array
     {
-        if (($_ENV['DIRECTIVE_CONFIG_CACHE'] ?? '1') === '0') {
-            return null;
-        }
-
         $cacheFile = 'var/cache/config.php';
 
         if (!file_exists($cacheFile)) {

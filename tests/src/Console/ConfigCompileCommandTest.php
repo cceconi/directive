@@ -78,7 +78,7 @@ describe('ConfigCompileCommand', function (): void {
     });
 
     it('generates var/cache/config.php successfully', function (): void {
-        $_ENV['APP_ENV'] = 'production';
+        $_ENV['APP_ENV'] = 'prod';
 
         $tmpRoot = sys_get_temp_dir() . '/directive-compile-test-' . uniqid();
         mkdir($tmpRoot, 0o755, true);
@@ -100,7 +100,7 @@ describe('ConfigCompileCommand', function (): void {
     });
 
     it('does not write sensitive variables (SECRET, KEY) to the cache', function (): void {
-        $_ENV['APP_ENV']    = 'production';
+        $_ENV['APP_ENV']    = 'prod';
         $_ENV['APP_SECRET'] = 'real-secret-value';
         $_ENV['APP_KEY']    = 'real-key-value';
 
@@ -123,7 +123,7 @@ describe('ConfigCompileCommand', function (): void {
     });
 
     it('overwrites an existing cache file without error', function (): void {
-        $_ENV['APP_ENV'] = 'production';
+        $_ENV['APP_ENV'] = 'prod';
 
         $tmpRoot = sys_get_temp_dir() . '/directive-compile-overwrite-' . uniqid();
         mkdir($tmpRoot . '/var/cache', 0o755, true);
@@ -152,7 +152,7 @@ describe('ConfigCompileCommand', function (): void {
     });
 
     it('fails with exit code 1 when var/cache/ directory does not exist', function (): void {
-        $_ENV['APP_ENV'] = 'production';
+        $_ENV['APP_ENV'] = 'prod';
 
         $tmpRoot = sys_get_temp_dir() . '/directive-compile-nodir-' . uniqid();
         mkdir($tmpRoot, 0o755, true);

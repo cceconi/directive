@@ -8,7 +8,7 @@ interface LoggingConfigInterface
 {
     public function getLogPath(): string;
     public function getAppCode(): string;
-    public function getEnvCode(): string;
+    public function getAppEnv(): string;
     public function getAppVersion(): string;
     public function getLogStrategy(): LogStrategy;
     public function getLogBufferSize(): int;

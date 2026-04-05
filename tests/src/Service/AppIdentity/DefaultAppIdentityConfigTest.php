@@ -4,50 +4,54 @@ declare(strict_types=1);
 
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Directive\Service\AppIdentity\DefaultAppIdentityConfig;
+use Tests\Helpers\TestConfig;
 
 describe('DefaultAppIdentityConfig', function (): void {
 
     beforeEach(function (): void {
         unset(
-            $_ENV['DIRECTIVE_APP_CODE'],
-            $_ENV['DIRECTIVE_APP_NAME'],
-            $_ENV['DIRECTIVE_APP_VERSION'],
-            $_ENV['DIRECTIVE_APP_DESCRIPTION'],
-            $_ENV['DIRECTIVE_APP_URL'],
+            $_ENV['APP_CODE'],
+            $_ENV['APP_NAME'],
+            $_ENV['APP_VERSION'],
+            $_ENV['APP_DESCRIPTION'],
+            $_ENV['APP_URL'],
         );
     });
 
     it('implements AppIdentityConfigInterface', function (): void {
-        $config = new DefaultAppIdentityConfig();
+        $config = new TestConfig();
+        $appIdentityConfig = new DefaultAppIdentityConfig($config);
         $config->audit();
-        expect($config)->toBeInstanceOf(AppIdentityConfigInterface::class);
+        expect($appIdentityConfig)->toBeInstanceOf(AppIdentityConfigInterface::class);
     });
 
     it('returns default values when no env vars are set', function (): void {
-        $config = new DefaultAppIdentityConfig();
+        $config = new TestConfig();
+        $appIdentityConfig = new DefaultAppIdentityConfig($config);
         $config->audit();
 
-        expect($config->getAppCode())->toBe('app');
-        expect($config->getAppName())->toBe('Directive App');
-        expect($config->getAppVersion())->toBe('1.0.0');
-        expect($config->getAppDescription())->toBe('');
-        expect($config->getAppUrl())->toBe('');
+        expect($appIdentityConfig->getAppCode())->toBe('app');
+        expect($appIdentityConfig->getAppName())->toBe('Directive App');
+        expect($appIdentityConfig->getAppVersion())->toBe('1.0.0');
+        expect($appIdentityConfig->getAppDescription())->toBe('');
+        expect($appIdentityConfig->getAppUrl())->toBe('');
     });
 
     it('reads values from $_ENV', function (): void {
-        $_ENV['DIRECTIVE_APP_CODE']        = 'myapp';
-        $_ENV['DIRECTIVE_APP_NAME']        = 'My Application';
-        $_ENV['DIRECTIVE_APP_VERSION']     = '2.5.1';
-        $_ENV['DIRECTIVE_APP_DESCRIPTION'] = 'An amazing app';
-        $_ENV['DIRECTIVE_APP_URL']         = 'https://example.com';
+        $_ENV['APP_CODE']        = 'myapp';
+        $_ENV['APP_NAME']        = 'My Application';
+        $_ENV['APP_VERSION']     = '2.5.1';
+        $_ENV['APP_DESCRIPTION'] = 'An amazing app';
+        $_ENV['APP_URL']         = 'https://example.com';
 
-        $config = new DefaultAppIdentityConfig();
+        $config = new TestConfig();
+        $appIdentityConfig = new DefaultAppIdentityConfig($config);
         $config->audit();
 
-        expect($config->getAppCode())->toBe('myapp');
-        expect($config->getAppName())->toBe('My Application');
-        expect($config->getAppVersion())->toBe('2.5.1');
-        expect($config->getAppDescription())->toBe('An amazing app');
-        expect($config->getAppUrl())->toBe('https://example.com');
+        expect($appIdentityConfig->getAppCode())->toBe('myapp');
+        expect($appIdentityConfig->getAppName())->toBe('My Application');
+        expect($appIdentityConfig->getAppVersion())->toBe('2.5.1');
+        expect($appIdentityConfig->getAppDescription())->toBe('An amazing app');
+        expect($appIdentityConfig->getAppUrl())->toBe('https://example.com');
     });
 });

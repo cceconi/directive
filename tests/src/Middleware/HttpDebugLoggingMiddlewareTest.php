@@ -14,6 +14,7 @@ use Nyholm\Psr7\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Tests\Helpers\TestConfig;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -21,10 +22,11 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 function makeDebugLogger(): array
 {
-    $config = new DefaultLoggingConfig();
+    $config = new TestConfig();
+    $loggingConfig = new DefaultLoggingConfig($config);
     $config->audit();
 
-    $logger      = new DirectiveLogger($config, new RequestIdHolder());
+    $logger      = new DirectiveLogger($loggingConfig, new RequestIdHolder());
     $testHandler = new TestHandler(Level::Debug, bubble: false);
     $logger->setHandlers([$testHandler]);
 

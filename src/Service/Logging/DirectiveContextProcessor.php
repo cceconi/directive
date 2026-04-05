@@ -27,7 +27,7 @@ final class DirectiveContextProcessor implements ProcessorInterface
     {
         return $record->with(extra: array_merge($record->extra, [
             'request_id'  => $this->holder->get()->value,
-            'env'         => $this->config->getEnvCode(),
+            'env'         => $this->config->getAppEnv(),
             'app_version' => $this->config->getAppVersion(),
         ]));
     }

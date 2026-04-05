@@ -32,7 +32,7 @@ describe('AbstractConfiguration source tracking', function (): void {
     });
 
     it('getSource() returns "default" for optional keys absent from $_ENV', function (): void {
-        $_ENV['APP_ENV'] = 'production';
+        $_ENV['APP_ENV'] = 'prod';
         $config = new SourceTrackingConfig();
         $config->audit();
 
@@ -45,7 +45,7 @@ describe('AbstractConfiguration source tracking', function (): void {
 
         $tmpDir = sys_get_temp_dir() . '/directive-source-test-' . uniqid();
         mkdir($tmpDir, 0o755, true);
-        file_put_contents($tmpDir . '/.env.local', "APP_ENV=production\n");
+        file_put_contents($tmpDir . '/.env.local', "APP_ENV=prod\n");
 
         $dotenv = new Symfony\Component\Dotenv\Dotenv();
         ConfigSourceTracker::loadTracked($dotenv, $tmpDir);
@@ -60,7 +60,7 @@ describe('AbstractConfiguration source tracking', function (): void {
     });
 
     it('getSource() returns "default" when tracker has no entry (no loadTracked called)', function (): void {
-        $_ENV['APP_ENV'] = 'staging';
+        $_ENV['APP_ENV'] = 'test';
         // ConfigSourceTracker is reset (from beforeEach), so getSource returns null → audit uses 'default'? No:
         // Actually, 'default' is only used when raw === null (var not in $_ENV).
         // When raw !== null and tracker returns null, source is ConfigSourceTracker::getSource() ?? 'default'
@@ -74,7 +74,7 @@ describe('AbstractConfiguration source tracking', function (): void {
     });
 
     it('getSource() throws ConfigurationException for undeclared key', function (): void {
-        $_ENV['APP_ENV'] = 'production';
+        $_ENV['APP_ENV'] = 'prod';
         $config = new SourceTrackingConfig();
         $config->audit();
 
@@ -88,14 +88,14 @@ describe('AbstractConfiguration source tracking', function (): void {
     });
 
     it('getAll() still returns correct values after source tracking is added', function (): void {
-        $_ENV['APP_ENV'] = 'production';
+        $_ENV['APP_ENV'] = 'prod';
         $_ENV['CACHE_TTL'] = '600';
 
         $config = new SourceTrackingConfig();
         $config->audit();
 
         expect($config->getAll())->toMatchArray([
-            'APP_ENV'   => 'production',
+            'APP_ENV'   => 'prod',
             'CACHE_TTL' => 600,
         ]);
     });

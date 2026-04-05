@@ -7,22 +7,24 @@ use Directive\Service\Logging\DirectiveLogger;
 use Directive\Service\Logging\RequestIdHolder;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\StreamHandler;
+use Tests\Helpers\TestConfig;
 
 describe('DirectiveLogger — strategy', function (): void {
 
     afterEach(function (): void {
         unset(
-            $_ENV['DIRECTIVE_LOG_STRATEGY'],
-            $_ENV['DIRECTIVE_LOG_BUFFER_SIZE'],
+            $_ENV['LOG_STRATEGY'],
+            $_ENV['LOG_BUFFER_SIZE'],
         );
     });
 
     it('uses StreamHandler with Immediate strategy', function (): void {
-        $_ENV['DIRECTIVE_LOG_STRATEGY'] = 'immediate';
-        $config = new DefaultLoggingConfig();
+        $_ENV['LOG_STRATEGY'] = 'immediate';
+        $config = new TestConfig();
+        $loggingConfig = new DefaultLoggingConfig($config);
         $config->audit();
 
-        $logger   = new DirectiveLogger($config, new RequestIdHolder());
+        $logger   = new DirectiveLogger($loggingConfig, new RequestIdHolder());
         $handlers = $logger->getHandlers();
 
         expect($handlers)->toHaveCount(1);
@@ -30,11 +32,12 @@ describe('DirectiveLogger — strategy', function (): void {
     });
 
     it('uses FingersCrossedHandler with BufferedOnError strategy', function (): void {
-        $_ENV['DIRECTIVE_LOG_STRATEGY'] = 'buffered_on_error';
-        $config = new DefaultLoggingConfig();
+        $_ENV['LOG_STRATEGY'] = 'buffered_on_error';
+        $config = new TestConfig();
+        $loggingConfig = new DefaultLoggingConfig($config);
         $config->audit();
 
-        $logger   = new DirectiveLogger($config, new RequestIdHolder());
+        $logger   = new DirectiveLogger($loggingConfig, new RequestIdHolder());
         $handlers = $logger->getHandlers();
 
         expect($handlers)->toHaveCount(1);
@@ -42,13 +45,14 @@ describe('DirectiveLogger — strategy', function (): void {
     });
 
     it('configures FingersCrossedHandler with custom buffer size', function (): void {
-        $_ENV['DIRECTIVE_LOG_STRATEGY']    = 'buffered_on_error';
-        $_ENV['DIRECTIVE_LOG_BUFFER_SIZE'] = '50';
+        $_ENV['LOG_STRATEGY']    = 'buffered_on_error';
+        $_ENV['LOG_BUFFER_SIZE'] = '50';
 
-        $config = new DefaultLoggingConfig();
+        $config = new TestConfig();
+        $loggingConfig = new DefaultLoggingConfig($config);
         $config->audit();
 
-        $logger  = new DirectiveLogger($config, new RequestIdHolder());
+        $logger  = new DirectiveLogger($loggingConfig, new RequestIdHolder());
         $handler = $logger->getHandlers()[0];
 
         expect($handler)->toBeInstanceOf(FingersCrossedHandler::class);
@@ -60,10 +64,11 @@ describe('DirectiveLogger — strategy', function (): void {
     });
 
     it('registers DirectiveContextProcessor', function (): void {
-        $config = new DefaultLoggingConfig();
+        $config = new TestConfig();
+        $loggingConfig = new DefaultLoggingConfig($config);
         $config->audit();
 
-        $logger     = new DirectiveLogger($config, new RequestIdHolder());
+        $logger     = new DirectiveLogger($loggingConfig, new RequestIdHolder());
         $processors = $logger->getProcessors();
 
         expect($processors)->toHaveCount(1);
@@ -71,12 +76,13 @@ describe('DirectiveLogger — strategy', function (): void {
     });
 
     it('uses app code as logger name', function (): void {
-        $_ENV['DIRECTIVE_APP_CODE'] = 'myapp';
-        $config = new DefaultLoggingConfig();
+        $_ENV['APP_CODE'] = 'myapp';
+        $config = new TestConfig();
+        $loggingConfig = new DefaultLoggingConfig($config);
         $config->audit();
 
-        $logger = new DirectiveLogger($config, new RequestIdHolder());
+        $logger = new DirectiveLogger($loggingConfig, new RequestIdHolder());
         expect($logger->getName())->toBe('myapp');
-        unset($_ENV['DIRECTIVE_APP_CODE']);
+        unset($_ENV['APP_CODE']);
     });
 });

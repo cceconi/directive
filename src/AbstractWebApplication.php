@@ -89,15 +89,13 @@ abstract class AbstractWebApplication extends AbstractApplication
     {
         parent::registerServices($config);
 
-        $loggingConfig = new DefaultLoggingConfig();
-        $loggingConfig->audit();
+        $loggingConfig = new DefaultLoggingConfig($config);
 
         $holder   = new RequestIdHolder();
         $logger   = new DirectiveLogger($loggingConfig, $holder);
         $features = new DirectiveFeatures();
 
-        $rateLimitConfig = new DefaultRateLimitConfig();
-        $rateLimitConfig->audit();
+        $rateLimitConfig = new DefaultRateLimitConfig($config);
 
         $this->addDefinitions([
             LoggerInterface::class          => $logger,
@@ -251,7 +249,7 @@ abstract class AbstractWebApplication extends AbstractApplication
         $this->slim->add(HttpSecurityMiddleware::class);       // 3
         $this->slim->add(LoggerMiddleware::class);             // 2
 
-        // Optional: debug request/response logging (enabled via DIRECTIVE_DEBUG_LOGGING)
+        // Optional: debug request/response logging (enabled via DEBUG_LOGGING)
         // Must be added BEFORE RequestIdMiddleware so it executes AFTER it (LIFO)
         /** @var AbstractFeatures $features */
         $features = $this->get(AbstractFeatures::class);

@@ -197,8 +197,9 @@ final class DebugLoggingWebApplication extends AbstractWebApplication
 
         $this->testHandler = new TestHandler(Level::Debug, bubble: false);
 
-        $loggingConfig = new DefaultLoggingConfig();
-        $loggingConfig->audit();
+        $config = new TestConfig();
+        $loggingConfig = new DefaultLoggingConfig($config);
+        $config->audit();
         $holder = new RequestIdHolder();
         $logger = new DirectiveLogger($loggingConfig, $holder);
         $logger->setHandlers([$this->testHandler]);
@@ -227,11 +228,11 @@ final class DebugLoggingWebApplication extends AbstractWebApplication
 describe('WebApplication HttpDebugLoggingMiddleware wiring', function (): void {
 
     afterEach(function (): void {
-        unset($_ENV['DIRECTIVE_DEBUG_LOGGING']);
+        unset($_ENV['DEBUG_LOGGING']);
     });
 
     it('wires HttpDebugLoggingMiddleware and logs request/response when debug_logging is enabled', function (): void {
-        $_ENV['DIRECTIVE_DEBUG_LOGGING'] = '1';
+        $_ENV['DEBUG_LOGGING'] = '1';
 
         $app = new DebugLoggingWebApplication();
         $app->setConfig(TestConfig::class);
@@ -245,7 +246,7 @@ describe('WebApplication HttpDebugLoggingMiddleware wiring', function (): void {
     });
 
     it('does not wire HttpDebugLoggingMiddleware when debug_logging is disabled', function (): void {
-        unset($_ENV['DIRECTIVE_DEBUG_LOGGING']);
+        unset($_ENV['DEBUG_LOGGING']);
 
         $app = new DebugLoggingWebApplication();
         $app->setConfig(TestConfig::class);

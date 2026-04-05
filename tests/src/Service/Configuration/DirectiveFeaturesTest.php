@@ -10,8 +10,8 @@ describe('DirectiveFeatures', function (): void {
 
     beforeEach(function (): void {
         unset(
-            $_ENV['DIRECTIVE_RATE_LIMIT_ENABLED'],
-            $_ENV['DIRECTIVE_DEBUG_LOGGING'],
+            $_ENV['RATE_LIMIT_ENABLED'],
+            $_ENV['DEBUG_LOGGING'],
         );
     });
 
@@ -25,13 +25,13 @@ describe('DirectiveFeatures', function (): void {
     });
 
     it('rate_limit can be disabled via env var', function (): void {
-        $_ENV['DIRECTIVE_RATE_LIMIT_ENABLED'] = '0';
+        $_ENV['RATE_LIMIT_ENABLED'] = '0';
         $features = new DirectiveFeatures();
         expect($features->isEnabled('rate_limit'))->toBeFalse();
     });
 
     it('rate_limit can be explicitly enabled via env var', function (): void {
-        $_ENV['DIRECTIVE_RATE_LIMIT_ENABLED'] = '1';
+        $_ENV['RATE_LIMIT_ENABLED'] = '1';
         $features = new DirectiveFeatures();
         expect($features->isEnabled('rate_limit'))->toBeTrue();
     });
@@ -54,7 +54,7 @@ describe('DirectiveFeatures', function (): void {
     });
 
     it('debug_logging can be enabled via env var', function (): void {
-        $_ENV['DIRECTIVE_DEBUG_LOGGING'] = '1';
+        $_ENV['DEBUG_LOGGING'] = '1';
         $features = new DirectiveFeatures();
         expect($features->isEnabled('debug_logging'))->toBeTrue();
     });

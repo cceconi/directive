@@ -7,6 +7,7 @@ use Directive\Application\EventBus\NullDomainEventBus;
 use Directive\AbstractConsoleApplication;
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Logging\RequestIdHolder;
 use Directive\Service\Security\Antivirus\AntivirusConfigInterface;
 use Directive\Service\Security\Antivirus\DefaultAntivirusConfig;
 use Directive\Service\Security\SecurityConfigInterface;
@@ -39,6 +40,14 @@ final class BootTestApplication extends AbstractConsoleApplication
 // ---------------------------------------------------------------------------
 
 describe('AbstractApplication service auto-binding', function (): void {
+
+    beforeEach(function (): void {
+        $_ENV['APP_ENV'] = 'prod';
+    });
+
+    afterEach(function (): void {
+        unset($_ENV['APP_ENV']);
+    });
 
     it('auto-binds AntivirusConfigInterface to DefaultAntivirusConfig', function (): void {
         $app = new BootTestApplication();
@@ -100,6 +109,10 @@ describe('AbstractApplication service auto-binding', function (): void {
             public function getAppName(): string
             {
                 return 'Overridden Name';
+            }
+            public function getAppEnv(): string
+            {
+                return 'test';
             }
             public function getAppVersion(): string
             {
@@ -168,7 +181,7 @@ describe('AbstractApplication service auto-binding', function (): void {
         $app = new BootTestApplication();
         $app->setConfig(TestConfig::class);
 
-        expect(fn () => $app->define([AntivirusConfigInterface::class => new DefaultAntivirusConfig()]))
+        expect(fn () => $app->define([RequestIdHolder::class => new RequestIdHolder()]))
             ->toThrow(\LogicException::class);
     });
 });
@@ -176,11 +189,11 @@ describe('AbstractApplication service auto-binding', function (): void {
 describe('AbstractApplication production cache warnings', function (): void {
 
     beforeEach(function (): void {
-        unset($_ENV['APP_ENV'], $_ENV['DIRECTIVE_CONFIG_CACHE']);
+        unset($_ENV['APP_ENV']);
     });
 
     afterEach(function (): void {
-        unset($_ENV['APP_ENV'], $_ENV['DIRECTIVE_CONFIG_CACHE']);
+        unset($_ENV['APP_ENV']);
     });
 
     it('boots without error in non-production env', function (): void {
@@ -193,7 +206,7 @@ describe('AbstractApplication production cache warnings', function (): void {
     });
 
     it('boots without error in production when cache file exists', function (): void {
-        $_ENV['APP_ENV'] = 'production';
+        $_ENV['APP_ENV'] = 'prod';
 
         $cacheFile = 'var/cache/config.php';
         $cacheDir  = dirname($cacheFile);
@@ -203,7 +216,7 @@ describe('AbstractApplication production cache warnings', function (): void {
             if (!is_dir($cacheDir)) {
                 mkdir($cacheDir, 0o755, true);
             }
-            file_put_contents($cacheFile, '<?php return [];');
+            file_put_contents($cacheFile, '<?php return [\'Directive\\Service\\AppIdentity\\AppIdentityConfigInterface\' => [\'APP_ENV\' => \'production\'], ];');
             $created = true;
         }
 

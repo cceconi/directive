@@ -14,7 +14,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * Emits DEBUG-level records for every HTTP request/response cycle.
  *
  * Only active when the 'debug_logging' feature flag is enabled
- * (env DIRECTIVE_DEBUG_LOGGING=true). WebApplication adds it to the
+ * (env DEBUG_LOGGING=true). WebApplication adds it to the
  * middleware stack dynamically after checking the flag.
  *
  * Middleware position: between RequestIdMiddleware (outermost) and

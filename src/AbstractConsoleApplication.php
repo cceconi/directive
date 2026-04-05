@@ -98,11 +98,12 @@ abstract class AbstractConsoleApplication extends AbstractApplication
 
         // Build ConsoleLogger and register it for both its own interface
         // and WebLoggerInterface so middlewares relying on WebLoggerInterface work.
-        $loggingConfig = new DefaultLoggingConfig();
-        $loggingConfig->audit();
+        $loggingConfig = new DefaultLoggingConfig($config);
+        $config->audit();
 
         $holder = new RequestIdHolder();
-        $logger = new DirectiveLogger($loggingConfig, $holder);
+        $logFile = rtrim($loggingConfig->getLogPath(), '/') . '/console.log';
+        $logger = new DirectiveLogger($loggingConfig, $holder, $logFile);
 
         $this->addDefinitions([
             LoggerInterface::class  => $logger,

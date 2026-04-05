@@ -9,16 +9,18 @@ use Monolog\Handler\TestHandler;
 use Monolog\Level;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\ServerRequest;
+use Tests\Helpers\TestConfig;
 
 /**
  * Build a DirectiveLogger with a TestHandler injected for assertion.
  */
 function makeTestLogger(): array
 {
-    $config = new DefaultLoggingConfig();
+    $config = new TestConfig();
+    $loggingConfig = new DefaultLoggingConfig($config);
     $config->audit();
 
-    $logger = new DirectiveLogger($config, new RequestIdHolder());
+    $logger = new DirectiveLogger($loggingConfig, new RequestIdHolder());
 
     $testHandler = new TestHandler(Level::Debug, bubble: false);
     // Prepend TestHandler so it captures records before StreamHandler

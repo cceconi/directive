@@ -46,7 +46,7 @@ abstract class AbstractConfiguration
      *
      * @param list<string> $allowed Whitelist of accepted raw string values (empty = any)
      */
-    protected function required(string $key, string $type = 'string', array $allowed = []): void
+    public function required(string $key, string $type = 'string', array $allowed = []): void
     {
         $this->definitions[$key] = [
             'type'     => $type,
@@ -61,7 +61,7 @@ abstract class AbstractConfiguration
      *
      * @param list<string> $allowed Whitelist of accepted raw string values (empty = any)
      */
-    protected function optional(string $key, mixed $default, string $type = 'string', array $allowed = []): void
+    public function optional(string $key, mixed $default, string $type = 'string', array $allowed = []): void
     {
         $this->definitions[$key] = [
             'type'     => $type,

@@ -8,6 +8,7 @@ use Directive\Service\Logging\RequestId;
 use Directive\Service\Logging\RequestIdHolder;
 use Monolog\Level;
 use Monolog\LogRecord;
+use Tests\Helpers\TestConfig;
 
 describe('DirectiveContextProcessor', function (): void {
 
@@ -25,42 +26,46 @@ describe('DirectiveContextProcessor', function (): void {
         $holder = new RequestIdHolder();
         $holder->set(new RequestId('req-abc'));
 
-        $config = new DefaultLoggingConfig();
+        $config = new TestConfig();
+        $loggingConfig = new DefaultLoggingConfig($config);
         $config->audit();
 
-        $processor = new DirectiveContextProcessor($holder, $config);
+        $processor = new DirectiveContextProcessor($holder, $loggingConfig);
         $result    = $processor(makeRecord());
 
         expect($result->extra['request_id'])->toBe('req-abc');
     });
 
     it('injects env from config', function (): void {
-        $_ENV['DIRECTIVE_ENV_CODE'] = 'testing';
-        $config = new DefaultLoggingConfig();
+        $_ENV['APP_ENV'] = 'test';
+        $config = new TestConfig();
+        $loggingConfig = new DefaultLoggingConfig($config);
         $config->audit();
 
-        $processor = new DirectiveContextProcessor(new RequestIdHolder(), $config);
+        $processor = new DirectiveContextProcessor(new RequestIdHolder(), $loggingConfig);
         $result    = $processor(makeRecord());
 
-        expect($result->extra['env'])->toBe('testing');
-        unset($_ENV['DIRECTIVE_ENV_CODE']);
+        expect($result->extra['env'])->toBe('test');
+        unset($_ENV['APP_ENV']);
     });
 
     it('injects app_version from config', function (): void {
-        $_ENV['DIRECTIVE_APP_VERSION'] = '3.1.4';
-        $config = new DefaultLoggingConfig();
+        $_ENV['APP_VERSION'] = '3.1.4';
+        $config = new TestConfig();
+        $loggingConfig = new DefaultLoggingConfig($config);
         $config->audit();
 
-        $processor = new DirectiveContextProcessor(new RequestIdHolder(), $config);
+        $processor = new DirectiveContextProcessor(new RequestIdHolder(), $loggingConfig);
         $result    = $processor(makeRecord());
 
         expect($result->extra['app_version'])->toBe('3.1.4');
-        unset($_ENV['DIRECTIVE_APP_VERSION']);
+        unset($_ENV['APP_VERSION']);
     });
 
     it('preserves existing extra keys', function (): void {
         $holder = new RequestIdHolder();
-        $config = new DefaultLoggingConfig();
+        $config = new TestConfig();
+        $loggingConfig = new DefaultLoggingConfig($config);
         $config->audit();
 
         $record = new LogRecord(
@@ -71,7 +76,7 @@ describe('DirectiveContextProcessor', function (): void {
             extra: ['existing' => 'value'],
         );
 
-        $processor = new DirectiveContextProcessor($holder, $config);
+        $processor = new DirectiveContextProcessor($holder, $loggingConfig);
         $result    = $processor($record);
 
         expect($result->extra['existing'])->toBe('value');
@@ -80,10 +85,11 @@ describe('DirectiveContextProcessor', function (): void {
 
     it('uses empty string for request_id in console context', function (): void {
         $holder = new RequestIdHolder(); // default = RequestId('')
-        $config = new DefaultLoggingConfig();
+        $config = new TestConfig();
+        $loggingConfig = new DefaultLoggingConfig($config);
         $config->audit();
 
-        $processor = new DirectiveContextProcessor($holder, $config);
+        $processor = new DirectiveContextProcessor($holder, $loggingConfig);
         $result    = $processor(makeRecord());
 
         expect($result->extra['request_id'])->toBe('');

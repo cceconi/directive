@@ -29,9 +29,9 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 final class DirectiveLogger extends Logger
 {
-    public function __construct(LoggingConfigInterface $config, RequestIdHolder $holder)
+    public function __construct(LoggingConfigInterface $config, RequestIdHolder $holder, string $stream = 'php://stdout')
     {
-        $streamHandler = new StreamHandler('php://stdout');
+        $streamHandler = new StreamHandler($stream);
         $streamHandler->setFormatter(new JsonFormatter());
 
         $handler = match ($config->getLogStrategy()) {

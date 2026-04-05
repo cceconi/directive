@@ -54,7 +54,7 @@ describe('ConfigAuditCommand', function (): void {
     });
 
     it('displays a table with variable names', function (): void {
-        $_ENV['APP_ENV'] = 'production';
+        $_ENV['APP_ENV'] = 'prod';
 
         $command = new ConfigAuditCommand(makeAuditContainer());
         $tester  = new CommandTester($command);
@@ -66,7 +66,7 @@ describe('ConfigAuditCommand', function (): void {
     });
 
     it('masks sensitive variable values as ***', function (): void {
-        $_ENV['APP_ENV']        = 'production';
+        $_ENV['APP_ENV']        = 'prod';
         $_ENV['APP_SECRET_KEY'] = 'super-secret-value';
 
         $command = new ConfigAuditCommand(makeAuditContainer());
@@ -79,7 +79,7 @@ describe('ConfigAuditCommand', function (): void {
     });
 
     it('shows resolved value for non-sensitive variable', function (): void {
-        $_ENV['APP_ENV']  = 'production';
+        $_ENV['APP_ENV']  = 'prod';
         $_ENV['CACHE_TTL'] = '600';
 
         $command = new ConfigAuditCommand(makeAuditContainer());
@@ -90,7 +90,7 @@ describe('ConfigAuditCommand', function (): void {
     });
 
     it('shows source column in output', function (): void {
-        $_ENV['APP_ENV'] = 'staging';
+        $_ENV['APP_ENV'] = 'test';
 
         $command = new ConfigAuditCommand(makeAuditContainer());
         $tester  = new CommandTester($command);

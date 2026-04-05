@@ -48,6 +48,11 @@ function makeSchemaContainer(bool $hasIdentity = false, string $version = '1.2.3
                         return 'test-app';
                     }
 
+                    public function getAppEnv(): string
+                    {
+                        return 'test';
+                    }
+
                     public function getAppVersion(): string
                     {
                         return $this->v;
