@@ -6,7 +6,7 @@ namespace Directive\Console;
 
 use Directive\Cli\DirectiveCommand;
 use Directive\Exception\ConfigurationException;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Displays all declared configuration variables with their resolved values and source origins.
  *
  * All service config keys (logging, security, http, …) are declared into the single shared
- * AbstractConfiguration dictionary, so this command shows every key in one table.
+ * Configuration dictionary, so this command shows every key in one table.
  *
  * Columns: Variable | Value | Source
  * Sensitive keys (containing SECRET, PASSWORD, KEY, TOKEN, …) are masked as ***.
@@ -31,14 +31,14 @@ final class ConfigAuditCommand extends DirectiveCommand
 
     protected function executeCommand(InputInterface $input, OutputInterface $output): int
     {
-        if (!$this->container->has(AbstractConfiguration::class)) {
-            $output->writeln('<comment>No AbstractConfiguration bound in the container.</comment>');
+        if (!$this->container->has(Configuration::class)) {
+            $output->writeln('<comment>No Configuration bound in the container.</comment>');
 
             return self::SUCCESS;
         }
 
-        /** @var AbstractConfiguration $config */
-        $config = $this->container->get(AbstractConfiguration::class);
+        /** @var Configuration $config */
+        $config = $this->container->get(Configuration::class);
         $config->audit();
 
         $definitions = $config->getDefinitions();

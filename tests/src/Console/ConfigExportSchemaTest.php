@@ -4,22 +4,19 @@ declare(strict_types=1);
 
 use Directive\Console\ConfigExportCommand;
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function makeSchemaConfig(): AbstractConfiguration
+function makeSchemaConfig(): Configuration
 {
-    return new class extends AbstractConfiguration {
-        protected function define(): void
-        {
-            $this->required('APP_ENV', 'string');
-            $this->optional('LOG_LEVEL', 'info', 'string', ['debug', 'info', 'warning', 'error']);
-            $this->optional('CACHE_TTL', 300, 'int');
-        }
-    };
+    $config = new Configuration();
+    $config->required('APP_ENV', 'string');
+    $config->optional('LOG_LEVEL', 'info', 'string', ['debug', 'info', 'warning', 'error']);
+    $config->optional('CACHE_TTL', 300, 'int');
+    return $config;
 }
 
 function makeSchemaContainer(bool $hasIdentity = false, string $version = '1.2.3'): ContainerInterface
@@ -29,7 +26,7 @@ function makeSchemaContainer(bool $hasIdentity = false, string $version = '1.2.3
 
         public function get(string $id): mixed
         {
-            if ($id === AbstractConfiguration::class) {
+            if ($id === Configuration::class) {
                 return makeSchemaConfig();
             }
 
@@ -75,7 +72,7 @@ function makeSchemaContainer(bool $hasIdentity = false, string $version = '1.2.3
 
         public function has(string $id): bool
         {
-            if ($id === AbstractConfiguration::class) {
+            if ($id === Configuration::class) {
                 return true;
             }
 

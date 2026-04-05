@@ -4,23 +4,22 @@ declare(strict_types=1);
 
 namespace Directive\Service\AppIdentity;
 
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
+use Directive\Service\Configuration\ConfigProviderInterface;
 
-final class DefaultAppIdentityConfig implements AppIdentityConfigInterface
+final class DefaultAppIdentityConfig implements AppIdentityConfigInterface, ConfigProviderInterface
 {
-    public function __construct(private AbstractConfiguration $config) {
-        $this->define();
-    }
+    public function __construct(private Configuration $config) {}
 
-    protected function define(): void
+    public function define(Configuration $config): void
     {
-        $this->config->optional('APP_CODE', 'app', 'string');
-        $this->config->optional('APP_NAME', 'Directive App', 'string');
-        $this->config->optional('APP_ENV', 'dev', 'string', ['dev', 'prod', 'test']);
-        $this->config->optional('APP_ENV_PROD_NAME', 'prod', 'string', ['prod']);
-        $this->config->optional('APP_VERSION', '1.0.0', 'string');
-        $this->config->optional('APP_DESCRIPTION', '', 'string');
-        $this->config->optional('APP_URL', '', 'string');
+        $config->optional('APP_CODE', 'app', 'string');
+        $config->optional('APP_NAME', 'Directive App', 'string');
+        $config->optional('APP_ENV', 'dev', 'string');
+        $config->optional('APP_ENV_PROD_NAME', 'prod', 'string');
+        $config->optional('APP_VERSION', '1.0.0', 'string');
+        $config->optional('APP_DESCRIPTION', '', 'string');
+        $config->optional('APP_URL', '', 'string');
     }
 
     public function getAppCode(): string

@@ -6,7 +6,7 @@ namespace Directive\Console;
 
 use Directive\Cli\DirectiveCommand;
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -51,7 +51,7 @@ final class ConfigExportCommand extends DirectiveCommand
         );
 
         $this->addOption(
-            'version',
+            'appVersion',
             null,
             InputOption::VALUE_REQUIRED,
             'Override appVersion embedded in the schema (--schema mode only)',
@@ -60,8 +60,8 @@ final class ConfigExportCommand extends DirectiveCommand
 
     protected function executeCommand(InputInterface $input, OutputInterface $output): int
     {
-        if (!$this->container->has(AbstractConfiguration::class)) {
-            $output->writeln('<comment>No AbstractConfiguration bound in the container.</comment>');
+        if (!$this->container->has(Configuration::class)) {
+            $output->writeln('<comment>No Configuration bound in the container.</comment>');
 
             return self::SUCCESS;
         }
@@ -79,8 +79,8 @@ final class ConfigExportCommand extends DirectiveCommand
 
     private function exportEnvExample(InputInterface $input, OutputInterface $output): int
     {
-        /** @var AbstractConfiguration $config */
-        $config = $this->container->get(AbstractConfiguration::class);
+        /** @var Configuration $config */
+        $config = $this->container->get(Configuration::class);
 
         $definitions = $config->getDefinitions();
 
@@ -113,11 +113,11 @@ final class ConfigExportCommand extends DirectiveCommand
 
     private function exportSchema(InputInterface $input, OutputInterface $output): int
     {
-        /** @var AbstractConfiguration $config */
-        $config = $this->container->get(AbstractConfiguration::class);
+        /** @var Configuration $config */
+        $config = $this->container->get(Configuration::class);
 
-        // Resolve appVersion: explicit --version flag overrides the DI-injected identity config
-        $versionOverride = $input->getOption('version');
+        // Resolve appVersion: explicit --appVersion flag overrides the DI-injected identity config
+        $versionOverride = $input->getOption('appVersion');
 
         if (is_string($versionOverride) && $versionOverride !== '') {
             $appVersion = $versionOverride;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Directive\Service\Security\Antivirus\AntivirusConfigInterface;
 use Directive\Service\Security\Antivirus\DefaultAntivirusConfig;
-use Tests\Helpers\TestConfig;
 
 describe('DefaultAntivirusConfig', function (): void {
 
@@ -18,15 +17,19 @@ describe('DefaultAntivirusConfig', function (): void {
     });
 
     it('implements AntivirusConfigInterface', function (): void {
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $antivirusConfig = new DefaultAntivirusConfig($config);
+
+        $antivirusConfig->define($config);
         $config->audit();
         expect($antivirusConfig)->toBeInstanceOf(AntivirusConfigInterface::class);
     });
 
     it('returns default values when no env vars are set', function (): void {
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $antivirusConfig = new DefaultAntivirusConfig($config);
+
+        $antivirusConfig->define($config);
         $config->audit();
 
         expect($antivirusConfig->getName())->toBe('clamav');
@@ -38,8 +41,10 @@ describe('DefaultAntivirusConfig', function (): void {
     it('casts port to int from env', function (): void {
         $_ENV['ANTIVIRUS_PORT'] = '9999';
 
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $antivirusConfig = new DefaultAntivirusConfig($config);
+
+        $antivirusConfig->define($config);
         $config->audit();
 
         expect($antivirusConfig->getPort())->toBe(9999);
@@ -49,8 +54,10 @@ describe('DefaultAntivirusConfig', function (): void {
     it('casts timeout to int from env', function (): void {
         $_ENV['ANTIVIRUS_TIMEOUT'] = '30';
 
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $antivirusConfig = new DefaultAntivirusConfig($config);
+
+        $antivirusConfig->define($config);
         $config->audit();
 
         expect($antivirusConfig->getTimeout())->toBe(30);
@@ -60,8 +67,10 @@ describe('DefaultAntivirusConfig', function (): void {
     it('reads host from env', function (): void {
         $_ENV['ANTIVIRUS_HOST'] = '10.0.0.1';
 
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $antivirusConfig = new DefaultAntivirusConfig($config);
+
+        $antivirusConfig->define($config);
         $config->audit();
 
         expect($antivirusConfig->getHost())->toBe('10.0.0.1');

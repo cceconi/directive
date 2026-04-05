@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Directive\Http\Response\HttpResponse;
 use Directive\Service\AppManagement\AppInfoInterface;
 use Directive\Service\AppManagement\ClientHeadersInterface;
-use Directive\Service\Configuration\AbstractConfiguration;
 use Directive\Service\Health\AbstractHealthCheck;
 use Directive\Service\Health\HealthCheckInterface;
 use Directive\Service\Maintenance\MaintenanceManagerInterface;
@@ -13,6 +12,7 @@ use Directive\Service\Security\AccessManagerInterface;
 use Directive\Service\Security\CookiesManagerInterface;
 use Directive\Service\Security\HeaderManagerInterface;
 use Directive\AbstractWebApplication;
+use Directive\Service\Configuration\Configuration;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
 use Psr\Http\Message\ResponseInterface;
@@ -142,7 +142,7 @@ class HealthRouteWebApplication extends AbstractWebApplication
     /** @var MaintenanceManagerInterface|null */
     public ?MaintenanceManagerInterface $maintenanceOverride = null;
 
-    protected function registerServices(AbstractConfiguration $config): void
+    protected function registerServices(Configuration $config): void
     {
         parent::registerServices($config);
 

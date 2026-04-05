@@ -9,15 +9,15 @@ use Monolog\Handler\TestHandler;
 use Monolog\Level;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\ServerRequest;
-use Tests\Helpers\TestConfig;
 
 /**
  * Build a DirectiveLogger with a TestHandler injected for assertion.
  */
 function makeTestLogger(): array
 {
-    $config = new TestConfig();
+    $config = makeTestConfig();
     $loggingConfig = new DefaultLoggingConfig($config);
+    $loggingConfig->define($config);
     $config->audit();
 
     $logger = new DirectiveLogger($loggingConfig, new RequestIdHolder());

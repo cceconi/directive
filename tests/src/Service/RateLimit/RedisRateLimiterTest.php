@@ -8,8 +8,6 @@ use Directive\Service\RateLimit\DefaultRateLimitConfig;
 use Directive\Service\RateLimit\RateLimitResult;
 use Directive\Service\RateLimit\RedisRateLimiter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Tests\Helpers\TestConfig;
-
 /**
  * Tests for RedisRateLimiter using an in-memory ArrayAdapter cache.
  * No real Redis connection is required.
@@ -18,9 +16,11 @@ describe('RedisRateLimiter (in-memory cache)', function (): void {
 
     function makeRateLimiter(): RedisRateLimiter
     {
-        $config = new TestConfig();
+        $config = makeTestConfig();
+        $rateLimitConfig = new DefaultRateLimitConfig($config);
+        $rateLimitConfig->define($config);
         return new RedisRateLimiter(
-            config: new DefaultRateLimitConfig($config),
+            config: $rateLimitConfig,
             cachePool: new ArrayAdapter(),
         );
     }

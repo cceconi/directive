@@ -7,7 +7,6 @@ use Directive\Service\Logging\DirectiveLogger;
 use Directive\Service\Logging\RequestIdHolder;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\StreamHandler;
-use Tests\Helpers\TestConfig;
 
 describe('DirectiveLogger — strategy', function (): void {
 
@@ -20,8 +19,10 @@ describe('DirectiveLogger — strategy', function (): void {
 
     it('uses StreamHandler with Immediate strategy', function (): void {
         $_ENV['LOG_STRATEGY'] = 'immediate';
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $loggingConfig = new DefaultLoggingConfig($config);
+
+        $loggingConfig->define($config);
         $config->audit();
 
         $logger   = new DirectiveLogger($loggingConfig, new RequestIdHolder());
@@ -33,8 +34,10 @@ describe('DirectiveLogger — strategy', function (): void {
 
     it('uses FingersCrossedHandler with BufferedOnError strategy', function (): void {
         $_ENV['LOG_STRATEGY'] = 'buffered_on_error';
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $loggingConfig = new DefaultLoggingConfig($config);
+
+        $loggingConfig->define($config);
         $config->audit();
 
         $logger   = new DirectiveLogger($loggingConfig, new RequestIdHolder());
@@ -48,8 +51,10 @@ describe('DirectiveLogger — strategy', function (): void {
         $_ENV['LOG_STRATEGY']    = 'buffered_on_error';
         $_ENV['LOG_BUFFER_SIZE'] = '50';
 
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $loggingConfig = new DefaultLoggingConfig($config);
+
+        $loggingConfig->define($config);
         $config->audit();
 
         $logger  = new DirectiveLogger($loggingConfig, new RequestIdHolder());
@@ -64,8 +69,10 @@ describe('DirectiveLogger — strategy', function (): void {
     });
 
     it('registers DirectiveContextProcessor', function (): void {
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $loggingConfig = new DefaultLoggingConfig($config);
+
+        $loggingConfig->define($config);
         $config->audit();
 
         $logger     = new DirectiveLogger($loggingConfig, new RequestIdHolder());
@@ -77,8 +84,10 @@ describe('DirectiveLogger — strategy', function (): void {
 
     it('uses app code as logger name', function (): void {
         $_ENV['APP_CODE'] = 'myapp';
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $loggingConfig = new DefaultLoggingConfig($config);
+
+        $loggingConfig->define($config);
         $config->audit();
 
         $logger = new DirectiveLogger($loggingConfig, new RequestIdHolder());

@@ -3,21 +3,17 @@
 declare(strict_types=1);
 
 use Directive\Console\ConfigExportCommand;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
-function makeExportConfig(): AbstractConfiguration
+function makeExportConfig(): Configuration
 {
-    return new class extends AbstractConfiguration {
-        protected function define(): void
-        {
-            $this->required('APP_ENV', 'string');
-            $this->required('DB_PORT', 'int');
-            $this->optional('LOG_LEVEL', 'info', 'string');
-        }
-        public function audit(): void {} // no-op
-    };
+    $config = new Configuration();
+    $config->required('APP_ENV', 'string');
+    $config->optional('DB_PORT', 5432, 'int');
+    $config->optional('LOG_LEVEL', 'info', 'string');
+    return $config;
 }
 
 function makeExportContainer(): ContainerInterface
@@ -29,7 +25,7 @@ function makeExportContainer(): ContainerInterface
         }
         public function has(string $id): bool
         {
-            return $id === AbstractConfiguration::class;
+            return $id === Configuration::class;
         }
     };
 }
@@ -82,7 +78,7 @@ describe('ConfigExportCommand', function (): void {
         unlink($tmpFile);
     });
 
-    it('succeeds gracefully when no AbstractConfiguration is bound', function (): void {
+    it('succeeds gracefully when no Configuration is bound', function (): void {
         $container = new class implements ContainerInterface {
             public function get(string $id): mixed
             {

@@ -3,24 +3,21 @@
 declare(strict_types=1);
 
 use Directive\Console\ConfigCompileCommand;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
 use Directive\Service\Configuration\ConfigSourceTracker;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function makeCompileConfig(): AbstractConfiguration
+function makeCompileConfig(): Configuration
 {
-    return new class extends AbstractConfiguration {
-        protected function define(): void
-        {
-            $this->required('APP_ENV', 'string');
-            $this->optional('APP_SECRET', 'secret-default', 'string');
-            $this->optional('APP_KEY', 'key-default', 'string');
-            $this->optional('CACHE_TTL', 300, 'int');
-        }
-    };
+    $config = new Configuration();
+    $config->optional('APP_ENV', 'prod', 'string');
+    $config->optional('APP_SECRET', 'secret-default', 'string');
+    $config->optional('APP_KEY', 'key-default', 'string');
+    $config->optional('CACHE_TTL', 300, 'int');
+    return $config;
 }
 
 function makeCompileContainer(bool $hasConfig = true): ContainerInterface
@@ -35,7 +32,7 @@ function makeCompileContainer(bool $hasConfig = true): ContainerInterface
 
         public function has(string $id): bool
         {
-            return $this->has && $id === AbstractConfiguration::class;
+            return $this->has && $id === Configuration::class;
         }
     };
 }
@@ -189,7 +186,7 @@ describe('ConfigCompileCommand', function (): void {
         chdir((string) $originalCwd);
 
         expect($exitCode)->toBe(0);
-        expect($tester->getDisplay())->toContain('No AbstractConfiguration');
+        expect($tester->getDisplay())->toContain('No Configuration');
 
         @rmdir($tmpRoot . '/var/cache');
         @rmdir($tmpRoot . '/var');

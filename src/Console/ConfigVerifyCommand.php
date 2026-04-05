@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Directive\Console;
 
 use Directive\Cli\DirectiveCommand;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
 use Directive\Service\Configuration\ConfigurationVaultInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Cross-checks declared configuration keys against a secrets vault.
  *
- * Reports keys that are declared in AbstractConfiguration but absent from
+ * Reports keys that are declared in Configuration but absent from
  * the vault, and vault keys that are not declared in the configuration.
  */
 #[AsCommand(
@@ -25,8 +25,8 @@ final class ConfigVerifyCommand extends DirectiveCommand
 {
     protected function executeCommand(InputInterface $input, OutputInterface $output): int
     {
-        if (!$this->container->has(AbstractConfiguration::class)) {
-            $output->writeln('<comment>No AbstractConfiguration bound in the container.</comment>');
+        if (!$this->container->has(Configuration::class)) {
+            $output->writeln('<comment>No Configuration bound in the container.</comment>');
 
             return self::SUCCESS;
         }
@@ -37,8 +37,8 @@ final class ConfigVerifyCommand extends DirectiveCommand
             return self::SUCCESS;
         }
 
-        /** @var AbstractConfiguration $config */
-        $config = $this->container->get(AbstractConfiguration::class);
+        /** @var Configuration $config */
+        $config = $this->container->get(Configuration::class);
 
         /** @var ConfigurationVaultInterface $vault */
         $vault = $this->container->get(ConfigurationVaultInterface::class);

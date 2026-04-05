@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Directive\Service\AppIdentity\DefaultAppIdentityConfig;
-use Tests\Helpers\TestConfig;
 
 describe('DefaultAppIdentityConfig', function (): void {
 
@@ -19,15 +18,19 @@ describe('DefaultAppIdentityConfig', function (): void {
     });
 
     it('implements AppIdentityConfigInterface', function (): void {
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $appIdentityConfig = new DefaultAppIdentityConfig($config);
+
+        $appIdentityConfig->define($config);
         $config->audit();
         expect($appIdentityConfig)->toBeInstanceOf(AppIdentityConfigInterface::class);
     });
 
     it('returns default values when no env vars are set', function (): void {
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $appIdentityConfig = new DefaultAppIdentityConfig($config);
+
+        $appIdentityConfig->define($config);
         $config->audit();
 
         expect($appIdentityConfig->getAppCode())->toBe('app');
@@ -44,8 +47,10 @@ describe('DefaultAppIdentityConfig', function (): void {
         $_ENV['APP_DESCRIPTION'] = 'An amazing app';
         $_ENV['APP_URL']         = 'https://example.com';
 
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $appIdentityConfig = new DefaultAppIdentityConfig($config);
+
+        $appIdentityConfig->define($config);
         $config->audit();
 
         expect($appIdentityConfig->getAppCode())->toBe('myapp');

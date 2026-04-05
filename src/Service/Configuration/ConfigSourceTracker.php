@@ -14,7 +14,7 @@ use Symfony\Component\Dotenv\Dotenv;
  *   ConfigSourceTracker::snapshotSystemVars();
  *   ConfigSourceTracker::loadTracked($dotenv, basePath: dirname(__DIR__));
  *
- * AbstractConfiguration::audit() then calls ConfigSourceTracker::getSource()
+ * Configuration::audit() then calls ConfigSourceTracker::getSource()
  * for each resolved variable to record its origin.
  *
  * Possible source labels:
@@ -80,7 +80,7 @@ final class ConfigSourceTracker
 
     /**
      * Return the tracked source for a variable, or null if unknown.
-     * 'default' is set by AbstractConfiguration::audit() when no $_ENV entry exists.
+     * 'default' is set by Configuration::audit() when no $_ENV entry exists.
      */
     public static function getSource(string $key): ?string
     {

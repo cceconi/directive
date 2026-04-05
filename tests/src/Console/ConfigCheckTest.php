@@ -3,23 +3,19 @@
 declare(strict_types=1);
 
 use Directive\Console\ConfigCheckCommand;
-use Directive\Exception\ConfigurationException;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
-function makeConfig(bool $throws = false): AbstractConfiguration
+function makeConfig(bool $throws = false): Configuration
 {
-    return new class ($throws) extends AbstractConfiguration {
-        public function __construct(private readonly bool $throws) {}
-        protected function define(): void {}
-        public function audit(): void
-        {
-            if ($this->throws) {
-                throw new ConfigurationException('Missing required variable: APP_ENV');
-            }
-        }
-    };
+    $config = new Configuration();
+    if ($throws) {
+        // Required key absent from $_ENV → audit() will throw ConfigurationException
+        unset($_ENV['__DIRECTIVE_TEST_REQUIRED__']);
+        $config->required('__DIRECTIVE_TEST_REQUIRED__', 'string');
+    }
+    return $config;
 }
 
 function makeContainer(bool $hasConfig, bool $configThrows = false): ContainerInterface
@@ -35,7 +31,7 @@ function makeContainer(bool $hasConfig, bool $configThrows = false): ContainerIn
         }
         public function has(string $id): bool
         {
-            return $this->hasConfig && $id === AbstractConfiguration::class;
+            return $this->hasConfig && $id === Configuration::class;
         }
     };
 }
@@ -58,7 +54,7 @@ describe('ConfigCheckCommand', function (): void {
         expect($tester->getDisplay())->toContain('errors detected');
     });
 
-    it('succeeds gracefully when no AbstractConfiguration is bound', function (): void {
+    it('succeeds gracefully when no Configuration is bound', function (): void {
         $command = new ConfigCheckCommand(makeContainer(false));
         $tester  = new CommandTester($command);
         $tester->execute([]);

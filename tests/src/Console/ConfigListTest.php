@@ -3,23 +3,16 @@
 declare(strict_types=1);
 
 use Directive\Console\ConfigListCommand;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
-function makeListConfig(): AbstractConfiguration
+function makeListConfig(): Configuration
 {
-    return new class extends AbstractConfiguration {
-        protected function define(): void
-        {
-            $this->required('APP_ENV', 'string');
-            $this->optional('APP_SECRET', '***', 'string');
-        }
-        public function audit(): void
-        {
-            // no-op for tests
-        }
-    };
+    $config = new Configuration();
+    $config->optional('APP_ENV', 'prod', 'string');
+    $config->optional('APP_SECRET', '***', 'string');
+    return $config;
 }
 
 function makeListContainer(): ContainerInterface
@@ -31,7 +24,7 @@ function makeListContainer(): ContainerInterface
         }
         public function has(string $id): bool
         {
-            return $id === AbstractConfiguration::class;
+            return $id === Configuration::class;
         }
     };
 }

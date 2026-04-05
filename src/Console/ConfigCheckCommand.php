@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Directive\Console;
 
 use Directive\Cli\DirectiveCommand;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Performs a dry-run audit of the application configuration.
  *
- * Calls AbstractConfiguration::audit() and reports success or the list
+ * Calls Configuration::audit() and reports success or the list
  * of validation errors without stopping the process.
  */
 #[AsCommand(
@@ -24,14 +24,14 @@ final class ConfigCheckCommand extends DirectiveCommand
 {
     protected function executeCommand(InputInterface $input, OutputInterface $output): int
     {
-        if (!$this->container->has(AbstractConfiguration::class)) {
-            $output->writeln('<comment>No AbstractConfiguration bound in the container — nothing to check.</comment>');
+        if (!$this->container->has(Configuration::class)) {
+            $output->writeln('<comment>No Configuration bound in the container — nothing to check.</comment>');
 
             return self::SUCCESS;
         }
 
-        /** @var AbstractConfiguration $config */
-        $config = $this->container->get(AbstractConfiguration::class);
+        /** @var Configuration $config */
+        $config = $this->container->get(Configuration::class);
 
         try {
             $config->audit();

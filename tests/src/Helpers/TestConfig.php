@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace Tests\Helpers;
 
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
+use Directive\Service\Configuration\ConfigProviderInterface;
 
 /** Minimal configuration for tests — all keys are optional with sensible defaults. */
-final class TestConfig extends AbstractConfiguration
+final class TestConfig implements ConfigProviderInterface
 {
-    protected function define(): void
+    public function define(Configuration $config): void
     {
-        $this->optional('APP_CODE', 'directive-test', 'string');
-        $this->optional('APP_NAME', 'DirectiveTestApp', 'string');
-        $this->optional('APP_ENV', 'test', 'string');
-        $this->optional('APP_VERSION', '3.0.0', 'string');
-        $this->optional('APP_DESCRIPTION', 'Test application', 'string');
-        $this->optional('APP_URL', '', 'string');
-        $this->optional('LOG_PATH', '/tmp', 'string');
-        $this->optional('UPLOAD_TMPDIR', '/tmp/directive-test-uploads', 'string');
+        $config->optional('APP_CODE', 'directive-test', 'string');
+        $config->optional('APP_NAME', 'DirectiveTestApp', 'string');
+        $config->optional('APP_ENV', 'test', 'string');
+        $config->optional('APP_VERSION', '3.0.0', 'string');
+        $config->optional('APP_DESCRIPTION', 'Test application', 'string');
+        $config->optional('APP_URL', '', 'string');
+        $config->optional('LOG_PATH', '/tmp', 'string');
+        $config->optional('UPLOAD_TMPDIR', '/tmp/directive-test-uploads', 'string');
     }
 }

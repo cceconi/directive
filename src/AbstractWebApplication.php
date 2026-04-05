@@ -14,7 +14,7 @@ use Directive\Http\Middleware\LoggerMiddleware;
 use Directive\Http\Middleware\MaintenanceMiddleware;
 use Directive\Http\Middleware\RateLimitMiddleware;
 use Directive\Http\Middleware\RequestIdMiddleware;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
 use Directive\Service\Configuration\AbstractFeatures;
 use Directive\Service\Configuration\DirectiveFeatures;
 use Directive\Service\Health\HealthCheckInterface;
@@ -85,7 +85,7 @@ abstract class AbstractWebApplication extends AbstractApplication
         return 'webapp';
     }
 
-    protected function registerServices(AbstractConfiguration $config): void
+    protected function registerServices(Configuration $config): void
     {
         parent::registerServices($config);
 

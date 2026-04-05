@@ -3,23 +3,20 @@
 declare(strict_types=1);
 
 use Directive\Console\ConfigAuditCommand;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
 use Directive\Service\Configuration\ConfigSourceTracker;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function makeAuditConfig(): AbstractConfiguration
+function makeAuditConfig(): Configuration
 {
-    return new class extends AbstractConfiguration {
-        protected function define(): void
-        {
-            $this->required('APP_ENV', 'string');
-            $this->optional('APP_SECRET_KEY', 'secret-default', 'string');
-            $this->optional('CACHE_TTL', 300, 'int');
-        }
-    };
+    $config = new Configuration();
+    $config->required('APP_ENV', 'string');
+    $config->optional('APP_SECRET_KEY', 'secret-default', 'string');
+    $config->optional('CACHE_TTL', 300, 'int');
+    return $config;
 }
 
 function makeAuditContainer(bool $hasConfig = true): ContainerInterface
@@ -34,7 +31,7 @@ function makeAuditContainer(bool $hasConfig = true): ContainerInterface
 
         public function has(string $id): bool
         {
-            return $this->has && $id === AbstractConfiguration::class;
+            return $this->has && $id === Configuration::class;
         }
     };
 }
@@ -107,6 +104,6 @@ describe('ConfigAuditCommand', function (): void {
         $tester->execute([]);
 
         expect($tester->getStatusCode())->toBe(0);
-        expect($tester->getDisplay())->toContain('No AbstractConfiguration');
+        expect($tester->getDisplay())->toContain('No Configuration');
     });
 });

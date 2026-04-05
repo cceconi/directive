@@ -6,7 +6,7 @@ use Directive\Application\EventBus\DomainEventBusInterface;
 use Directive\Application\EventBus\NullDomainEventBus;
 use Directive\AbstractConsoleApplication;
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
 use Directive\Service\Logging\RequestIdHolder;
 use Directive\Service\Security\Antivirus\AntivirusConfigInterface;
 use Directive\Service\Security\Antivirus\DefaultAntivirusConfig;
@@ -20,7 +20,7 @@ use Tests\Helpers\TestConfig;
 
 final class BootTestApplication extends AbstractConsoleApplication
 {
-    protected function registerServices(AbstractConfiguration $config): void
+    protected function registerServices(Configuration $config): void
     {
         // intentionally minimal — we only need the container to be built
     }
@@ -161,7 +161,7 @@ describe('AbstractApplication service auto-binding', function (): void {
                 parent::__construct();
             }
 
-            protected function registerServices(AbstractConfiguration $config): void {}
+            protected function registerServices(Configuration $config): void {}
 
             protected function addServices(): void {}
 

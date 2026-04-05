@@ -12,7 +12,8 @@ use Directive\Http\Middleware\DefaultHttpConfig;
 use Directive\Http\Middleware\HttpConfigInterface;
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Directive\Service\AppIdentity\DefaultAppIdentityConfig;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
+use Directive\Service\Configuration\ConfigProviderInterface;
 use Directive\Service\Logging\DefaultLoggingConfig;
 use Directive\Service\Logging\LoggingConfigInterface;
 use Directive\Service\Logging\RuntimeLogger;
@@ -54,20 +55,27 @@ abstract class AbstractApplication implements ApplicationInterface
     // ApplicationInterface
     // ------------------------------------------------------------------
 
-    final public function setConfig(string $configClass): static
+    final public function setConfig(string $configProviderClass): static
     {
-        /** @var AbstractConfiguration $config */
-        $config = new $configClass();
+        $config = new Configuration();
 
         // Inject compiled cache values before audit() so non-sensitive resolved
         // variables skip $_ENV lookup (sensitive vars are never in the cache).
-        $cached = $this->loadConfigCache($configClass);
+        $cached = $this->loadConfigCache($configProviderClass);
         if ($cached !== null) {
             $config->loadCache($cached);
         }
 
-        // Auto-bind the 5 default service configs (skip any already overridden by user).
-        $loggingConfig = $this->autoBindServiceDefaults($config);
+        // Service configs declare their keys first.
+        $loggingConfig = $this->buildServiceDefaults($config);
+
+        // AppConfig declares last — its declarations win on any key conflict.
+        /** @var ConfigProviderInterface $appProvider */
+        $appProvider = new $configProviderClass();
+        $appProvider->define($config);
+
+        // Resolve all values from $_ENV now that every provider has declared.
+        $config->audit();
 
         // Re-init RuntimeLogger now that we know the real log directory.
         new RuntimeLogger($this->runtimeLoggerName(), $loggingConfig->getLogPath());
@@ -76,13 +84,10 @@ abstract class AbstractApplication implements ApplicationInterface
         $this->checkProductionCacheConfig($config);
 
         $this->builder->addDefinitions([
-            $configClass                 => $config,
-            AbstractConfiguration::class => $config,
+            Configuration::class => $config,
         ]);
 
         $this->registerServices($config);
-
-        $config->audit();
 
         $this->configureContainer();
 
@@ -123,7 +128,7 @@ abstract class AbstractApplication implements ApplicationInterface
      * Called before the container is built.
      * Override in subclasses to add mode-specific definitions.
      */
-    protected function registerServices(AbstractConfiguration $config): void
+    protected function registerServices(Configuration $config): void
     {
         // Populated in subsequent epics (loggers, security, managers…).
     }
@@ -183,14 +188,14 @@ abstract class AbstractApplication implements ApplicationInterface
     }
 
     /**
-     * Instantiates, audits, and registers each default service config
+     * Instantiates, calls define(), and registers each default service config
      * unless the user already provided that interface binding.
      *
      * Returns the resolved LoggingConfigInterface for RuntimeLogger re-init.
      */
-    private function autoBindServiceDefaults(AbstractConfiguration $config): LoggingConfigInterface
+    private function buildServiceDefaults(Configuration $config): LoggingConfigInterface
     {
-        /** @var array<class-string, AbstractConfiguration|object> $defaults */
+        /** @var array<class-string, object> $defaults */
         $defaults = [
             LoggingConfigInterface::class     => new DefaultLoggingConfig($config),
             AppIdentityConfigInterface::class => new DefaultAppIdentityConfig($config),
@@ -200,8 +205,8 @@ abstract class AbstractApplication implements ApplicationInterface
         ];
 
         foreach ($defaults as $interface => $impl) {
-            if ($impl instanceof AbstractConfiguration) {
-                $impl->audit();
+            if ($impl instanceof ConfigProviderInterface) {
+                $impl->define($config);
             }
             if (!in_array($interface, $this->userDefinedKeys, true)) {
                 $this->builder->addDefinitions([$interface => $impl]);
@@ -241,7 +246,7 @@ abstract class AbstractApplication implements ApplicationInterface
     /**
      * Emit warnings when running in production without a config cache.
      */
-    private function checkProductionCacheConfig(AbstractConfiguration $config): void
+    private function checkProductionCacheConfig(Configuration $config): void
     {
         $appEnv = $config->get('APP_ENV');
 
@@ -263,7 +268,7 @@ abstract class AbstractApplication implements ApplicationInterface
      *
      * @return array<string, mixed>|null
      */
-    private function loadConfigCache(string $configClass): ?array
+    private function loadConfigCache(string $configProviderClass): ?array
     {
         $cacheFile = 'var/cache/config.php';
 
@@ -274,6 +279,6 @@ abstract class AbstractApplication implements ApplicationInterface
         /** @var array<string, array<string, mixed>> $cache */
         $cache = include $cacheFile;
 
-        return $cache[$configClass] ?? null;
+        return $cache[$configProviderClass] ?? null;
     }
 }

@@ -3,23 +3,31 @@
 declare(strict_types=1);
 
 use Directive\Exception\ConfigurationException;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
+use Directive\Service\Configuration\ConfigProviderInterface;
 use Directive\Service\Configuration\ConfigSourceTracker;
 
 // ── Stub ─────────────────────────────────────────────────────────────────────
 
-final class SourceTrackingConfig extends AbstractConfiguration
+final class SourceTrackingConfigProvider implements ConfigProviderInterface
 {
-    protected function define(): void
+    public function define(Configuration $config): void
     {
-        $this->required('APP_ENV', 'string');
-        $this->optional('CACHE_TTL', 300, 'int');
+        $config->required('APP_ENV', 'string');
+        $config->optional('CACHE_TTL', 300, 'int');
     }
+}
+
+function makeSourceConfig(): Configuration
+{
+    $config = new Configuration();
+    (new SourceTrackingConfigProvider())->define($config);
+    return $config;
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
-describe('AbstractConfiguration source tracking', function (): void {
+describe('Configuration source tracking', function (): void {
 
     beforeEach(function (): void {
         ConfigSourceTracker::reset();
@@ -33,7 +41,7 @@ describe('AbstractConfiguration source tracking', function (): void {
 
     it('getSource() returns "default" for optional keys absent from $_ENV', function (): void {
         $_ENV['APP_ENV'] = 'prod';
-        $config = new SourceTrackingConfig();
+        $config = makeSourceConfig();
         $config->audit();
 
         expect($config->getSource('CACHE_TTL'))->toBe('default');
@@ -53,7 +61,7 @@ describe('AbstractConfiguration source tracking', function (): void {
         @unlink($tmpDir . '/.env.local');
         @rmdir($tmpDir);
 
-        $config = new SourceTrackingConfig();
+        $config = makeSourceConfig();
         $config->audit();
 
         expect($config->getSource('APP_ENV'))->toBe('.env.local');
@@ -66,7 +74,7 @@ describe('AbstractConfiguration source tracking', function (): void {
         // When raw !== null and tracker returns null, source is ConfigSourceTracker::getSource() ?? 'default'
         // → since tracker is empty, result is 'default'
 
-        $config = new SourceTrackingConfig();
+        $config = makeSourceConfig();
         $config->audit();
 
         // Tracker has no entry for APP_ENV → source = 'default' (fallback)
@@ -75,14 +83,14 @@ describe('AbstractConfiguration source tracking', function (): void {
 
     it('getSource() throws ConfigurationException for undeclared key', function (): void {
         $_ENV['APP_ENV'] = 'prod';
-        $config = new SourceTrackingConfig();
+        $config = makeSourceConfig();
         $config->audit();
 
         expect(fn() => $config->getSource('UNDECLARED'))->toThrow(ConfigurationException::class);
     });
 
     it('getSource() throws ConfigurationException before audit() is called', function (): void {
-        $config = new SourceTrackingConfig();
+        $config = makeSourceConfig();
 
         expect(fn() => $config->getSource('APP_ENV'))->toThrow(ConfigurationException::class);
     });
@@ -91,7 +99,7 @@ describe('AbstractConfiguration source tracking', function (): void {
         $_ENV['APP_ENV'] = 'prod';
         $_ENV['CACHE_TTL'] = '600';
 
-        $config = new SourceTrackingConfig();
+        $config = makeSourceConfig();
         $config->audit();
 
         expect($config->getAll())->toMatchArray([

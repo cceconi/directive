@@ -7,12 +7,17 @@ namespace Directive\Service\Configuration;
 use Directive\Exception\ConfigurationException;
 
 /**
- * Base class for application-level configuration backed by environment variables.
+ * Shared configuration dictionary backed by environment variables.
  *
- * Subclasses call required() / optional() inside define() to declare their
- * keys, then call audit() once at boot time to validate and resolve all values.
+ * The framework instantiates one Configuration per application boot. Each
+ * ConfigProviderInterface (service configs, then AppConfig) calls required() /
+ * optional() on it to declare their keys. AppConfig is always called last so
+ * its declarations override any framework default.
+ *
+ * After all providers have declared their keys, AbstractApplication calls
+ * audit() once to validate and resolve all values from $_ENV.
  */
-abstract class AbstractConfiguration
+final class Configuration
 {
     /** @var array<string, array{type: string, required: bool, default: mixed, allowed: list<string>}> */
     private array $definitions = [];
@@ -23,22 +28,8 @@ abstract class AbstractConfiguration
     /** @var array<string, string> */
     private array $sources = [];
 
-    public function __construct()
-    {
-        $this->define();
-    }
-
     // ------------------------------------------------------------------
-    // Contract for subclasses
-    // ------------------------------------------------------------------
-
-    /**
-     * Declare configuration keys by calling required() and optional().
-     */
-    abstract protected function define(): void;
-
-    // ------------------------------------------------------------------
-    // Declaration helpers
+    // Declaration helpers (called by ConfigProviderInterface::define())
     // ------------------------------------------------------------------
 
     /**
@@ -58,6 +49,9 @@ abstract class AbstractConfiguration
 
     /**
      * Declare an optional environment variable with a fallback default.
+     *
+     * If the key was already declared (e.g. by a service config), the new
+     * declaration wins — the last caller governs the default and constraints.
      *
      * @param list<string> $allowed Whitelist of accepted raw string values (empty = any)
      */
@@ -182,7 +176,7 @@ abstract class AbstractConfiguration
     /**
      * Return the tracked source origin for a resolved variable.
      *
-     * Possible values: '.env', '.env.local', 'system', 'default'.
+     * Possible values: '.env', '.env.local', 'system', 'default', 'cache'.
      *
      * @throws ConfigurationException when the key is not declared or audit() has not been called yet.
      */

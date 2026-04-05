@@ -3,21 +3,17 @@
 declare(strict_types=1);
 
 use Directive\Console\ConfigVerifyCommand;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
 use Directive\Service\Configuration\ConfigurationVaultInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
-function makeVerifyConfig(): AbstractConfiguration
+function makeVerifyConfig(): Configuration
 {
-    return new class extends AbstractConfiguration {
-        protected function define(): void
-        {
-            $this->required('APP_ENV', 'string');
-            $this->required('DB_PORT', 'int');
-        }
-        public function audit(): void {} // no-op
-    };
+    $config = new Configuration();
+    $config->optional('APP_ENV', 'prod', 'string');
+    $config->optional('DB_PORT', 5432, 'int');
+    return $config;
 }
 
 function makeVault(array $keys): ConfigurationVaultInterface
@@ -42,7 +38,7 @@ function makeVerifyContainer(bool $hasConfig, bool $hasVault, array $vaultKeys =
 
         public function get(string $id): mixed
         {
-            if ($id === AbstractConfiguration::class) {
+            if ($id === Configuration::class) {
                 return makeVerifyConfig();
             }
             return makeVault($this->vaultKeys);
@@ -50,7 +46,7 @@ function makeVerifyContainer(bool $hasConfig, bool $hasVault, array $vaultKeys =
 
         public function has(string $id): bool
         {
-            if ($id === AbstractConfiguration::class) {
+            if ($id === Configuration::class) {
                 return $this->hasConfig;
             }
             if ($id === ConfigurationVaultInterface::class) {
@@ -89,7 +85,7 @@ describe('ConfigVerifyCommand', function (): void {
         expect($tester->getDisplay())->toContain('EXTRA_KEY');
     });
 
-    it('succeeds gracefully when no AbstractConfiguration is bound', function (): void {
+    it('succeeds gracefully when no Configuration is bound', function (): void {
         $command = new ConfigVerifyCommand(makeVerifyContainer(false, false));
         $tester  = new CommandTester($command);
         $tester->execute([]);

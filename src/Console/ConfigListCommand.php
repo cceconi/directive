@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Directive\Console;
 
 use Directive\Cli\DirectiveCommand;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,14 +25,14 @@ final class ConfigListCommand extends DirectiveCommand
 
     protected function executeCommand(InputInterface $input, OutputInterface $output): int
     {
-        if (!$this->container->has(AbstractConfiguration::class)) {
-            $output->writeln('<comment>No AbstractConfiguration bound in the container.</comment>');
+        if (!$this->container->has(Configuration::class)) {
+            $output->writeln('<comment>No Configuration bound in the container.</comment>');
 
             return self::SUCCESS;
         }
 
-        /** @var AbstractConfiguration $config */
-        $config = $this->container->get(AbstractConfiguration::class);
+        /** @var Configuration $config */
+        $config = $this->container->get(Configuration::class);
 
         $config->audit();
 

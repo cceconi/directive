@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Directive\Service\RateLimit;
 
 use Directive\Http\Routing\RateLimitKeyType;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
+use Directive\Service\Configuration\ConfigProviderInterface;
 
 /**
  * Default implementation of RateLimitConfigInterface backed by environment variables.
@@ -18,18 +19,16 @@ use Directive\Service\Configuration\AbstractConfiguration;
  *   RATE_LIMIT_MAX_REQUESTS int     default: 100
  *   RATE_LIMIT_KEY_TYPE     string  default: 'ip'  (ip|user_id|api_key)
  */
-class DefaultRateLimitConfig implements RateLimitConfigInterface
+class DefaultRateLimitConfig implements RateLimitConfigInterface, ConfigProviderInterface
 {
-    public function __construct(private AbstractConfiguration $config) {
-        $this->define();
-    }
+    public function __construct(private Configuration $config) {}
 
-    protected function define(): void
+    public function define(Configuration $config): void
     {
-        $this->config->optional('RATE_LIMIT_REDIS_DSN', 'tcp://127.0.0.1:6379', 'string');
-        $this->config->optional('RATE_LIMIT_WINDOW', 60, 'int');
-        $this->config->optional('RATE_LIMIT_MAX_REQUESTS', 100, 'int');
-        $this->config->optional('RATE_LIMIT_KEY_TYPE', 'ip', 'string', ['ip', 'user_id', 'api_key']);
+        $config->optional('RATE_LIMIT_REDIS_DSN', 'tcp://127.0.0.1:6379', 'string');
+        $config->optional('RATE_LIMIT_WINDOW', 60, 'int');
+        $config->optional('RATE_LIMIT_MAX_REQUESTS', 100, 'int');
+        $config->optional('RATE_LIMIT_KEY_TYPE', 'ip', 'string', ['ip', 'user_id', 'api_key']);
     }
 
     public function getRedisDsn(): string

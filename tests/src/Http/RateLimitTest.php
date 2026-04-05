@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Directive\Http\Routing\RateLimit;
 use Directive\Http\Routing\RateLimitKeyType;
 use Directive\Service\RateLimit\DefaultRateLimitConfig;
-use Tests\Helpers\TestConfig;
 
 describe('RateLimitKeyType enum', function (): void {
 
@@ -37,8 +36,9 @@ describe('RateLimit value object', function (): void {
     });
 
     it('fromConfig builds a RateLimit from DefaultRateLimitConfig defaults', function (): void {
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $rateLimitConfig = new DefaultRateLimitConfig($config);
+        $rateLimitConfig->define($config);
         $config->audit();
         $rl     = RateLimit::fromConfig($rateLimitConfig);
 
@@ -52,8 +52,9 @@ describe('RateLimit value object', function (): void {
         $_ENV['RATE_LIMIT_MAX_REQUESTS']  = '50';
         $_ENV['RATE_LIMIT_KEY_TYPE']      = 'user_id';
 
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $rateLimitConfig = new DefaultRateLimitConfig($config);
+        $rateLimitConfig->define($config);
         $config->audit();
         $rl     = RateLimit::fromConfig($rateLimitConfig);
 

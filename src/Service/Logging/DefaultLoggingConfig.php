@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace Directive\Service\Logging;
 
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
+use Directive\Service\Configuration\ConfigProviderInterface;
 
-final class DefaultLoggingConfig implements LoggingConfigInterface
+final class DefaultLoggingConfig implements LoggingConfigInterface, ConfigProviderInterface
 {
-    public function __construct(private AbstractConfiguration $config) {
-        $this->define();
-    }
+    public function __construct(private Configuration $config) {}
 
-    protected function define(): void
+    public function define(Configuration $config): void
     {
-        $this->config->optional('LOG_PATH', 'var/log', 'string');
-        $this->config->optional('LOG_STRATEGY', 'immediate', 'string');
-        $this->config->optional('LOG_BUFFER_SIZE', 200, 'int');
+        $config->optional('LOG_PATH', 'var/log', 'string');
+        $config->optional('LOG_STRATEGY', 'immediate', 'string');
+        $config->optional('LOG_BUFFER_SIZE', 200, 'int');
     }
 
     public function getLogPath(): string

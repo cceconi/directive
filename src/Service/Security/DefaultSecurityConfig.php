@@ -4,25 +4,24 @@ declare(strict_types=1);
 
 namespace Directive\Service\Security;
 
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
+use Directive\Service\Configuration\ConfigProviderInterface;
 
-final class DefaultSecurityConfig implements SecurityConfigInterface
+final class DefaultSecurityConfig implements SecurityConfigInterface, ConfigProviderInterface
 {
-    public function __construct(private AbstractConfiguration $config) {
-        $this->define();
-    }
+    public function __construct(private Configuration $config) {}
 
-    protected function define(): void
+    public function define(Configuration $config): void
     {
-        $this->config->optional('SECURITY_TOKEN_LIFETIME', 300, 'int');
-        $this->config->optional('SECURITY_COOKIE_DOMAIN', '', 'string');
-        $this->config->optional('SECURITY_COOKIE_HTTPONLY', true, 'bool');
-        $this->config->optional('SECURITY_COOKIE_SAMESITE', 'Strict', 'string');
-        $this->config->optional('SECURITY_HTTP_SECURE', true, 'bool');
-        $this->config->optional('APP_URL', '', 'string');
+        $config->optional('SECURITY_TOKEN_LIFETIME', 300, 'int');
+        $config->optional('SECURITY_COOKIE_DOMAIN', '', 'string');
+        $config->optional('SECURITY_COOKIE_HTTPONLY', true, 'bool');
+        $config->optional('SECURITY_COOKIE_SAMESITE', 'Strict', 'string');
+        $config->optional('SECURITY_HTTP_SECURE', true, 'bool');
+        $config->optional('APP_URL', '', 'string');
         // Comma-separated lists
-        $this->config->optional('SECURITY_HTTP_RELAXED', '', 'string');
-        $this->config->optional('SECURITY_CORS_ORIGINS', '', 'string');
+        $config->optional('SECURITY_HTTP_RELAXED', '', 'string');
+        $config->optional('SECURITY_CORS_ORIGINS', '', 'string');
     }
 
     public function getTokenLifetime(): int

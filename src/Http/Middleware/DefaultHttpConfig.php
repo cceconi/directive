@@ -4,20 +4,18 @@ declare(strict_types=1);
 
 namespace Directive\Http\Middleware;
 
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
+use Directive\Service\Configuration\ConfigProviderInterface;
 
-final class DefaultHttpConfig implements HttpConfigInterface
+final class DefaultHttpConfig implements HttpConfigInterface, ConfigProviderInterface
 {
-    public function __construct(private AbstractConfiguration $config)
-    {
-        $this->define();
-    }
+    public function __construct(private Configuration $config) {}
 
-    protected function define(): void
+    public function define(Configuration $config): void
     {
-        $this->config->optional('RESPONSE_COMPRESS', false, 'bool');
-        $this->config->optional('UPLOAD_TMPDIR', sys_get_temp_dir(), 'string');
-        $this->config->optional('CLIENT_HEADERS', '', 'string');
+        $config->optional('RESPONSE_COMPRESS', false, 'bool');
+        $config->optional('UPLOAD_TMPDIR', sys_get_temp_dir(), 'string');
+        $config->optional('CLIENT_HEADERS', '', 'string');
     }
 
     public function isCompressionEnabled(): bool

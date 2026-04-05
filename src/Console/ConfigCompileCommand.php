@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Directive\Console;
 
 use Directive\Cli\DirectiveCommand;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Generates var/cache/config.php -- a PHP cache of resolved, non-sensitive configuration.
  *
  * All service config keys (logging, security, http, …) live in the single shared
- * AbstractConfiguration dictionary, so the cache captures every non-sensitive key
+ * Configuration dictionary, so the cache captures every non-sensitive key
  * in one entry keyed by the user's config class name.
  *
  * Sensitive variables (names containing SECRET, PASSWORD, KEY, TOKEN, ...) are NEVER
@@ -59,14 +59,14 @@ final class ConfigCompileCommand extends DirectiveCommand
             return self::FAILURE;
         }
 
-        if (!$this->container->has(AbstractConfiguration::class)) {
-            $output->writeln('<comment>No AbstractConfiguration bound in the container.</comment>');
+        if (!$this->container->has(Configuration::class)) {
+            $output->writeln('<comment>No Configuration bound in the container.</comment>');
 
             return self::SUCCESS;
         }
 
-        /** @var AbstractConfiguration $config */
-        $config = $this->container->get(AbstractConfiguration::class);
+        /** @var Configuration $config */
+        $config = $this->container->get(Configuration::class);
         $config->audit();
 
         $class       = get_class($config);

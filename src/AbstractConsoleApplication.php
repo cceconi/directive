@@ -22,7 +22,7 @@ use Directive\Console\Generator\GenerateUseCaseCommandCommand;
 use Directive\Console\Generator\GenerateUseCaseQueryCommand;
 use Directive\Console\OpenApiCommand;
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
 use Directive\Service\Logging\DefaultLoggingConfig;
 use Directive\Service\Logging\DirectiveLogger;
 use Directive\Service\Logging\RequestIdHolder;
@@ -92,14 +92,13 @@ abstract class AbstractConsoleApplication extends AbstractApplication
         return 'console';
     }
 
-    protected function registerServices(AbstractConfiguration $config): void
+    protected function registerServices(Configuration $config): void
     {
         parent::registerServices($config);
 
         // Build ConsoleLogger and register it for both its own interface
         // and WebLoggerInterface so middlewares relying on WebLoggerInterface work.
         $loggingConfig = new DefaultLoggingConfig($config);
-        $config->audit();
 
         $holder = new RequestIdHolder();
         $logFile = rtrim($loggingConfig->getLogPath(), '/') . '/console.log';
@@ -129,7 +128,7 @@ abstract class AbstractConsoleApplication extends AbstractApplication
 
         $this->console = new Application(
             name: $appId->getAppName(),
-            version: '3.0',
+            version: $appId->getAppVersion(),
         );
 
         // Always-present framework commands

@@ -25,8 +25,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Tests\Helpers\StubApi;
 use Tests\Helpers\StubWebUser;
-use Tests\Helpers\TestConfig;
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -41,12 +39,14 @@ function buildRlContainer(
     array $overrides = [],
 ): Psr\Container\ContainerInterface {
     $builder = new ContainerBuilder();
-    $config = new TestConfig();
+    $config = makeTestConfig();
+    $rateLimitConfig = new DefaultRateLimitConfig($config);
+    $rateLimitConfig->define($config);
     $builder->addDefinitions(array_merge(
         [
             ApiDefinitionManager::class   => $manager,
             AbstractFeatures::class       => new DirectiveFeatures(),
-            RateLimitConfigInterface::class => new DefaultRateLimitConfig($config),
+            RateLimitConfigInterface::class => $rateLimitConfig,
             RateLimiterInterface::class   => new NullRateLimiter(),
             WebUserInterface::class       => new StubWebUser(),
         ],

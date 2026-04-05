@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Directive\Service\Logging\DefaultLoggingConfig;
 use Directive\Service\Logging\LoggingConfigInterface;
 use Directive\Service\Logging\LogStrategy;
-use Tests\Helpers\TestConfig;
 
 describe('DefaultLoggingConfig', function (): void {
 
@@ -18,15 +17,19 @@ describe('DefaultLoggingConfig', function (): void {
     });
 
     it('implements LoggingConfigInterface', function (): void {
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $loggingConfig = new DefaultLoggingConfig($config);
+
+        $loggingConfig->define($config);
         $config->audit();
         expect($loggingConfig)->toBeInstanceOf(LoggingConfigInterface::class);
     });
 
     it('returns default values when no env vars are set', function (): void {
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $loggingConfig = new DefaultLoggingConfig($config);
+
+        $loggingConfig->define($config);
         $config->audit();
 
         expect($loggingConfig->getLogPath())->toBe('var/log');
@@ -39,8 +42,10 @@ describe('DefaultLoggingConfig', function (): void {
         $_ENV['LOG_STRATEGY']  = 'buffered_on_error';
         $_ENV['LOG_BUFFER_SIZE'] = '50';
 
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $loggingConfig = new DefaultLoggingConfig($config);
+
+        $loggingConfig->define($config);
         $config->audit();
 
         expect($loggingConfig->getLogPath())->toBe('/var/log/myapp');

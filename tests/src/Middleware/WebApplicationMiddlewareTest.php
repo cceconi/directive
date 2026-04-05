@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Directive\Http\Response\HttpResponse;
 use Directive\Service\AppManagement\AppInfoInterface;
 use Directive\Service\AppManagement\ClientHeadersInterface;
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
 use Directive\Service\Logging\DefaultLoggingConfig;
 use Directive\Service\Logging\DirectiveLogger;
 use Directive\Service\Logging\RequestIdHolder;
@@ -110,7 +110,7 @@ final class FullStackWebApplication extends AbstractWebApplication
 {
     public bool $configureMiddlewareCalled = false;
 
-    protected function registerServices(AbstractConfiguration $config): void
+    protected function registerServices(Configuration $config): void
     {
         parent::registerServices($config);
 
@@ -191,15 +191,13 @@ final class DebugLoggingWebApplication extends AbstractWebApplication
 {
     public TestHandler $testHandler;
 
-    protected function registerServices(AbstractConfiguration $config): void
+    protected function registerServices(Configuration $config): void
     {
         parent::registerServices($config);
 
         $this->testHandler = new TestHandler(Level::Debug, bubble: false);
 
-        $config = new TestConfig();
         $loggingConfig = new DefaultLoggingConfig($config);
-        $config->audit();
         $holder = new RequestIdHolder();
         $logger = new DirectiveLogger($loggingConfig, $holder);
         $logger->setHandlers([$this->testHandler]);

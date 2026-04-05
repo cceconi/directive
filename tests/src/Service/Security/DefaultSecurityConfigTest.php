@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Directive\Service\Security\DefaultSecurityConfig;
 use Directive\Service\Security\SecurityConfigInterface;
-use Tests\Helpers\TestConfig;
 
 describe('DefaultSecurityConfig', function (): void {
 
@@ -22,15 +21,19 @@ describe('DefaultSecurityConfig', function (): void {
     });
 
     it('implements SecurityConfigInterface', function (): void {
-        $config = new TestConfig();    
+        $config = makeTestConfig();    
         $securityConfig = new DefaultSecurityConfig($config);
+    
+        $securityConfig->define($config);
         $config->audit();
         expect($securityConfig)->toBeInstanceOf(SecurityConfigInterface::class);
     });
 
     it('returns defaults when no env vars are set', function (): void {
-        $config = new TestConfig();    
+        $config = makeTestConfig();    
         $securityConfig = new DefaultSecurityConfig($config);
+    
+        $securityConfig->define($config);
         $config->audit();
 
         expect($securityConfig->getTokenLifetime())->toBe(300);
@@ -47,8 +50,10 @@ describe('DefaultSecurityConfig', function (): void {
     it('parses comma-separated relaxed hosts', function (): void {
         $_ENV['SECURITY_HTTP_RELAXED'] = 'localhost, 127.0.0.1, dev.example.com';
 
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $securityConfig = new DefaultSecurityConfig($config);
+
+        $securityConfig->define($config);
         $config->audit();
 
         expect($securityConfig->getHttpRelaxedHosts())->toBe(['localhost', '127.0.0.1', 'dev.example.com']);
@@ -57,8 +62,10 @@ describe('DefaultSecurityConfig', function (): void {
     it('parses comma-separated CORS origins', function (): void {
         $_ENV['SECURITY_CORS_ORIGINS'] = 'https://app.example.com, https://admin.example.com';
 
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $securityConfig = new DefaultSecurityConfig($config);
+
+        $securityConfig->define($config);
         $config->audit();
 
         expect($securityConfig->getCorsAllowedOrigins())->toBe(['https://app.example.com', 'https://admin.example.com']);
@@ -67,8 +74,10 @@ describe('DefaultSecurityConfig', function (): void {
     it('reads token lifetime from env', function (): void {
         $_ENV['SECURITY_TOKEN_LIFETIME'] = '3600';
 
-        $config = new TestConfig();
+        $config = makeTestConfig();
         $securityConfig = new DefaultSecurityConfig($config);
+
+        $securityConfig->define($config);
         $config->audit();
 
         expect($securityConfig->getTokenLifetime())->toBe(3600);

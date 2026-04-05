@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace Directive\Service\Security\Antivirus;
 
-use Directive\Service\Configuration\AbstractConfiguration;
+use Directive\Service\Configuration\Configuration;
+use Directive\Service\Configuration\ConfigProviderInterface;
 
-final class DefaultAntivirusConfig implements AntivirusConfigInterface
+final class DefaultAntivirusConfig implements AntivirusConfigInterface, ConfigProviderInterface
 {
-    public function __construct(private AbstractConfiguration $config) {
-        $this->define();
-    }
+    public function __construct(private Configuration $config) {}
 
-    protected function define(): void
+    public function define(Configuration $config): void
     {
-        $this->config->optional('ANTIVIRUS_NAME', 'clamav', 'string');
-        $this->config->optional('ANTIVIRUS_HOST', '127.0.0.1', 'string');
-        $this->config->optional('ANTIVIRUS_PORT', 3310, 'int');
-        $this->config->optional('ANTIVIRUS_TIMEOUT', 5, 'int');
+        $config->optional('ANTIVIRUS_NAME', 'clamav', 'string');
+        $config->optional('ANTIVIRUS_HOST', '127.0.0.1', 'string');
+        $config->optional('ANTIVIRUS_PORT', 3310, 'int');
+        $config->optional('ANTIVIRUS_TIMEOUT', 5, 'int');
     }
 
     public function getName(): string
