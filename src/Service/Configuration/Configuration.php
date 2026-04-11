@@ -205,6 +205,28 @@ final class Configuration
         return $this->definitions;
     }
 
+    /**
+     * Inject a runtime value that is computed by the framework (not read from $_ENV).
+     *
+     * The key is declared as optional with an empty-string default and immediately
+     * marked as resolved from source 'runtime'. It will be skipped by audit().
+     * Calling get() on the key works like any other declared key.
+     *
+     * Use this for values such as BASE_PATH that are known at boot time but are
+     * not environment variables (so they cannot go through required()/optional()).
+     */
+    public function setRuntimeValue(string $key, mixed $value): void
+    {
+        $this->definitions[$key] = [
+            'type'     => 'string',
+            'required' => false,
+            'default'  => '',
+            'allowed'  => [],
+        ];
+        $this->resolved[$key] = $value;
+        $this->sources[$key]  = 'runtime';
+    }
+
     // ------------------------------------------------------------------
     // Internals
     // ------------------------------------------------------------------

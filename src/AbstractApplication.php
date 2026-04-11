@@ -12,11 +12,14 @@ use Directive\Http\Middleware\DefaultHttpConfig;
 use Directive\Http\Middleware\HttpConfigInterface;
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Directive\Service\AppIdentity\DefaultAppIdentityConfig;
+use Directive\Service\AppManagement\AppInfo;
+use Directive\Service\AppManagement\AppInfoInterface;
 use Directive\Service\Configuration\Configuration;
 use Directive\Service\Configuration\ConfigProviderInterface;
 use Directive\Service\Logging\DefaultLoggingConfig;
 use Directive\Service\Logging\LoggingConfigInterface;
 use Directive\Service\Logging\RuntimeLogger;
+use Directive\Service\Maintenance\DefaultMaintenanceConfig;
 use Directive\Service\Security\Antivirus\AntivirusConfigInterface;
 use Directive\Service\Security\Antivirus\DefaultAntivirusConfig;
 use Directive\Service\Security\DefaultSecurityConfig;
@@ -41,6 +44,9 @@ abstract class AbstractApplication implements ApplicationInterface
     /** @var array<string> Interface keys already registered by user via addDefinitions(). */
     private array $userDefinedKeys = [];
 
+    /** Set in buildServiceDefaults(), available to subclasses during registerServices(). */
+    protected AppIdentityConfigInterface $appIdentityConfig;
+
     public function __construct()
     {
         // RuntimeLogger is bootstrapped first — it catches any PHP error/exception
@@ -58,6 +64,10 @@ abstract class AbstractApplication implements ApplicationInterface
     final public function setConfig(string $configProviderClass): static
     {
         $config = new Configuration();
+
+        // BASE_PATH is injected as a runtime value — it is computed from the
+        // entry-point location, not read from $_ENV.
+        $config->setRuntimeValue('BASE_PATH', $this->resolveBasePath());
 
         // Inject compiled cache values before audit() so non-sensitive resolved
         // variables skip $_ENV lookup (sensitive vars are never in the cache).
@@ -195,13 +205,19 @@ abstract class AbstractApplication implements ApplicationInterface
      */
     private function buildServiceDefaults(Configuration $config): LoggingConfigInterface
     {
+        $appInfo = new AppInfo($this->loadAppInfo());
+
+        $this->appIdentityConfig = new DefaultAppIdentityConfig($appInfo, $config);
+
         /** @var array<class-string, object> $defaults */
         $defaults = [
-            LoggingConfigInterface::class     => new DefaultLoggingConfig($config),
-            AppIdentityConfigInterface::class => new DefaultAppIdentityConfig($config),
+            AppInfoInterface::class           => $appInfo,
+            AppIdentityConfigInterface::class => $this->appIdentityConfig,
+            LoggingConfigInterface::class     => new DefaultLoggingConfig($this->appIdentityConfig, $config),
             AntivirusConfigInterface::class   => new DefaultAntivirusConfig($config),
             SecurityConfigInterface::class    => new DefaultSecurityConfig($config),
             HttpConfigInterface::class        => new DefaultHttpConfig($config),
+            DefaultMaintenanceConfig::class   => new DefaultMaintenanceConfig($config),
         ];
 
         foreach ($defaults as $interface => $impl) {
@@ -280,5 +296,47 @@ abstract class AbstractApplication implements ApplicationInterface
         $cache = include $cacheFile;
 
         return $cache[$configProviderClass] ?? null;
+    }
+
+    /** @return array<string, mixed> */
+    private function loadAppInfo(): array
+    {
+        $file = $this->resolveBasePath() . '/var/appinfo.json';
+        if (!is_file($file)) {
+            return [];
+        }
+
+        $raw = file_get_contents($file);
+        if ($raw === false) {
+            return [];
+        }
+
+        $data = json_decode($raw, true);
+
+        return is_array($data) ? $data : [];
+    }
+
+    /**
+     * Derive the project root from the web entry-point script location.
+     *
+     * When served via a web entry point (public/index.php), PHP's CWD is
+     * typically the document root (public/), not the project root.
+     * We derive the project root from SCRIPT_FILENAME: "public/index.php"
+     * lives one level below the project root, so dirname(dirname(...)) gives
+     * the right anchor. Falls back to CWD for CLI contexts where the working
+     * directory is already the project root.
+     */
+    private function resolveBasePath(): string
+    {
+        $scriptFile = $_SERVER['SCRIPT_FILENAME'] ?? '';
+        if ($scriptFile !== '') {
+            $scriptDir   = dirname(realpath($scriptFile) ?: $scriptFile);
+            $projectRoot = dirname($scriptDir);
+            if (is_dir($projectRoot . '/var')) {
+                return $projectRoot;
+            }
+        }
+
+        return (string) getcwd();
     }
 }

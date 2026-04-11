@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Directive\Service\Logging\DefaultLoggingConfig;
 use Directive\Service\Logging\DirectiveLogger;
 use Directive\Service\Logging\RequestIdHolder;
 use Monolog\Handler\TestHandler;
@@ -15,10 +14,7 @@ use Nyholm\Psr7\ServerRequest;
  */
 function makeTestLogger(): array
 {
-    $config = makeTestConfig();
-    $loggingConfig = new DefaultLoggingConfig($config);
-    $loggingConfig->define($config);
-    $config->audit();
+    $loggingConfig = makeTestLoggingConfig();
 
     $logger = new DirectiveLogger($loggingConfig, new RequestIdHolder());
 

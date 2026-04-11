@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Directive;
 
 use Directive\Cli\DirectiveCommand;
+use Directive\Console\CiAppInfoCommand;
 use Directive\Console\ConfigAuditCommand;
 use Directive\Console\ConfigCheckCommand;
 use Directive\Console\ConfigCompileCommand;
@@ -98,7 +99,7 @@ abstract class AbstractConsoleApplication extends AbstractApplication
 
         // Build ConsoleLogger and register it for both its own interface
         // and WebLoggerInterface so middlewares relying on WebLoggerInterface work.
-        $loggingConfig = new DefaultLoggingConfig($config);
+        $loggingConfig = new DefaultLoggingConfig($this->appIdentityConfig, $config);
 
         $holder = new RequestIdHolder();
         $logFile = rtrim($loggingConfig->getLogPath(), '/') . '/console.log';
@@ -132,6 +133,7 @@ abstract class AbstractConsoleApplication extends AbstractApplication
         );
 
         // Always-present framework commands
+        $this->console->addCommand(new CiAppInfoCommand($this->getContainer()));
         $this->console->addCommand(new OpenApiCommand($this->getContainer()));
         $this->console->addCommand(new ConfigCheckCommand($this->getContainer()));
         $this->console->addCommand(new ConfigListCommand($this->getContainer()));

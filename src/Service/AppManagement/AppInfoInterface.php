@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Directive\Service\AppManagement;
 
-/**
- * Exposes metadata about the running application.
- * Concrete implementation lives in Epic 8.
- */
 interface AppInfoInterface
 {
-    public function getVersion(): string;
-
     public function getName(): string;
+    public function getVersion(): string;
+    public function getCommitId(): string;
+    public function getBranch(): string;
+    public function getTag(): string;
+    public function getBuildNumber(): string;
+    public function getBuiltAt(): string;
+    public function getBuiltBy(): string;
 }

@@ -15,14 +15,15 @@ use Nyholm\Psr7\Response;
 
 final class HMStubAppInfo implements AppInfoInterface
 {
-    public function getVersion(): string
-    {
-        return '1.2.3';
-    }
-    public function getName(): string
-    {
-        return 'test-app';
-    }
+    public function getName(): string        { return 'test-app'; }
+    public function getVersion(): string     { return '1.2.3'; }
+
+    public function getCommitId(): string    { return 'abc1234'; }
+    public function getBranch(): string      { return 'main'; }
+    public function getTag(): string         { return ''; }
+    public function getBuildNumber(): string { return '1'; }
+    public function getBuiltAt(): string     { return '2026-01-01T00:00:00+00:00'; }
+    public function getBuiltBy(): string     { return 'test'; }
 }
 
 final class HMStubMaintenanceOff implements MaintenanceManagerInterface

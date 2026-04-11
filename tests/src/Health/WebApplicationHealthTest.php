@@ -27,14 +27,14 @@ use Tests\Helpers\TestConfig;
 
 final class HRStubAppInfo implements AppInfoInterface
 {
-    public function getVersion(): string
-    {
-        return '0.0.0-test';
-    }
-    public function getName(): string
-    {
-        return 'test';
-    }
+    public function getName(): string        { return 'test'; }
+    public function getVersion(): string     { return '0.0.0-test'; }
+    public function getCommitId(): string    { return ''; }
+    public function getBranch(): string      { return ''; }
+    public function getTag(): string         { return ''; }
+    public function getBuildNumber(): string { return ''; }
+    public function getBuiltAt(): string     { return ''; }
+    public function getBuiltBy(): string     { return ''; }
 }
 
 final class HRStubHeaderManager implements HeaderManagerInterface

@@ -14,7 +14,20 @@ use Directive\Http\Middleware\LoggerMiddleware;
 use Directive\Http\Middleware\MaintenanceMiddleware;
 use Directive\Http\Middleware\RateLimitMiddleware;
 use Directive\Http\Middleware\RequestIdMiddleware;
+use Directive\Service\AppManagement\AppInfoService;
+use Directive\Service\AppManagement\ClientHeaders;
+use Directive\Service\AppManagement\ClientHeadersInterface;
 use Directive\Service\Configuration\Configuration;
+use Directive\Service\Maintenance\DefaultMaintenanceConfig;
+use Directive\Service\Maintenance\MaintenanceManager;
+use Directive\Service\Maintenance\MaintenanceManagerInterface;
+use Directive\Service\Security\Access\AccessManager;
+use Directive\Service\Security\AccessManagerInterface;
+use Directive\Service\Security\CookiesManager;
+use Directive\Service\Security\CookiesManagerInterface;
+use Directive\Service\Security\HeaderManager;
+use Directive\Service\Security\HeaderManagerInterface;
+use Directive\Service\Utils\Json;
 use Directive\Service\Configuration\AbstractFeatures;
 use Directive\Service\Configuration\DirectiveFeatures;
 use Directive\Service\Health\HealthCheckInterface;
@@ -28,8 +41,10 @@ use Directive\Service\RateLimit\RateLimiterInterface;
 use Directive\Service\RateLimit\RedisRateLimiter;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Slim\App;
 use Slim\Factory\AppFactory;
@@ -89,7 +104,7 @@ abstract class AbstractWebApplication extends AbstractApplication
     {
         parent::registerServices($config);
 
-        $loggingConfig = new DefaultLoggingConfig($config);
+        $loggingConfig = new DefaultLoggingConfig($this->appIdentityConfig, $config);
 
         $holder   = new RequestIdHolder();
         $logger   = new DirectiveLogger($loggingConfig, $holder);
@@ -97,13 +112,30 @@ abstract class AbstractWebApplication extends AbstractApplication
 
         $rateLimitConfig = new DefaultRateLimitConfig($config);
 
+        $psr17Factory = new Psr17Factory();
+
+        $maintenanceConfig = new DefaultMaintenanceConfig($config);
+
         $this->addDefinitions([
-            LoggerInterface::class          => $logger,
-            DirectiveLogger::class          => $logger,
-            RequestIdHolder::class          => $holder,
-            AbstractFeatures::class         => $features,
-            RateLimitConfigInterface::class => $rateLimitConfig,
-            RateLimiterInterface::class     => new RedisRateLimiter($rateLimitConfig),
+            LoggerInterface::class              => $logger,
+            DirectiveLogger::class              => $logger,
+            RequestIdHolder::class              => $holder,
+            AbstractFeatures::class             => $features,
+            RateLimitConfigInterface::class     => $rateLimitConfig,
+            RateLimiterInterface::class         => new RedisRateLimiter($rateLimitConfig),
+            Psr17Factory::class                 => $psr17Factory,
+            ResponseFactoryInterface::class     => $psr17Factory,
+            StreamFactoryInterface::class       => $psr17Factory,
+            HeaderManagerInterface::class       => \DI\autowire(HeaderManager::class),
+            CookiesManagerInterface::class      => \DI\autowire(CookiesManager::class),
+            AccessManagerInterface::class       => \DI\autowire(AccessManager::class),
+            ClientHeadersInterface::class       => \DI\autowire(ClientHeaders::class),
+            MaintenanceManagerInterface::class  => new MaintenanceManager(
+                secretKey: $maintenanceConfig->getSecretKey(),
+                filename:  $maintenanceConfig->getFilename(),
+                json:      new Json(),
+                logger:    $logger,
+            ),
         ]);
     }
 
@@ -131,7 +163,7 @@ abstract class AbstractWebApplication extends AbstractApplication
      * Register all framework routes.
      *
      * Route pattern: /{domain}/{version}/{service}/{resource}
-     * Built-in routes: POST /maintenance, GET /appinfo/{key},
+     * Built-in routes: POST /maintenance, GET /info, GET /info/details,
      *                  GET /health/live, GET /health/ready
      *
      * The actual dispatch logic lives in Rest\Router (Epic 3).
@@ -180,10 +212,17 @@ abstract class AbstractWebApplication extends AbstractApplication
             return $response;
         });
 
-        // -- Built-in: app info -------------------------------------------
-        $app->get('/appinfo/{key}', function ($request, $response) {
-            // Epic 8: delegate to AppManager::resolve()
-            return $response;
+        // -- Built-in: app info (public + details) -----------------------
+        $app->get('/info', function ($request, $response) use ($container) {
+            /** @var AppInfoService $appInfoService */
+            $appInfoService = $container->get(AppInfoService::class);
+            return $appInfoService->resolvePublic($response);
+        });
+
+        $app->get('/info/details', function ($request, $response) use ($container) {
+            /** @var AppInfoService $appInfoService */
+            $appInfoService = $container->get(AppInfoService::class);
+            return $appInfoService->resolveDetails($request, $response);
         });
 
         // -- Built-in: health probes (IETF + Kubernetes) ------------------

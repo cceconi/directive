@@ -159,7 +159,7 @@ describe('ConfigExportCommand --schema', function (): void {
 
         $command = new ConfigExportCommand(makeSchemaContainer(hasIdentity: true, version: '1.0.0'));
         $tester  = new CommandTester($command);
-        $tester->execute(['--schema' => true, '--version' => '9.9.9']);
+        $tester->execute(['--schema' => true, '--appVersion' => '9.9.9']);
 
         chdir((string) $cwd);
 

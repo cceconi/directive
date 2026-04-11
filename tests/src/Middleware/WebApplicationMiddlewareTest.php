@@ -6,7 +6,6 @@ use Directive\Http\Response\HttpResponse;
 use Directive\Service\AppManagement\AppInfoInterface;
 use Directive\Service\AppManagement\ClientHeadersInterface;
 use Directive\Service\Configuration\Configuration;
-use Directive\Service\Logging\DefaultLoggingConfig;
 use Directive\Service\Logging\DirectiveLogger;
 use Directive\Service\Logging\RequestIdHolder;
 use Directive\Service\Maintenance\MaintenanceManagerInterface;
@@ -31,14 +30,14 @@ use Tests\Helpers\TestConfig;
 
 final class StubAppInfo implements AppInfoInterface
 {
-    public function getVersion(): string
-    {
-        return '0.0.0-test';
-    }
-    public function getName(): string
-    {
-        return 'test';
-    }
+    public function getName(): string        { return 'test'; }
+    public function getVersion(): string     { return '0.0.0-test'; }
+    public function getCommitId(): string    { return ''; }
+    public function getBranch(): string      { return ''; }
+    public function getTag(): string         { return ''; }
+    public function getBuildNumber(): string { return ''; }
+    public function getBuiltAt(): string     { return ''; }
+    public function getBuiltBy(): string     { return ''; }
 }
 
 final class StubHeaderManager implements HeaderManagerInterface
@@ -197,7 +196,7 @@ final class DebugLoggingWebApplication extends AbstractWebApplication
 
         $this->testHandler = new TestHandler(Level::Debug, bubble: false);
 
-        $loggingConfig = new DefaultLoggingConfig($config);
+        $loggingConfig = makeTestLoggingConfig();
         $holder = new RequestIdHolder();
         $logger = new DirectiveLogger($loggingConfig, $holder);
         $logger->setHandlers([$this->testHandler]);

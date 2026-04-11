@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use DI\ContainerBuilder;
 use Directive\Http\Middleware\HttpDebugLoggingMiddleware;
-use Directive\Service\Logging\DefaultLoggingConfig;
 use Directive\Service\Logging\DirectiveLogger;
 use Directive\Service\Logging\RequestIdHolder;
 use Monolog\Handler\TestHandler;
@@ -21,10 +20,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 function makeDebugLogger(): array
 {
-    $config = makeTestConfig();
-    $loggingConfig = new DefaultLoggingConfig($config);
-    $loggingConfig->define($config);
-    $config->audit();
+    $loggingConfig = makeTestLoggingConfig();
 
     $logger      = new DirectiveLogger($loggingConfig, new RequestIdHolder());
     $testHandler = new TestHandler(Level::Debug, bubble: false);

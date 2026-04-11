@@ -4,32 +4,38 @@ declare(strict_types=1);
 
 namespace Directive\Service\AppIdentity;
 
+use Directive\Service\AppManagement\AppInfo;
 use Directive\Service\Configuration\Configuration;
 use Directive\Service\Configuration\ConfigProviderInterface;
 
 final class DefaultAppIdentityConfig implements AppIdentityConfigInterface, ConfigProviderInterface
 {
-    public function __construct(private Configuration $config) {}
+    public function __construct(
+        private readonly AppInfo $appInfo,
+        private readonly Configuration $config,
+    ) {}
 
     public function define(Configuration $config): void
     {
-        $config->optional('APP_CODE', 'app', 'string');
-        $config->optional('APP_NAME', 'Directive App', 'string');
-        $config->optional('APP_ENV', 'dev', 'string');
-        $config->optional('APP_ENV_PROD_NAME', 'prod', 'string');
-        $config->optional('APP_VERSION', '1.0.0', 'string');
+        $config->optional('APP_ENV', 'development', 'string');
+        $config->optional('APP_ENV_PROD_NAME', 'production', 'string');
         $config->optional('APP_DESCRIPTION', '', 'string');
         $config->optional('APP_URL', '', 'string');
+        $config->optional('MANAGEMENT_TOKEN', '', 'string');
     }
 
     public function getAppCode(): string
     {
-        return (string) $this->config->get('APP_CODE');
+        $name = $this->appInfo->getName();
+        if ($name === '') {
+            return '';
+        }
+        return trim((string) preg_replace('/[^a-z0-9]+/', '-', strtolower($name)), '-');
     }
 
     public function getAppName(): string
     {
-        return (string) $this->config->get('APP_NAME');
+        return $this->appInfo->getName();
     }
 
     public function getAppEnv(): string
@@ -39,7 +45,7 @@ final class DefaultAppIdentityConfig implements AppIdentityConfigInterface, Conf
 
     public function getAppVersion(): string
     {
-        return (string) $this->config->get('APP_VERSION');
+        return $this->appInfo->getVersion();
     }
 
     public function getAppDescription(): string

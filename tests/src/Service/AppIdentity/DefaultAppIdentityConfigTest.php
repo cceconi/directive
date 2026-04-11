@@ -4,59 +4,77 @@ declare(strict_types=1);
 
 use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Directive\Service\AppIdentity\DefaultAppIdentityConfig;
+use Directive\Service\AppManagement\AppInfo;
 
 describe('DefaultAppIdentityConfig', function (): void {
 
     beforeEach(function (): void {
-        unset(
-            $_ENV['APP_CODE'],
-            $_ENV['APP_NAME'],
-            $_ENV['APP_VERSION'],
-            $_ENV['APP_DESCRIPTION'],
-            $_ENV['APP_URL'],
-        );
+        unset($_ENV['APP_ENV'], $_ENV['APP_DESCRIPTION'], $_ENV['APP_URL']);
+    });
+
+    afterEach(function (): void {
+        unset($_ENV['APP_ENV'], $_ENV['APP_DESCRIPTION'], $_ENV['APP_URL']);
     });
 
     it('implements AppIdentityConfigInterface', function (): void {
         $config = makeTestConfig();
-        $appIdentityConfig = new DefaultAppIdentityConfig($config);
-
-        $appIdentityConfig->define($config);
+        $subject = new DefaultAppIdentityConfig(new AppInfo(['name' => 'my-app', 'version' => '1.0.0']), $config);
+        $subject->define($config);
         $config->audit();
-        expect($appIdentityConfig)->toBeInstanceOf(AppIdentityConfigInterface::class);
+        expect($subject)->toBeInstanceOf(AppIdentityConfigInterface::class);
     });
 
-    it('returns default values when no env vars are set', function (): void {
+    it('reads name and version from AppInfo', function (): void {
         $config = makeTestConfig();
-        $appIdentityConfig = new DefaultAppIdentityConfig($config);
-
-        $appIdentityConfig->define($config);
+        $subject = new DefaultAppIdentityConfig(new AppInfo(['name' => 'My App', 'version' => '2.5.1']), $config);
+        $subject->define($config);
         $config->audit();
 
-        expect($appIdentityConfig->getAppCode())->toBe('app');
-        expect($appIdentityConfig->getAppName())->toBe('Directive App');
-        expect($appIdentityConfig->getAppVersion())->toBe('1.0.0');
-        expect($appIdentityConfig->getAppDescription())->toBe('');
-        expect($appIdentityConfig->getAppUrl())->toBe('');
+        expect($subject->getAppName())->toBe('My App');
+        expect($subject->getAppVersion())->toBe('2.5.1');
     });
 
-    it('reads values from $_ENV', function (): void {
-        $_ENV['APP_CODE']        = 'myapp';
-        $_ENV['APP_NAME']        = 'My Application';
-        $_ENV['APP_VERSION']     = '2.5.1';
-        $_ENV['APP_DESCRIPTION'] = 'An amazing app';
-        $_ENV['APP_URL']         = 'https://example.com';
-
+    it('derives slug code from AppInfo name', function (): void {
         $config = makeTestConfig();
-        $appIdentityConfig = new DefaultAppIdentityConfig($config);
-
-        $appIdentityConfig->define($config);
+        $subject = new DefaultAppIdentityConfig(new AppInfo(['name' => 'My Test Project']), $config);
+        $subject->define($config);
         $config->audit();
 
-        expect($appIdentityConfig->getAppCode())->toBe('myapp');
-        expect($appIdentityConfig->getAppName())->toBe('My Application');
-        expect($appIdentityConfig->getAppVersion())->toBe('2.5.1');
-        expect($appIdentityConfig->getAppDescription())->toBe('An amazing app');
-        expect($appIdentityConfig->getAppUrl())->toBe('https://example.com');
+        expect($subject->getAppCode())->toBe('my-test-project');
+    });
+
+    it('returns empty string when AppInfo is empty', function (): void {
+        $config = makeTestConfig();
+        $subject = new DefaultAppIdentityConfig(new AppInfo([]), $config);
+        $subject->define($config);
+        $config->audit();
+
+        expect($subject->getAppName())->toBe('');
+        expect($subject->getAppVersion())->toBe('');
+        expect($subject->getAppCode())->toBe('');
+    });
+
+    it('reads env and description from configuration', function (): void {
+        $_ENV['APP_ENV']         = 'staging';
+        $_ENV['APP_DESCRIPTION'] = 'A staging app';
+        $_ENV['APP_URL']         = 'https://staging.example.com';
+
+        $config = makeTestConfig();
+        $subject = new DefaultAppIdentityConfig(new AppInfo(['name' => 'app']), $config);
+        $subject->define($config);
+        $config->audit();
+
+        expect($subject->getAppEnv())->toBe('staging');
+        expect($subject->getAppDescription())->toBe('A staging app');
+        expect($subject->getAppUrl())->toBe('https://staging.example.com');
+    });
+
+    it('collapses multiple separators into single dash in code', function (): void {
+        $config = makeTestConfig();
+        $subject = new DefaultAppIdentityConfig(new AppInfo(['name' => 'My -- Cool  App!']), $config);
+        $subject->define($config);
+        $config->audit();
+
+        expect($subject->getAppCode())->toBe('my-cool-app');
     });
 });

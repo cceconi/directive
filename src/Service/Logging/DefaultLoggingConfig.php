@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Directive\Service\Logging;
 
+use Directive\Service\AppIdentity\AppIdentityConfigInterface;
 use Directive\Service\Configuration\Configuration;
 use Directive\Service\Configuration\ConfigProviderInterface;
 
 final class DefaultLoggingConfig implements LoggingConfigInterface, ConfigProviderInterface
 {
-    public function __construct(private Configuration $config) {}
+    public function __construct(
+        private AppIdentityConfigInterface $appIdentity,
+        private Configuration $config,
+    ) {}
 
     public function define(Configuration $config): void
     {
@@ -25,17 +29,17 @@ final class DefaultLoggingConfig implements LoggingConfigInterface, ConfigProvid
 
     public function getAppCode(): string
     {
-        return (string) $this->config->get('APP_CODE');
+        return $this->appIdentity->getAppCode();
     }
 
     public function getAppEnv(): string
     {
-        return (string) $this->config->get('APP_ENV');
+        return $this->appIdentity->getAppEnv();
     }
 
     public function getAppVersion(): string
     {
-        return (string) $this->config->get('APP_VERSION');
+        return $this->appIdentity->getAppVersion();
     }
 
     public function getLogStrategy(): LogStrategy

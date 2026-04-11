@@ -30,7 +30,7 @@ final class RuntimeLogger
         $dir    = $logDir !== '' ? $logDir : sys_get_temp_dir();
         $logger = new Logger($name);
         $logger->pushHandler(new RotatingFileHandler($dir . '/directive_runtime.log', 30));
-        $logger->pushHandler(new StreamHandler(STDERR, Logger::WARNING));
+        $logger->pushHandler(new StreamHandler('php://stderr', Logger::WARNING));
 
         ErrorHandler::register($logger);
         Registry::addLogger($logger, self::REGISTRY_KEY);
